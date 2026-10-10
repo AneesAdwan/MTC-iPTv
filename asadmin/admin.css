@@ -666,3 +666,33 @@ tr.saved td{background:rgba(34,197,94,.07);transition:background .3s}
 .topbar:has(.tb-ver) .tb-search{margin-inline-start:0}
 @media (max-width:1000px){.tb-ver small{display:none}}
 @media (max-width:640px){.tb-ver span{display:none}.tb-ver{padding:0 10px;height:34px}.topbar{gap:10px}.topbar .tb-search{min-width:0}.tb-search input::placeholder{font-size:12.5px}}
+
+/* إعادة الترقيم */
+.nb-presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.nb-p{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:14px;background:var(--panel);border:1px solid var(--bd);text-align:start;transition:.15s}
+.nb-p:hover{border-color:var(--bd2);background:var(--panel2)}
+.nb-p.on{border-color:hsl(var(--h) 80% 60% / .65);background:linear-gradient(135deg,hsl(var(--h) 70% 50% / .14),transparent 70%)}
+.nb-pi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:hsl(var(--h) 70% 50% / .15);color:hsl(var(--h) 85% 70%)}
+.nb-p b{font-size:14.5px}
+.nb-p small{color:var(--mut);font-size:12px;line-height:1.6}
+.nb-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;align-items:start}
+.nb-keys{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:6px}
+.nb-keys li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--panel2);border:1px solid var(--bd)}
+.nb-keys li>div{flex:1;min-width:0}
+.nb-keys li b{display:block;font-size:14px}
+.nb-keys li small{display:block;color:var(--dim);font-size:11.5px}
+.nb-keys em{width:24px;height:24px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--grad);font:800 12px Inter,var(--font);font-style:normal;color:#fff}
+.nb-ki{color:var(--ac2);display:grid}
+.nb-keys [data-up] .ic{transform:rotate(90deg)}
+.nb-keys [data-down] .ic{transform:rotate(90deg)}
+.nb-opts{display:flex;flex-direction:column;gap:14px}
+.nb-opts .panel-h{margin-bottom:0}
+.nb-act{display:flex;gap:10px;flex-wrap:wrap}
+.nb-act .btn2{flex:1}
+.nb-new{font:800 16px Inter,var(--font);color:#fff}
+.nb-old{font:600 13px Inter,var(--font);color:var(--dim);text-decoration:line-through}
+.nb-gap td{padding:6px 14px!important;background:rgba(255,122,26,.06);color:#fdba74;font-size:12.5px;font-weight:700}
+.nb-gap .ic{width:14px;height:14px;vertical-align:-2px}
+.nb-more{padding:10px 16px}
+.tbl-top h3{display:flex;align-items:center;gap:8px;font-size:15px}
+@media (max-width:1000px){.nb-grid{grid-template-columns:1fr}}

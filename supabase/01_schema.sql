@@ -42,6 +42,9 @@ drop function if exists public.admin_restore_links(jsonb) cascade;
 drop function if exists public.dup_key(public.channels) cascade;
 drop function if exists public.admin_mark_distinct(uuid[]) cascade;
 drop function if exists public.admin_stream_action(text, uuid[]) cascade;
+drop function if exists public.admin_renumber_plan(text[], integer, integer, boolean) cascade;
+drop function if exists public.admin_renumber_preview(text[], integer, integer, boolean, integer) cascade;
+drop function if exists public.admin_renumber_apply(text[], integer, integer, boolean) cascade;
 
 
 -- ─── 1) المشرفون ────────────────────────────────────────────────────────────
@@ -399,7 +402,7 @@ begin
     when 'delete_dead_channels' then
       delete from channels c where not exists (select 1 from streams s where s.channel_id = c.id and s.is_active and s.status <> 'offline');
     when 'clear_broken_logos' then update channels set logo_url = null, logo_status = 'unknown' where logo_status = 'broken';
-    when 'reset_checks' then update streams set status = 'unknown', fail_count = 0, last_error = null, http_status = null, response_ms = null, last_checked_at = null;
+    when 'reset_checks' then update streams set status = 'unknown', fail_count = 0, last_error = null, http_status = null, response_ms = null, last_checked_at = null where true;
     when 'delete_hidden' then delete from channels where not is_published;
     when 'delete_pending' then delete from channels where hidden_reason = 'pending';
     when 'delete_manual' then delete from channels where is_manual;
@@ -494,21 +497,110 @@ begin
   return n;
 end $$;
 
--- إعادة ترقيم القنوات: العربية أولًا، ثم حسب الدولة والترتيب والاسم
-create function public.admin_renumber() returns integer
-language plpgsql security definer set search_path = public, pg_temp as $$
+-- ─── نظام إعادة الترقيم المرن ───────────────────────────────────────────────
+-- p_keys: أسس الترتيب بالأولوية، من القائمة المسموحة:
+--   arab (العربية أولًا) · country (ترتيب الدول) · country_name (اسم الدولة أبجديًا) · category (الفئة)
+--   language (اللغة) · featured (المميزة أولًا) · quality (الأعلى جودة أولًا) · online (الأكثر روابط تعمل)
+--   name / name_desc (الاسم) · newest / oldest (تاريخ الإضافة) · sort_order (ترتيب الظهور) · current (الرقم الحالي)
+-- p_start: أول رقم · p_block: إن كان > 0 تبدأ كل مجموعة (حسب أول أساس) من رقم مستدير (مضاعفات p_block)
+-- p_published_first: المنشورة أولًا ثم غير المنشورة (المعلّقة والمخفية) في آخر القائمة
+create function public.admin_renumber_plan(p_keys text[], p_start integer default 1, p_block integer default 0, p_published_first boolean default true)
+returns table (id uuid, new_number integer)
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare
+  k text; ord text[] := '{}'; grp text := null; sql text;
+  map constant jsonb := jsonb_build_object(
+    'arab',         jsonb_build_array('coalesce(co.is_arab, false) desc', 'coalesce(co.is_arab, false)::text'),
+    'country',      jsonb_build_array('co.sort_order nulls last, co.name_ar nulls last', 'coalesce(c.country_code, ''-'')'),
+    'country_name', jsonb_build_array('co.name_ar nulls last', 'coalesce(c.country_code, ''-'')'),
+    'category',     jsonb_build_array('cat.sort_order nulls last, cat.name_ar nulls last', 'coalesce(c.category_slug, ''-'')'),
+    'language',     jsonb_build_array('l.sort_order nulls last, l.name_ar nulls last', 'coalesce(c.language_code, ''-'')'),
+    'featured',     jsonb_build_array('c.is_featured desc', 'c.is_featured::text'),
+    'quality',      jsonb_build_array('case c.quality when ''4K'' then 4 when ''FHD'' then 3 when ''HD'' then 2 when ''SD'' then 1 else 0 end desc',
+                                      'coalesce(c.quality, ''-'')'),
+    'online',       jsonb_build_array('(select count(*) from streams s where s.channel_id = c.id and s.is_active and s.status = ''online'') desc', null),
+    'name',         jsonb_build_array('lower(c.name)', null),
+    'name_desc',    jsonb_build_array('lower(c.name) desc', null),
+    'newest',       jsonb_build_array('c.created_at desc', null),
+    'oldest',       jsonb_build_array('c.created_at', null),
+    'sort_order',   jsonb_build_array('c.sort_order', null),
+    'current',      jsonb_build_array('c.number nulls last', null));
+begin
+  if not is_mtc_admin() then raise exception 'forbidden'; end if;
+  if p_start is null or p_start < 1 then raise exception 'أول رقم يجب أن يكون 1 أو أكثر'; end if;
+  if p_published_first then ord := ord || 'c.is_published desc'::text; end if;
+  foreach k in array coalesce(p_keys, '{}') loop
+    if not map ? k then raise exception 'أساس ترتيب غير معروف: %', k; end if;
+    ord := ord || (map->k->>0);
+    if grp is null and p_block > 0 then grp := map->k->>1; end if;   -- المجموعة = أول أساس قابل للتجميع
+  end loop;
+  ord := ord || 'c.number nulls last'::text || 'c.id'::text;          -- ترتيب ثابت عند التساوي
+
+  sql := format($q$
+    with base as (
+      select c.id, %3$s as g, row_number() over (order by %1$s) as rn
+      from channels c
+      left join countries co on co.code = c.country_code
+      left join categories cat on cat.slug = c.category_slug
+      left join languages l on l.code = c.language_code
+    ), grp as (
+      select g, min(rn) as first_rn, count(*) as n, ceil(count(*)::numeric / %2$s)::int * %2$s as size from base group by g
+    ), starts as (
+      select g, first_rn, coalesce(sum(size) over (order by first_rn rows between unbounded preceding and 1 preceding), 0) as off from grp
+    )
+    select b.id, (%4$s + s.off + (row_number() over (partition by b.g order by b.rn)) - 1)::int
+    from base b join starts s on s.g = b.g
+  $q$, array_to_string(ord, ', '), greatest(p_block, 1),
+       case when grp is null then '''all''' else format('(c.is_published::text || ''|'' || %s)', grp) end,
+       p_start);
+  -- بدون مجموعات: ترقيم متتالٍ مباشر
+  if grp is null then
+    sql := format('select c.id, (%2$s + row_number() over (order by %1$s) - 1)::int from channels c
+      left join countries co on co.code = c.country_code left join categories cat on cat.slug = c.category_slug
+      left join languages l on l.code = c.language_code', array_to_string(ord, ', '), p_start);
+  end if;
+  return query execute sql;
+end $$;
+
+-- معاينة قبل التطبيق: أول p_limit قناة بأرقامها القديمة والجديدة + عدد ما سيتغير + بدايات المجموعات
+create function public.admin_renumber_preview(p_keys text[], p_start integer default 1, p_block integer default 0,
+                                              p_published_first boolean default true, p_limit integer default 60)
+returns jsonb language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare r jsonb;
+begin
+  if not is_mtc_admin() then raise exception 'forbidden'; end if;
+  with p as (select * from admin_renumber_plan(p_keys, p_start, p_block, p_published_first)),
+  j as (select p.new_number, c.number as old_number, c.name, c.logo_url, c.is_published, c.hidden_reason, c.quality,
+               co.name_ar as country, co.flag_url, cat.name_ar as category
+        from p join channels c on c.id = p.id
+        left join countries co on co.code = c.country_code left join categories cat on cat.slug = c.category_slug)
+  select jsonb_build_object(
+    'total',   (select count(*) from j),
+    'changed', (select count(*) from j where old_number is distinct from new_number),
+    'max',     (select max(new_number) from j),
+    'rows',    coalesce((select jsonb_agg(x order by x.new_number) from (select * from j order by new_number limit p_limit) x), '[]'))
+  into r;
+  return r;
+end $$;
+
+-- التطبيق: يمسح الأرقام ثم يكتب الجديدة دفعة واحدة (الأرقام فريدة)
+create function public.admin_renumber_apply(p_keys text[], p_start integer default 1, p_block integer default 0, p_published_first boolean default true)
+returns integer language plpgsql security definer set search_path = public, pg_temp as $$
 declare n int;
 begin
   if not is_mtc_admin() then raise exception 'forbidden'; end if;
-  update channels set number = null;
-  update channels c set number = r.rn
-  from (select c2.id, row_number() over (
-          order by coalesce(co.is_arab, false) desc, co.sort_order, co.name_ar, c2.sort_order, c2.is_featured desc, c2.name) as rn
-        from channels c2 left join countries co on co.code = c2.country_code) r
-  where c.id = r.id;
+  create temp table _plan on commit drop as select * from admin_renumber_plan(p_keys, p_start, p_block, p_published_first);
+  update channels set number = null where number is not null;
+  update channels c set number = p.new_number from _plan p where c.id = p.id;
   get diagnostics n = row_count;
   return n;
 end $$;
+
+-- إعادة الترقيم الافتراضية (زر سريع): العربية أولًا ← ترتيب الدول ← ترتيب الظهور ← المميزة ← الاسم
+create function public.admin_renumber() returns integer
+language sql security definer set search_path = public, pg_temp as $$
+  select public.admin_renumber_apply(array['arab', 'country', 'sort_order', 'featured', 'name'], 1, 0, true)
+$$;
 
 -- قرارات المراجعة: approve نشر · reject حذف نهائي · merge دمج المكررة في أصلها (روابطها تصبح سيرفرات إضافية)
 create function public.admin_review_apply(p_action text, p_ids uuid[]) returns integer
@@ -698,7 +790,9 @@ grant execute on function public.is_mtc_admin(), public.admin_stats(), public.ad
   public.admin_merge(uuid, uuid[]), public.admin_hide_duplicates(uuid, uuid[]), public.admin_renumber(),
   public.admin_review_apply(text, uuid[]), public.admin_create_channel(jsonb, text), public.admin_restore_reset(boolean),
   public.admin_restore_rows(text, jsonb), public.admin_restore_links(jsonb),
-  public.admin_mark_distinct(uuid[]), public.admin_stream_action(text, uuid[]) to authenticated;
+  public.admin_mark_distinct(uuid[]), public.admin_stream_action(text, uuid[]),
+  public.admin_renumber_plan(text[], integer, integer, boolean), public.admin_renumber_preview(text[], integer, integer, boolean, integer),
+  public.admin_renumber_apply(text[], integer, integer, boolean) to authenticated;
 grant execute on function public.norm_name(text), public.server_of(text), public.touch_updated_at() to anon, authenticated;
 grant execute on function public.dup_key(public.channels) to authenticated;
 

@@ -526,18 +526,15 @@ function footerCredit() {
   const box = $('#ft-dev');
   if (!d.name_ar && !d.name_en && !links.length) { box.hidden = true; $('#ft-social').hidden = true; return; }
   const initials = (d.name_en || d.name_ar || '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => [...w][0]).join('').toUpperCase();
-  const date = new Intl.DateTimeFormat('ar-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(RELEASE_DATE));
-  box.innerHTML = `<div class="fd-who">
-      <span class="fd-av" aria-hidden="true"><b dir="ltr">${esc(initials)}</b></span>
-      <div class="fd-txt"><small>برمجة وتطوير</small>${d.name_ar ? `<b>${esc(d.name_ar)}</b>` : ''}${d.name_en ? `<span dir="ltr">Developed by <i>${esc(d.name_en)}</i></span>` : ''}</div>
-    </div>
-    <div class="fd-ver"><i class="dot"></i><div><small>الإصدار الحالي</small><b dir="ltr">v${VERSION}</b></div><span>${date}</span></div>`;
+  box.innerHTML = `<span class="fd-av" aria-hidden="true"><b dir="ltr">${esc(initials)}</b></span>
+    <div class="fd-txt">${d.name_ar ? `<p>برمجة وتطوير: <b>${esc(d.name_ar)}</b></p>` : '<p>برمجة وتطوير</p>'}${d.name_en ? `<span dir="ltr">Developed by <i>${esc(d.name_en)}</i></span>` : ''}</div>`;
   box.hidden = false;
   // حسابات المطوّر تحت بطاقة الشركة الأم
   const soc = $('#ft-social');
-  soc.innerHTML = links.length ? `<small>تواصل مع المطوّر</small><div>${links.map(s => `<a href="${esc(s.href)}" target="_blank" rel="noopener me" title="${esc(s.ar)}" aria-label="${esc(s.en)}" style="--c:${s.color}">${socialIcon(s, 17)}</a>`).join('')}</div>` : '';
+  soc.innerHTML = links.length ? `<small>تابع المطوّر</small><div>${links.map(s => `<a href="${esc(s.href)}" target="_blank" rel="noopener me" title="${esc(s.ar)}" aria-label="${esc(s.en)}" style="--c:${s.color}">${socialIcon(s, 17)}</a>`).join('')}</div>` : '';
   soc.hidden = !links.length;
 }
+$('#ft-ver').innerHTML = `<i class="dot"></i>الإصدار <b dir="ltr">v${VERSION}</b><small>${new Intl.DateTimeFormat('ar-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(RELEASE_DATE))}</small>`;
 footerCredit(); // يظهر فورًا بالقيم الافتراضية، ثم يُحدَّث بعد تحميل الإعدادات
 /** أرقام التذييل تعدّ تصاعديًا عند ظهورها */
 function footerStats() {

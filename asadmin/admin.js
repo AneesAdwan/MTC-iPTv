@@ -42,6 +42,7 @@ const TABS = [
   { k: 'reports', i: 'flag', t: 'بلاغات المشاهدين', badge: 'reports', warn: true },
   { k: 'sources', i: 'link', t: 'مصادر البث', badge: 'sources', sec: 'المحتوى' },
   { k: 'sections', i: 'grid', t: 'التقسيمات' },
+  { k: 'numbering', i: 'sort', t: 'إعادة الترقيم' },
   { k: 'settings', i: 'edit', t: 'الإعدادات العامة', sec: 'النظام' },
   { k: 'maintenance', i: 'settings', t: 'النسخ الاحتياطي والصيانة' }
 ];
@@ -272,7 +273,7 @@ function go(tab) {
   document.title = `${t.t} — لوحة تحكم MTC-iPTv`;
   const c = document.getElementById('content');
   c.innerHTML = '<div class="loading2"><i class="spin"></i><span>جارٍ التحميل…</span></div>';
-  ({ overview, review, channels, health, duplicates, reports, sources, sections, settings, maintenance })[t.k](c).catch(e => {
+  ({ overview, review, channels, health, duplicates, reports, sources, sections, numbering, settings, maintenance })[t.k](c).catch(e => {
     const old = /admin_stats|does not exist|schema cache|function/i.test(e.message);
     c.innerHTML = `<div class="alert2 ${old ? 'warn' : 'bad'}">${ic('alert')}<div><b>${old ? 'قاعدة البيانات تحتاج تحديثًا' : 'تعذّر تحميل الصفحة'}</b><p>${old ? 'شغّل أحدث نسخة من supabase/01_schema.sql ثم supabase/02_data.sql في Supabase ← SQL Editor.' : ''} ${esc(e.message)}</p></div></div>`;
     if (/الجلسة/.test(e.message)) renderLogin();
@@ -421,10 +422,7 @@ async function channels(c) {
   c.querySelectorAll('[data-page]').forEach(b => b.onclick = () => { S.page = +b.dataset.page; reload(); });
   c.querySelector('#add').onclick = () => editChannel(null);
   c.querySelector('[data-go]')?.addEventListener('click', () => go('sources'));
-  c.querySelector('#renumber').onclick = async e => {
-    if (!await modal({ title: 'إعادة ترقيم القنوات', icon: 'sort', ok: 'إعادة الترقيم', body: '<p>سيُعاد ترقيم كل القنوات من 1: القنوات العربية أولًا ثم حسب الدولة والترتيب والاسم. أرقام القنوات الحالية ستتغيّر.</p>' })) return;
-    busy(e.currentTarget, async () => { const n = await rpc('admin_renumber'); toast(`تم ترقيم ${num(n)} قناة`, 'success'); reload(); });
-  };
+  c.querySelector('#renumber').onclick = () => go('numbering');
 
   const bar = c.querySelector('#bulkbar');
   const updSel = () => { bar.hidden = !S.selected.size; c.querySelector('#selc').textContent = `${num(S.selected.size)} محددة`; };
@@ -1386,6 +1384,117 @@ function bindBackup(c) {
       S.sources = []; RV.bucket = 'unchecked'; RV.autoCheck = true; go('review');
     } catch (err) { await P.finish(`فشلت الاستعادة: ${err.message}`, false); go('maintenance'); }
   };
+}
+
+/* ═══════════════════ إعادة الترقيم ═══════════════════
+   يختار المدير أسس الترتيب بالأولوية (أو قالبًا جاهزًا)، يعاين النتيجة، ثم يطبّقها.
+   الحساب كله في قاعدة البيانات (admin_renumber_preview / admin_renumber_apply). */
+const NKEYS = {
+  arab: { t: 'الدول العربية أولًا', i: 'globe', g: true },
+  country: { t: 'ترتيب الدول', i: 'flag', g: true, d: 'حسب ترتيب الدول في التقسيمات' },
+  country_name: { t: 'اسم الدولة (أبجديًا)', i: 'flag', g: true },
+  category: { t: 'الفئة', i: 'grid', g: true, d: 'حسب ترتيب الفئات في التقسيمات' },
+  language: { t: 'اللغة', i: 'lang', g: true },
+  featured: { t: 'المميزة أولًا', i: 'star', g: true },
+  quality: { t: 'الأعلى جودة أولًا', i: 'tv', g: true, d: '4K ثم FHD ثم HD ثم SD' },
+  online: { t: 'الأكثر روابط تعمل', i: 'zap' },
+  sort_order: { t: 'ترتيب الظهور', i: 'sort', d: 'الحقل «ترتيب الظهور» في كل قناة' },
+  name: { t: 'الاسم (أ ← ي)', i: 'sort' },
+  name_desc: { t: 'الاسم (ي ← أ)', i: 'sort' },
+  newest: { t: 'الأحدث إضافة أولًا', i: 'history' },
+  oldest: { t: 'الأقدم إضافة أولًا', i: 'history' },
+  current: { t: 'الرقم الحالي', i: 'list', d: 'يحافظ على الترتيب الحالي قدر الإمكان' }
+};
+const NPRESETS = [
+  { k: 'tv', t: 'تلفاز عربي', d: 'العربية أولًا، ثم الدول بترتيبها، والمميزة في مقدمة كل دولة', i: 'tv', h: 350, keys: ['arab', 'country', 'sort_order', 'featured', 'name'], block: 0 },
+  { k: 'countries', t: 'لكل دولة ألف', d: 'كل دولة تبدأ من رقم مستدير: 1، 1001، 2001…', i: 'flag', h: 200, keys: ['arab', 'country', 'featured', 'name'], block: 1000 },
+  { k: 'categories', t: 'حسب الفئات', d: 'الأخبار ثم الرياضة ثم الأفلام… كل فئة تبدأ من مئة جديدة', i: 'grid', h: 280, keys: ['category', 'arab', 'country', 'name'], block: 100 },
+  { k: 'languages', t: 'حسب اللغة', d: 'العربية ثم الإنجليزية ثم الفرنسية… كل لغة من مئة جديدة', i: 'lang', h: 170, keys: ['language', 'arab', 'country', 'name'], block: 100 },
+  { k: 'quality', t: 'الأفضل أولًا', d: 'الأعلى جودة والأكثر روابط تعمل في البداية', i: 'star', h: 45, keys: ['quality', 'online', 'arab', 'name'], block: 0 },
+  { k: 'abc', t: 'أبجدي', d: 'كل القنوات حسب الاسم من الألف إلى الياء', i: 'sort', h: 220, keys: ['name'], block: 0 },
+  { k: 'newest', t: 'الأحدث أولًا', d: 'القنوات المضافة حديثًا تأخذ الأرقام الأولى', i: 'history', h: 120, keys: ['newest', 'name'], block: 0 }
+];
+const NUM = { keys: [...NPRESETS[0].keys], start: 1, block: 0, pub: true, preset: 'tv', preview: null, loaded: false };
+
+async function numbering(c) {
+  if (!NUM.loaded) { // آخر إعداد طُبّق يُحفظ في إعدادات الموقع
+    const saved = await getSetting('numbering').catch(() => null);
+    if (saved?.keys?.length) Object.assign(NUM, { keys: saved.keys.filter(k => NKEYS[k]), start: saved.start || 1, block: saved.block || 0, pub: saved.pub !== false, preset: saved.preset || '' });
+    NUM.loaded = true;
+  }
+  const st = await refreshStats();
+  const draw = () => {
+    const free = Object.keys(NKEYS).filter(k => !NUM.keys.includes(k));
+    const P = NUM.preview;
+    c.innerHTML = pageHead('إعادة الترقيم', 'رقم القناة مثل رقمها في التلفاز: يكتبه المشاهد للانتقال إليها مباشرة. اختر قالبًا جاهزًا أو ركّب أسس الترتيب بنفسك، عاين النتيجة، ثم طبّقها.')
+      + `<section class="nb-presets">${NPRESETS.map(p => `<button class="nb-p ${NUM.preset === p.k ? 'on' : ''}" data-p="${p.k}" style="--h:${p.h}"><span class="nb-pi">${ic(p.i)}</span><b>${p.t}</b><small>${p.d}</small></button>`).join('')}</section>
+      <section class="nb-grid">
+        <div class="panel">
+          <div class="panel-h"><h3>${ic('sort')} أسس الترتيب</h3><small>بالأولوية: الأول يحسم أولًا، والتالي عند التساوي</small></div>
+          <ol class="nb-keys">${NUM.keys.map((k, i) => `<li><em>${i + 1}</em><span class="nb-ki">${ic(NKEYS[k].i)}</span><div><b>${NKEYS[k].t}</b>${NKEYS[k].d ? `<small>${NKEYS[k].d}</small>` : ''}</div>
+            ${i === 0 && NUM.block && NKEYS[k].g ? '<span class="tag-s">يقسّم إلى مجموعات</span>' : ''}
+            <button class="icon2 xs" data-up="${i}" ${i ? '' : 'disabled'} title="أعلى">${ic('back')}</button><button class="icon2 xs" data-down="${i}" ${i < NUM.keys.length - 1 ? '' : 'disabled'} title="أسفل">${ic('next')}</button><button class="icon2 xs bad" data-rm="${i}" title="إزالة">${ic('x')}</button></li>`).join('')
+            || '<li class="muted">لم تختر أي أساس — ستُرقَّم القنوات حسب أرقامها الحالية.</li>'}</ol>
+          ${free.length ? `<div class="sel2">${ic('plus')}<select id="nb-add"><option value="">+ إضافة أساس ترتيب…</option>${free.map(k => `<option value="${k}">${NKEYS[k].t}</option>`).join('')}</select></div>` : ''}
+        </div>
+        <div class="panel nb-opts">
+          <div class="panel-h"><h3>${ic('settings')} الخيارات</h3></div>
+          <label class="fld"><span>أول رقم</span><input type="number" id="nb-start" min="1" value="${NUM.start}"></label>
+          <label class="fld"><span>بداية كل مجموعة</span><select id="nb-block">${[[0, 'متتالي بدون فجوات'], [10, 'من عشرة جديدة'], [100, 'من مئة جديدة'], [500, 'من خمسمئة جديدة'], [1000, 'من ألف جديدة']].map(([v, t]) => `<option value="${v}" ${NUM.block === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+            <small class="muted">المجموعة = أول أساس قابل للتقسيم (دولة، فئة، لغة…). مثال «من مئة»: الأخبار 1–99، الرياضة 101–…</small></label>
+          <label class="row-sw"><div><b>المنشورة أولًا</b><small>القنوات المخفية والمعلّقة تأخذ الأرقام الأخيرة</small></div>${sw(NUM.pub, 'id="nb-pub"')}</label>
+          <div class="nb-act"><button class="btn2 ghost" id="nb-prev">${ic('eye')} معاينة</button><button class="btn2 primary" id="nb-apply">${ic('check')} تطبيق الترقيم</button></div>
+          <p class="muted sm">${ic('info')} ${num(st.channels)} قناة ستُعاد أرقامها. المشاهدون الذين حفظوا أرقامًا قديمة سيجدون القنوات بأرقام جديدة.</p>
+        </div>
+      </section>
+      <section class="panel tbl-panel" id="nb-out">${P ? `
+        <div class="tbl-top"><h3>${ic('eye')} معاينة النتيجة</h3><span class="sp"></span>
+          <span class="chip2 off"><i></i>${num(P.total)} قناة</span><span class="chip2 ${P.changed ? 'warn' : 'ok'}"><i></i>${num(P.changed)} رقم سيتغيّر</span><span class="chip2 off"><i></i>آخر رقم ${num(P.max)}</span></div>
+        <div class="tbl-scroll"><table class="tbl2 nb-tbl"><thead><tr><th>الرقم الجديد</th><th>الحالي</th><th>القناة</th><th>الدولة</th><th>الفئة</th><th>الحالة</th></tr></thead>
+        <tbody>${P.rows.map((r, i) => { const prev = P.rows[i - 1]; const gap = prev && r.new_number - prev.new_number > 1;
+          return `${gap ? `<tr class="nb-gap"><td colspan="6">${ic('dots')} مجموعة جديدة تبدأ من ${num(r.new_number)}</td></tr>` : ''}<tr>
+          <td><b class="nb-new">${r.new_number}</b></td>
+          <td>${r.old_number === r.new_number ? '<span class="muted">بدون تغيير</span>' : `<span class="nb-old">${r.old_number ?? '—'}</span>`}</td>
+          <td><div class="ch2 sm">${thumb({ name: r.name, logo_url: r.logo_url, quality: r.quality })}<div><b>${esc(r.name)}</b></div></div></td>
+          <td><div class="cl">${flag(r.flag_url)}<span>${esc(r.country || '—')}</span></div></td>
+          <td>${esc(r.category || '—')}</td>
+          <td>${r.is_published ? chip('ok', 'منشورة') : r.hidden_reason === 'pending' ? chip('warn', 'معلّقة') : chip('off', 'مخفية')}</td></tr>`; }).join('')}</tbody></table></div>
+        <p class="muted sm nb-more">تُعرض أول ${num(P.rows.length)} قناة فقط.</p>`
+        : empty('eye', 'اضغط «معاينة» لرؤية النتيجة', 'لن يتغيّر أي رقم حتى تضغط «تطبيق الترقيم».')}</section>`;
+    bind();
+  };
+  const changed = () => { NUM.preset = ''; NUM.preview = null; draw(); };
+  const params = () => ({ p_keys: NUM.keys, p_start: Math.max(1, +NUM.start || 1), p_block: +NUM.block || 0, p_published_first: NUM.pub });
+  const bind = () => {
+    c.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { const p = NPRESETS.find(x => x.k === b.dataset.p); Object.assign(NUM, { keys: [...p.keys], block: p.block, preset: p.k, preview: null }); draw(); });
+    c.querySelectorAll('[data-up]').forEach(b => b.onclick = () => { const i = +b.dataset.up; [NUM.keys[i - 1], NUM.keys[i]] = [NUM.keys[i], NUM.keys[i - 1]]; changed(); });
+    c.querySelectorAll('[data-down]').forEach(b => b.onclick = () => { const i = +b.dataset.down; [NUM.keys[i + 1], NUM.keys[i]] = [NUM.keys[i], NUM.keys[i + 1]]; changed(); });
+    c.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { NUM.keys.splice(+b.dataset.rm, 1); changed(); });
+    c.querySelector('#nb-add')?.addEventListener('change', e => { if (e.target.value) { NUM.keys.push(e.target.value); changed(); } });
+    c.querySelector('#nb-start').onchange = e => { NUM.start = Math.max(1, +e.target.value || 1); NUM.preview = null; draw(); };
+    c.querySelector('#nb-block').onchange = e => { NUM.block = +e.target.value; NUM.preset = ''; NUM.preview = null; draw(); };
+    c.querySelector('#nb-pub').onchange = e => { NUM.pub = e.target.checked; NUM.preview = null; draw(); };
+    c.querySelector('#nb-prev').onclick = e => busy(e.currentTarget, async () => {
+      NUM.preview = await rpc('admin_renumber_preview', { ...params(), p_limit: 80 });
+      draw(); c.querySelector('#nb-out').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    c.querySelector('#nb-apply').onclick = async e => {
+      const btn = e.currentTarget;
+      const P = NUM.preview || await busy(btn, () => rpc('admin_renumber_preview', { ...params(), p_limit: 1 }));
+      if (!P) return;
+      if (!await modal({ title: 'تطبيق الترقيم الجديد', icon: 'sort', ok: 'تطبيق', confirmWord: P.changed > 100 ? 'ترقيم' : '',
+        body: `<p>سيتغيّر رقم <b>${num(P.changed)}</b> قناة من أصل ${num(P.total)}، وآخر رقم سيصبح <b>${num(P.max)}</b>.</p>
+          <p class="muted sm">الأسس: ${NUM.keys.map(k => NKEYS[k].t).join(' ← ') || 'الرقم الحالي'}${NUM.block ? ` · كل مجموعة من ${num(NUM.block)} جديدة` : ''}${NUM.pub ? ' · المنشورة أولًا' : ''}</p>` })) return;
+      await busy(btn, async () => {
+        const n = await rpc('admin_renumber_apply', params());
+        await saveSetting('numbering', { keys: NUM.keys, start: NUM.start, block: NUM.block, pub: NUM.pub, preset: NUM.preset }, false).catch(() => {});
+        toast(`تم ترقيم ${num(n)} قناة`, 'success');
+        NUM.preview = await rpc('admin_renumber_preview', { ...params(), p_limit: 80 });
+        draw();
+      });
+    };
+  };
+  draw();
 }
 
 /* ═══════════════════ بلاغات المشاهدين ═══════════════════ */
