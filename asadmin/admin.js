@@ -17,7 +17,11 @@ const num = n => (n ?? 0).toLocaleString('en-US');
 const date = d => d ? new Date(d).toLocaleString('ar', { dateStyle: 'medium', timeStyle: 'short' }) : '—';
 const ago = d => { if (!d) return 'لم يُفحص'; const m = Math.round((Date.now() - new Date(d)) / 60000); return m < 60 ? `قبل ${m} د` : m < 1440 ? `قبل ${Math.round(m / 60)} س` : `قبل ${Math.round(m / 1440)} يوم`; };
 const flag = url => url ? `<img class="flag" src="${esc(url)}" alt="">` : '';
-const rpc = (fn, body = {}) => rest(`rpc/${fn}`, { method: 'POST', auth: true, body }).then(r => r.data);
+// دالة غير موجودة في قاعدة البيانات = لم يُشغَّل آخر تحديث لها: رسالة واضحة بدل رسالة PostgREST
+const rpc = (fn, body = {}) => rest(`rpc/${fn}`, { method: 'POST', auth: true, body }).then(r => r.data).catch(e => {
+  if (/schema cache|Could not find the function/i.test(e.message)) throw new Error(`قاعدة البيانات تحتاج تحديثًا (الدالة ${fn} غير موجودة): شغّل ملف supabase/03_update.sql في Supabase ← SQL Editor ثم أعد المحاولة.`);
+  throw e;
+});
 const chunk = (a, n) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
 
 const SUGGESTED = [

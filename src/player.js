@@ -78,10 +78,11 @@ export function createPlayer(host, opts = {}) {
     <div class="yt-top" dir="rtl"><div class="yt-tlogo"></div><div class="yt-ttext"><b></b><small></small></div></div>
     <div class="yt-bezel"></div>
     <div class="yt-osd"></div>
+    ${opts.watermark ? `<img class="yt-wm" src="${opts.watermark}" alt="" aria-hidden="true" draggable="false">` : ''}
+    <div class="yt-lt" dir="rtl" aria-live="polite"></div>
     <div class="yt-pill"></div>
     <div class="yt-spin" hidden><i></i></div>
     <button class="yt-big" aria-label="تشغيل">${pi('play')}</button>
-    <button class="yt-unmute" hidden dir="rtl">${pi('mute')}<span>اضغط لتشغيل الصوت</span></button>
     <div class="yt-ripple l"><span>${pi('rew')}<b>10 ثوانٍ</b></span></div><div class="yt-ripple r"><span>${pi('fwd')}<b>10 ثوانٍ</b></span></div>
     <div class="yt-err" hidden dir="rtl"><div class="yt-err-in">${pi('alert')}<h4></h4><p></p>
       <div class="yt-err-act"><button data-e="retry">${pi('replay')} إعادة المحاولة</button><button data-e="server">${pi('server')} سيرفر آخر</button><button data-e="next">${pi('next')} القناة التالية</button><button data-e="report">${pi('flag')} إبلاغ</button></div></div></div>
@@ -127,6 +128,9 @@ export function createPlayer(host, opts = {}) {
 
   /* ───── أدوات عامة ───── */
   const setBtn = (a, icon, title) => { const b = $(`[data-a=${a}]`); b.innerHTML = pi(icon) + (a === 'settings' ? '<em></em>' : ''); if (title) b.title = title; };
+  // شريط القناة السفلي بأسلوب التلفاز: يصعد من أسفل الفيديو بعرضه ثم يختفي
+  let ltT = 0;
+  const banner = (html, ms = 6000) => { const b = $('.yt-lt'); b.innerHTML = html; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); b.style.setProperty('--lt-ms', `${ms}ms`); clearTimeout(ltT); ltT = setTimeout(() => b.classList.remove('on'), ms); };
   const osd = (html, ms = 1400) => { const o = $('.yt-osd'); o.innerHTML = html; o.classList.add('on'); clearTimeout(osdT); osdT = setTimeout(() => o.classList.remove('on'), ms); };
   const pill = text => { const p = $('.yt-pill'); p.textContent = text; p.classList.add('on'); clearTimeout(pillT); pillT = setTimeout(() => p.classList.remove('on'), 900); };
   const bezel = icon => { const b = $('.yt-bezel'); b.innerHTML = pi(icon); b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); clearTimeout(bezelT); bezelT = setTimeout(() => b.classList.remove('on'), 600); };
@@ -144,7 +148,13 @@ export function createPlayer(host, opts = {}) {
   const atLive = () => behind() < 12;
 
   /* ───── التشغيل ───── */
-  const play = () => v.play().catch(() => { v.muted = true; mutedByAutoplay = true; $('.yt-unmute').hidden = false; v.play().catch(() => {}); });
+  // البث يبدأ بالصوت دائمًا. إن منع المتصفح التشغيل بالصوت (فتح الرابط مباشرة بلا أي نقرة)
+  // يبدأ صامتًا مؤقتًا، ويعود الصوت تلقائيًا مع أول لمسة أو نقرة أو ضغطة زر في الصفحة — بلا أي زر إضافي.
+  const unlock = () => { ['pointerdown', 'keydown', 'touchstart'].forEach(t => document.removeEventListener(t, unlock, true)); if (mutedByAutoplay && !destroyed) { mutedByAutoplay = false; v.muted = false; if (v.paused) v.play().catch(() => {}); syncUi(); } };
+  const play = () => v.play().catch(() => {
+    v.muted = true; mutedByAutoplay = true; v.play().catch(() => {});
+    ['pointerdown', 'keydown', 'touchstart'].forEach(t => document.addEventListener(t, unlock, true));
+  });
   const toggle = () => { if (v.paused) { play(); bezel('play'); } else { v.pause(); bezel('pause'); } };
   const goLive = () => { const e = liveEdge(); if (e) v.currentTime = e; v.playbackRate = 1; play(); };
   const seekBy = s => { if (!dvr()) return; const [a] = range(); v.currentTime = Math.min(liveEdge(), Math.max(a, v.currentTime + s)); pill(`${s > 0 ? '+' : '−'}${Math.abs(s)} ث`); };
@@ -152,7 +162,7 @@ export function createPlayer(host, opts = {}) {
     v.volume = Math.min(1, Math.max(0, val)); v.muted = v.volume === 0;
     if (show) pill(`${Math.round(v.volume * 100)}%`);
   };
-  const toggleMute = () => { v.muted = !v.muted; if (!v.muted && v.volume === 0) v.volume = .5; mutedByAutoplay = false; $('.yt-unmute').hidden = true; bezel(v.muted ? 'mute' : 'vol'); };
+  const toggleMute = () => { v.muted = !v.muted; if (!v.muted && v.volume === 0) v.volume = .5; mutedByAutoplay = false; bezel(v.muted ? 'mute' : 'vol'); };
   const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
   const toggleFs = () => fsEl() ? (document.exitFullscreen || document.webkitExitFullscreen).call(document) : (root.requestFullscreen?.() || root.webkitRequestFullscreen?.() || v.webkitEnterFullscreen?.());
   const togglePip = () => document.pictureInPictureElement ? document.exitPictureInPicture() : v.requestPictureInPicture?.().catch(() => {});
@@ -465,7 +475,6 @@ export function createPlayer(host, opts = {}) {
     if (er === 'server') { failed.clear(); return start((si + 1) % item.streams.length); }
     if (er === 'next') return opts.onNext?.();
     if (er === 'report') return opts.onReport?.(item?.streams[si]);
-    if (e.target.closest('.yt-unmute')) { toggleMute(); return; }
     if (e.target.closest('.yt-menu, .yt-bottom, .yt-stats, .yt-help, .yt-err, .yt-chl')) return;
     if (!menu.hidden) { closeMenu(); return; }
     if (e.pointerType === 'touch') return; // اللمس يُعالج في touchend
@@ -478,13 +487,13 @@ export function createPlayer(host, opts = {}) {
   });
   root.addEventListener('mousemove', wake);
   root.addEventListener('mouseleave', () => { if (!v.paused) root.classList.remove('show'); });
-  volIn.addEventListener('input', () => { v.muted = false; mutedByAutoplay = false; $('.yt-unmute').hidden = true; setVolume(+volIn.value, false); });
+  volIn.addEventListener('input', () => { v.muted = false; mutedByAutoplay = false; setVolume(+volIn.value, false); });
 
   /* ───── اللمس: نقرة = إظهار التحكم، نقرتان على الجانب = تقديم/رجوع، سحب عمودي = تغيير القناة ───── */
   let t0 = null, lastTap = 0;
   root.addEventListener('touchstart', e => { if (e.touches.length === 1) t0 = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() }; }, { passive: true });
   root.addEventListener('touchend', e => {
-    if (!t0 || e.target.closest('.yt-bottom, .yt-menu, .yt-err, .yt-stats, .yt-help, .yt-unmute, .yt-big, .yt-chl, .yt-side')) { t0 = null; return; }
+    if (!t0 || e.target.closest('.yt-bottom, .yt-menu, .yt-err, .yt-stats, .yt-help, .yt-big, .yt-chl, .yt-side')) { t0 = null; return; }
     const p = e.changedTouches[0], dx = p.clientX - t0.x, dy = p.clientY - t0.y, dt = Date.now() - t0.t;
     const fromEdge = t0.x - root.getBoundingClientRect().left < 40;
     t0 = null;
@@ -561,7 +570,7 @@ export function createPlayer(host, opts = {}) {
   const outside = e => { if (!root.contains(e.target)) { closeMenu(); ctx.hidden = true; } };
   document.addEventListener('pointerdown', outside);
 
-  v.volume = prefs.volume; v.muted = prefs.muted;
+  v.volume = prefs.volume || 1; v.muted = false; // يبدأ بالصوت دائمًا
   syncUi();
 
   return {
@@ -581,11 +590,12 @@ export function createPlayer(host, opts = {}) {
     },
     setTheater(on) { setBtn('theater', on ? 'theaterOn' : 'theater', on ? 'العرض الافتراضي (t)' : 'وضع المسرح (t)'); },
     osd: (html, ms) => osd(html, ms),
+    banner: (html, ms) => banner(html, ms),
     focus: () => root.focus({ preventScroll: true }),
     get current() { return item?.streams[si]; },
     destroy() {
       destroyed = true;
-      [watchdog, hideT, osdT, pillT, bezelT, clickT].forEach(clearTimeout); clearInterval(statsT);
+      [watchdog, hideT, osdT, pillT, bezelT, clickT, ltT].forEach(clearTimeout); clearInterval(statsT);
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('fullscreenchange', onFs);
       document.removeEventListener('webkitfullscreenchange', onFs);

@@ -264,6 +264,7 @@ function buildWatch() {
     </aside>
   </div>`;
   W.player = createPlayer($('#pl'), {
+    watermark: 'img/mtc-iptv-logo-animated.svg', // شعار المنصة المتحرك في زاوية المشغّل
     onNext: () => zap(1), onPrev: () => zap(-1), onTheater: toggleTheater, onDigit: digit,
     onReport: s => report(S.byId.get(W.id), s),
     // قائمة القنوات داخل المشغّل في ملء الشاشة (من اليسار) — نفس منطق دليل القنوات
@@ -336,7 +337,23 @@ async function switchTo(c) {
   drawFamily(c);
   drawGuide();
 
-  W.player.osd(`<span class="osd-ch">${safeImg(c.logo_url) ? `<img src="${esc(c.logo_url)}" alt="" referrerpolicy="no-referrer">` : ''}<b>${c.number}</b><span class="osd-t"><span>${esc(c.name)}</span><small>${esc([c.country_name, c.category_name, c.quality].filter(Boolean).join(' · '))}</small></span></span>`, 2600);
+  // شريط القناة بأسلوب التلفاز: رقمها وشعارها واسمها وبياناتها، والقناة التالية والساعة — يبقى 7 ثوانٍ ليُقرأ براحة
+  {
+    const list = W.list.length ? W.list : S.ch, i = list.findIndex(x => x.id === c.id), nx = list.length > 1 ? list[(i + 1) % list.length] : null;
+    const now = new Intl.DateTimeFormat('ar-u-nu-latn', { hour: 'numeric', minute: '2-digit' }).format(new Date());
+    const tags = [
+      c.country_name && `${c.flag_url ? `<img class="lt-flag" src="${esc(c.flag_url)}" alt="">` : ''}${esc(c.country_name)}`,
+      c.category_name && esc(c.category_name), c.language_name && esc(c.language_name),
+      c.quality && `<em class="lt-q">${esc(c.quality)}</em>`
+    ].filter(Boolean);
+    W.player.banner(`<div class="lt-in">
+      <div class="lt-num"><small>القناة</small><b>${c.number}</b></div>
+      <div class="lt-logo">${safeImg(c.logo_url) ? `<img src="${esc(c.logo_url)}" alt="" referrerpolicy="no-referrer">` : `<span>${esc([...c.name][0] || '•')}</span>`}</div>
+      <div class="lt-main"><div class="lt-name"><span class="lt-live"><i></i>مباشر</span><b dir="auto">${esc(c.name)}</b></div>
+        <div class="lt-meta">${tags.map(t => `<span>${t}</span>`).join('')}</div></div>
+      <div class="lt-side"><b class="lt-clock">${now}</b>${nx ? `<small>التالي <span>${nx.number} · ${esc(nx.name)}</span></small>` : ''}</div>
+    </div><i class="lt-bar"></i>`, 7000);
+  }
   let streams = [];
   try {
     streams = (await rest(`catalog_streams?channel_id=eq.${c.id}&select=id,url,server,quality,status,priority`)).data || [];
