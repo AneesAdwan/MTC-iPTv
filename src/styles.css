@@ -762,3 +762,43 @@ body.reveal .page>:nth-child(1){--rd:.6s}body.reveal .page>:nth-child(2){--rd:.7
   .yt-chl footer{display:none}
 }
 @keyframes chlUp{from{transform:translateY(100%)}}
+
+/* ═════════ إشعار تثبيت التطبيق ═════════ */
+.ins{position:fixed;inset-inline:0;bottom:0;z-index:120;display:flex;justify-content:center;padding:0 16px calc(16px + env(safe-area-inset-bottom));pointer-events:none}
+.ins-card{pointer-events:auto;position:relative;width:min(440px,100%);background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:20px;padding:18px 18px 14px;box-shadow:0 24px 60px rgba(0,0,0,.55);transform:translateY(130%);opacity:0;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.ins.on .ins-card{transform:none;opacity:1}
+.ins-x{position:absolute;top:10px;inset-inline-end:10px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--mut);background:transparent}
+.ins-x:hover,.ins-x:focus-visible{background:var(--line);color:var(--txt)}
+.ins-x svg{width:16px;height:16px}
+.ins-top{display:flex;gap:14px;align-items:center;padding-inline-end:28px}
+.ins-logo{width:56px;height:56px;border-radius:14px;flex:none;box-shadow:0 6px 18px rgba(255,45,85,.25)}
+.ins-top b{font-size:16px}
+.ins-top p{margin:3px 0 0;font-size:13px;color:var(--mut);line-height:1.6}
+.ins-feat{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0;padding:0}
+.ins-feat li{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--mut);background:var(--line);border-radius:999px;padding:5px 10px}
+.ins-feat svg{width:13px;height:13px;color:var(--ac2)}
+.ins-steps{margin:14px 0 0;padding-inline-start:22px;font-size:13.5px;line-height:1.9;color:var(--txt)}
+.ins-steps li::marker{color:var(--ac);font-weight:700}
+.ins-k{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:6px;background:var(--line);vertical-align:middle;margin:0 2px}
+.ins-k svg{width:14px;height:14px;color:#3b82f6}
+.ins-act{display:flex;gap:8px;margin-top:16px}
+.ins-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:44px;border-radius:12px;font:700 14px var(--font);color:var(--txt);background:var(--line);transition:.2s}
+.ins-btn svg{width:17px;height:17px}
+.ins-btn.pri{flex:1.6;background:var(--grad);color:#fff;box-shadow:0 8px 22px rgba(255,45,85,.3)}
+.ins-btn:hover{filter:brightness(1.1)}
+.ins-btn:focus-visible,.ins-x:focus-visible,.ins-never:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.ins-never{display:block;margin:10px auto 0;font-size:12px;color:var(--dim);background:none;padding:4px 8px;border-radius:6px}
+.ins-never:hover{color:var(--mut);text-decoration:underline}
+@media (min-width:900px){.ins{justify-content:flex-start;padding:0 24px 24px}}
+/* التلفاز: بطاقة كبيرة في الوسط، تركيز واضح لأزرار الريموت */
+.ins.tv{align-items:center;justify-content:center;inset:0;background:rgba(0,0,0,.6);padding:0}
+.ins.tv .ins-card{width:min(720px,80vw);padding:36px 40px 28px;border-radius:28px;transform:scale(.92)}
+.ins.tv.on .ins-card{transform:none}
+.ins.tv .ins-logo{width:96px;height:96px;border-radius:22px}
+.ins.tv .ins-top b{font-size:30px}
+.ins.tv .ins-top p,.ins.tv .ins-steps{font-size:20px}
+.ins.tv .ins-feat li{font-size:17px;padding:8px 16px}
+.ins.tv .ins-btn{height:64px;font-size:21px;border-radius:16px}
+.ins.tv .ins-never{font-size:17px}
+.ins.tv button:focus{outline:4px solid #fff;outline-offset:4px;transform:scale(1.04)}
+.is-app .ft-install{display:none}

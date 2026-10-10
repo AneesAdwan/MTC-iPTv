@@ -1,4 +1,5 @@
 {
+  "id": "./",
   "name": "MTC-iPTv — بث مباشر",
   "short_name": "MTC-iPTv",
   "description": "آلاف القنوات المباشرة من كل دول العالم.",
@@ -7,9 +8,20 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
   "background_color": "#08080c",
   "theme_color": "#08080c",
+  "categories": ["entertainment", "news", "sports"],
   "icons": [
-    { "src": "img/mtc-iptv-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "img/app-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "img/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "img/app-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "img/mtc-iptv-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "البث المباشر", "url": "./#/live", "icons": [{ "src": "img/app-icon-192.png", "sizes": "192x192" }] },
+    { "name": "المفضلة", "url": "./#/favorites", "icons": [{ "src": "img/app-icon-192.png", "sizes": "192x192" }] },
+    { "name": "الدول", "url": "./#/countries", "icons": [{ "src": "img/app-icon-192.png", "sizes": "192x192" }] }
   ]
 }

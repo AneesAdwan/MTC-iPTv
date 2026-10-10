@@ -8,6 +8,7 @@ import { ic, logo } from './icons.js';
 import { hash, familyKeys } from './catalog.js';
 import { VERSION, RELEASE_DATE, COMPANY, DEVELOPER } from './version.js';
 import { socialLinks, socialIcon } from './social.js';
+import { initInstall, openInstall } from './install.js';
 
 const $ = s => document.querySelector(s);
 const M = $('#main');
@@ -511,6 +512,7 @@ $('#ft-group').innerHTML = `<div class="fg-emblem"><img data-src="img/mtc-group-
   <div class="fg-txt"><small>${esc(COMPANY.product)} إحدى شركات</small><b dir="ltr">MTC<span>-Group</span></b><span class="fg-ar">${esc(COMPANY.groupAr)}</span><span class="fg-rule"></span><em dir="ltr">${esc(COMPANY.groupEn)}</em></div>`;
 $('#to-top').innerHTML = `${ic('back')}<span>للأعلى</span>`;
 $('#to-top').onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
+$('#ft-install').onclick = e => { e.preventDefault(); openInstall(true); };
 // دخول بطاقة المجموعة بنفس أسلوب المقدمة عند الوصول إليها
 const groupIO = new IntersectionObserver(es => {
   if (!es[0].isIntersecting) return;
@@ -602,6 +604,7 @@ async function finishIntro(count) {
   document.body.classList.remove('intro'); // شعار الترويسة يظهر في نفس اللحظة والمكان
   s.remove();
   setTimeout(() => document.body.classList.remove('reveal'), 2600);
+  initInstall({ ic, toast }); // إشعار تثبيت التطبيق بعد قليل من التصفح
 }
 
 async function init() {
