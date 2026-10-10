@@ -8,7 +8,7 @@ import { hash } from '../src/catalog.js';
 import { createPlayer, loadHls } from '../src/player.js';
 import { SOCIAL, socialIcon, socialLinks, cleanHandle } from '../src/social.js';
 import { parseM3U } from './m3u.js';
-import { VERSION } from '../src/version.js';
+import { VERSION, RELEASE_DATE } from '../src/version.js';
 
 const app = document.getElementById('app');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -246,6 +246,7 @@ function renderShell() {
     <header class="topbar">
       <button class="icon2 menu-btn" id="menu" aria-label="القائمة">${ic('menu')}</button>
       <div class="crumbs"><small>لوحة التحكم</small><h1 id="tb-title"></h1></div>
+      <div class="tb-ver" title="رقم إصدار المنصة"><i></i><span>الإصدار</span><b dir="ltr">v${VERSION}</b><small>${new Intl.DateTimeFormat('ar-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(RELEASE_DATE))}</small></div>
       <label class="tb-search">${ic('search')}<input id="tb-q" type="search" placeholder="ابحث عن قناة بالاسم أو الرقم… (Enter)"></label>
       <a class="btn2 ghost sm hide-sm" href="../" target="_blank">${ic('external')} الموقع</a>
     </header>

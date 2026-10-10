@@ -649,3 +649,20 @@ tr.saved td{background:rgba(34,197,94,.07);transition:background .3s}
 .log li.bad::before{border:0;background:var(--bad);animation:none}
 @media (max-width:1100px){.bk-grid{grid-template-columns:1fr 1fr}.cmp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.bk-grid,.cmp-grid{grid-template-columns:1fr}.hero-pick{flex-wrap:wrap}}
+
+/* الإصدار 2.3: فحص الروابط */
+.h-tbl tr.off{opacity:.6}
+.h-tbl td small{display:block;margin-top:4px}
+.h-err{max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-ms{font:700 13px Inter,var(--font);color:#4ade80;white-space:nowrap}
+.h-ms.slow{color:#fbbf24}
+
+/* رقم الإصدار في وسط الهيدر */
+.tb-ver{margin-inline:auto;flex:none;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:999px;background:linear-gradient(90deg,rgba(255,45,85,.12),rgba(255,122,26,.08));border:1px solid rgba(255,122,26,.3);white-space:nowrap;font-size:12.5px;color:var(--mut)}
+.tb-ver i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pulseOk 2s infinite}
+.tb-ver b{font:800 14px Inter,var(--font);color:#fff}
+.tb-ver small{padding-inline-start:8px;border-inline-start:1px solid var(--bd2);color:var(--dim);font-size:11.5px}
+@media (max-width:1250px){.tb-ver small{display:none}}
+.topbar:has(.tb-ver) .tb-search{margin-inline-start:0}
+@media (max-width:1000px){.tb-ver small{display:none}}
+@media (max-width:640px){.tb-ver span{display:none}.tb-ver{padding:0 10px;height:34px}.topbar{gap:10px}.topbar .tb-search{min-width:0}.tb-search input::placeholder{font-size:12.5px}}

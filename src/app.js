@@ -509,7 +509,6 @@ setTimeout(() => { tickClock(); setInterval(tickClock, 1000); }, 1000 - (Date.no
 // شعار MTC-Group من الملف img/mtc-group-emblem.svg (حركته الدائمة داخل الملف) — يُحمَّل عند ظهور البطاقة لتبدأ حركة دخوله أمام المشاهد
 $('#ft-group').innerHTML = `<div class="fg-emblem"><img data-src="img/mtc-group-emblem.svg" alt="MTC-Group" width="96" height="96"></div>
   <div class="fg-txt"><small>${esc(COMPANY.product)} إحدى شركات</small><b dir="ltr">MTC<span>-Group</span></b><span class="fg-ar">${esc(COMPANY.groupAr)}</span><span class="fg-rule"></span><em dir="ltr">${esc(COMPANY.groupEn)}</em></div>`;
-$('#ft-ver').innerHTML = `<i class="dot"></i>الإصدار <b dir="ltr">v${VERSION}</b><small>· ${new Intl.DateTimeFormat('ar-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(RELEASE_DATE))}</small>`;
 $('#to-top').innerHTML = `${ic('back')}<span>للأعلى</span>`;
 $('#to-top').onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
 // دخول بطاقة المجموعة بنفس أسلوب المقدمة عند الوصول إليها
@@ -525,14 +524,19 @@ groupIO.observe($('#ft-group'));
 function footerCredit() {
   const d = S.settings.developer || DEVELOPER, links = socialLinks(d.social);
   const box = $('#ft-dev');
-  if (!d.name_ar && !d.name_en && !links.length) { box.hidden = true; return; }
+  if (!d.name_ar && !d.name_en && !links.length) { box.hidden = true; $('#ft-social').hidden = true; return; }
   const initials = (d.name_en || d.name_ar || '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => [...w][0]).join('').toUpperCase();
+  const date = new Intl.DateTimeFormat('ar-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(RELEASE_DATE));
   box.innerHTML = `<div class="fd-who">
       <span class="fd-av" aria-hidden="true"><b dir="ltr">${esc(initials)}</b></span>
       <div class="fd-txt"><small>برمجة وتطوير</small>${d.name_ar ? `<b>${esc(d.name_ar)}</b>` : ''}${d.name_en ? `<span dir="ltr">Developed by <i>${esc(d.name_en)}</i></span>` : ''}</div>
     </div>
-    ${links.length ? `<nav class="fd-social" aria-label="حسابات المطوّر"><small>تواصل معي</small><div>${links.map(s => `<a href="${esc(s.href)}" target="_blank" rel="noopener me" title="${esc(s.ar)}" aria-label="${esc(s.en)}" style="--c:${s.color}">${socialIcon(s, 17)}</a>`).join('')}</div></nav>` : ''}`;
+    <div class="fd-ver"><i class="dot"></i><div><small>الإصدار الحالي</small><b dir="ltr">v${VERSION}</b></div><span>${date}</span></div>`;
   box.hidden = false;
+  // حسابات المطوّر تحت بطاقة الشركة الأم
+  const soc = $('#ft-social');
+  soc.innerHTML = links.length ? `<small>تواصل مع المطوّر</small><div>${links.map(s => `<a href="${esc(s.href)}" target="_blank" rel="noopener me" title="${esc(s.ar)}" aria-label="${esc(s.en)}" style="--c:${s.color}">${socialIcon(s, 17)}</a>`).join('')}</div>` : '';
+  soc.hidden = !links.length;
 }
 footerCredit(); // يظهر فورًا بالقيم الافتراضية، ثم يُحدَّث بعد تحميل الإعدادات
 /** أرقام التذييل تعدّ تصاعديًا عند ظهورها */
