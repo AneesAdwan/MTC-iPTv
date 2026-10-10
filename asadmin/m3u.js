@@ -14,6 +14,11 @@ function cleanName(raw) {
   };
 }
 
+/** يزيل علامات مواقع التجميع من الرابط: "index.m3u8?checkedby:iptvcat.net" → "index.m3u8" */
+function cleanUrl(u) {
+  return u.trim().replace(/([?&])checkedby[:=][^&#]*&?/i, '$1').replace(/[?&]$/, '');
+}
+
 /**
  * @param {string} text محتوى ملف M3U
  * @returns {{items: object[], skipped: number}} items: {uid,name,logo,country,category,language,quality,url}
@@ -28,7 +33,7 @@ export function parseM3U(text, { skipHttp = true, skipGeo = true } = {}) {
     if (line.startsWith('#') || !meta) continue;
     const info = meta; meta = '';
     let url;
-    try { url = new URL(line); } catch { skipped++; continue; }
+    try { url = new URL(cleanUrl(line)); } catch { skipped++; continue; }
     if (!['https:', 'http:'].includes(url.protocol) || (skipHttp && url.protocol === 'http:') || url.href.length > 2000) { skipped++; continue; }
 
     const attrs = {};
@@ -41,7 +46,9 @@ export function parseM3U(text, { skipHttp = true, skipGeo = true } = {}) {
 
     // tvg-id بصيغة iptv-org: "AlJazeera.qa@SD" → المعرّف "AlJazeera.qa" والدولة "QA"
     const tvgId = (attrs['tvg-id'] || '').trim().split('@')[0];
-    const country = ((tvgId.match(/\.([a-z]{2})$/i) || [])[1] || (attrs['tvg-country'] || '').split(/[;,]/)[0].trim()).toUpperCase();
+    // tvg-country بعدة دول ("DZ;BH;IQ;SA") لا يحدد دولة القناة الأصلية، فتُترك فارغة (أو تأخذ الدولة الافتراضية)
+    const tvgCountries = (attrs['tvg-country'] || '').split(/[;,]/).map(x => x.trim()).filter(Boolean);
+    const country = ((tvgId.match(/\.([a-z]{2})$/i) || [])[1] || (tvgCountries.length === 1 ? tvgCountries[0] : '')).toUpperCase();
     const code = country === 'UK' ? 'GB' : /^[A-Z]{2}$/.test(country) ? country : null;
     const uid = tvgId || `name:${normName(name)}|${code || ''}`;
     if (out.has(url.href)) continue;

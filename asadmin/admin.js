@@ -1818,14 +1818,19 @@ async function convert(c) {
     const mine = V.mine || (V.mine = await loadMine());
     // روابط القناة الواحدة (نفس المعرّف) تُجمع في قناة واحدة بعدة سيرفرات
     const groups = new Map();
+    // داخل القائمة الواحدة: نفس الاسم = نفس القناة حتى لو اختلفت الدولة المكتوبة بجانب كل رابط
     for (const it of items) {
-      const country = it.country || V.country || null;
-      const uid = it.uid.startsWith('name:') ? `name:${normName(it.name)}|${country || ''}` : it.uid;
-      if (!groups.has(uid)) groups.set(uid, { uid, name: it.name, logo: it.logo, country, category: V.category || (it.category !== 'general' ? it.category : '') || 'general',
-        language: it.language, links: [] });
-      const g = groups.get(uid);
-      g.logo ||= it.logo;
+      const key = it.uid.startsWith('name:') ? `name:${normName(it.name)}` : it.uid;
+      const cat0 = it.category !== 'general' ? it.category : '';
+      if (!groups.has(key)) groups.set(key, { key, name: it.name, logo: it.logo, country: it.country || null, category: cat0, language: it.language, links: [] });
+      const g = groups.get(key);
+      g.logo ||= it.logo; g.country ||= it.country; g.category ||= cat0; g.language ||= it.language;
       g.links.push({ url: it.url, quality: it.quality, why: it.url.startsWith('http:') ? 'http' : mine.urls.has(it.url) ? 'have' : '' });
+    }
+    for (const g of groups.values()) {
+      g.country ||= V.country || null;
+      g.category = g.category || V.category || 'general';
+      g.uid = g.key.startsWith('name:') ? `${g.key}|${g.country || ''}` : g.key;
     }
     V.rows = [...groups.values()].map(g => {
       const same = mine.byUid.get(g.uid), like = !same ? mine.byName.get(normName(g.name)) : null;
