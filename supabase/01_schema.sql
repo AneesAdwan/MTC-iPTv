@@ -39,6 +39,9 @@ drop function if exists public.admin_create_channel(jsonb, text) cascade;
 drop function if exists public.admin_restore_reset(boolean) cascade;
 drop function if exists public.admin_restore_rows(text, jsonb) cascade;
 drop function if exists public.admin_restore_links(jsonb) cascade;
+drop function if exists public.dup_key(public.channels) cascade;
+drop function if exists public.admin_mark_distinct(uuid[]) cascade;
+drop function if exists public.admin_stream_action(text, uuid[]) cascade;
 
 
 -- ─── 1) المشرفون ────────────────────────────────────────────────────────────
@@ -126,6 +129,7 @@ create table public.channels (
   is_manual        boolean not null default false,                    -- أضيفت يدويًا (لا تُحذف مع المصادر)
   hidden_reason    text check (hidden_reason in ('manual','duplicate','offline','reported','pending')),  -- pending = بانتظار مراجعة المدير
   duplicate_of     uuid references public.channels(id) on delete set null,
+  dup_key          text,                                              -- يحدده المدير: «ليست مكررة» يعطي القناة مفتاحًا خاصًا بها
   sort_order       integer not null default 0,
   created_at       timestamptz not null default now(),
   updated_at       timestamptz not null default now()
@@ -202,6 +206,12 @@ create function public.norm_name(n text) returns text language sql immutable as 
            '([[:space:]]|[-_.:''"!?&*/\\|،]|\m(hd|fhd|sd|uhd|4k|tv)\M)+', '', 'g')  -- نُبقي + لأن ATV و ATV+ قناتان مختلفتان
 $$;
 
+-- مفتاح كشف التكرار: الاسم المُطبَّع، إلا إذا قرر المدير أن القناة «ليست مكررة» (dup_key خاص بها)
+-- فتبقى القناتان معًا ولا تُكشفان من جديد، بينما أي نسخة جديدة من الأصلية تُكشف كالمعتاد.
+create function public.dup_key(c public.channels) returns text language sql immutable as $$
+  select coalesce(c.dup_key, public.norm_name(c.name))
+$$;
+
 -- السيرفر = النطاق الرئيسي للرابط: "edge1.cdn.akamaized.net" → "akamaized.net"
 create function public.server_of(h text) returns text language sql immutable as $$
   select regexp_replace(coalesce(h, ''), '^.*\.([^.]+\.[^.]+)$', '\1')
@@ -262,7 +272,7 @@ with st as (
          row_number() over w as rn
   from public.channels c left join st on st.channel_id = c.id
   where c.is_published or c.hidden_reason = 'pending'
-  window w as (partition by public.norm_name(c.name), c.country_code
+  window w as (partition by public.dup_key(c), c.country_code
                order by c.is_published desc, coalesce(st.online, 0) > 0 desc, coalesce(st.online, 0) desc, c.number nulls last, c.id)
 )
 select id, number, name, uid, logo_url, logo_status, quality, country_code, category_slug, language_code, created_at,
@@ -293,10 +303,12 @@ begin
     'online',          (select count(*) from streams where status = 'online'),
     'offline',         (select count(*) from streams where status = 'offline'),
     'unchecked',       (select count(*) from streams where status = 'unknown'),
+    'disabled',        (select count(*) from streams where not is_active),
+    'slow',            (select count(*) from streams where is_active and status = 'online' and response_ms > 4000),
     'broken_logos',    (select count(*) from channels where logo_status = 'broken'),
     'sources',         (select count(*) from playlist_sources),
     'reports',         (select count(*) from reports where status = 'open'),
-    'duplicates',      (select count(*) from (select 1 from channels group by norm_name(name), country_code having count(*) > 1) d),
+    'duplicates',      (select count(*) from (select 1 from channels c group by dup_key(c), country_code having count(*) > 1) d),
     'countries',       (select count(distinct country_code) from channels),
     'pending',         (select count(*) from channels where hidden_reason = 'pending'),
     'review',          (select coalesce(jsonb_object_agg(bucket, n), '{}') from (select bucket, count(*) as n from review_queue group by 1) r),
@@ -441,7 +453,7 @@ begin
     select jsonb_agg(g order by g->>'name')
     from (
       select jsonb_build_object(
-        'key', norm_name(c.name) || '|' || coalesce(c.country_code, ''),
+        'key', dup_key(c) || '|' || coalesce(c.country_code, ''),
         'name', min(c.name),
         'country', c.country_code,
         'channels', jsonb_agg(jsonb_build_object(
@@ -451,7 +463,7 @@ begin
           'online',  (select count(*) from streams s where s.channel_id = c.id and s.status = 'online'))
           order by c.is_published desc, c.number)) as g
       from channels c
-      group by norm_name(c.name), c.country_code
+      group by dup_key(c), c.country_code
       having count(*) > 1
     ) d
   ), '[]'::jsonb);
@@ -594,6 +606,36 @@ begin
   return n;
 end $$;
 
+-- «ليست مكررة — أبقِ الاثنين»: كل قناة محددة تأخذ مفتاح تكرار خاصًا بها فلا تُعامل كنسخة من غيرها
+create function public.admin_mark_distinct(p_ids uuid[]) returns integer
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare n int;
+begin
+  if not is_mtc_admin() then raise exception 'forbidden'; end if;
+  update channels set dup_key = 'distinct:' || id::text, duplicate_of = null,
+         hidden_reason = case when hidden_reason = 'duplicate' then 'manual' else hidden_reason end
+  where id = any(p_ids);
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
+-- التحكم بنتائج فحص الروابط: enable تفعيل · disable تعطيل (يبقى ولا يُستخدم) · delete حذف · reset إعادة لحالة «لم يُفحص»
+create function public.admin_stream_action(p_action text, p_ids uuid[]) returns integer
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare n int;
+begin
+  if not is_mtc_admin() then raise exception 'forbidden'; end if;
+  case p_action
+    when 'enable'  then update streams set is_active = true  where id = any(p_ids);
+    when 'disable' then update streams set is_active = false where id = any(p_ids);
+    when 'delete'  then delete from streams where id = any(p_ids);
+    when 'reset'   then update streams set status = 'unknown', fail_count = 0, last_error = null, http_status = null, response_ms = null, last_checked_at = null where id = any(p_ids);
+    else raise exception 'unknown action %', p_action;
+  end case;
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
 -- ─── 11) الصلاحيات (RLS) ────────────────────────────────────────────────────
 alter table public.admin_users      enable row level security;
 alter table public.languages        enable row level security;
@@ -655,8 +697,10 @@ grant execute on function public.is_mtc_admin(), public.admin_stats(), public.ad
   public.admin_record_checks(jsonb), public.admin_record_logos(jsonb), public.admin_duplicates(),
   public.admin_merge(uuid, uuid[]), public.admin_hide_duplicates(uuid, uuid[]), public.admin_renumber(),
   public.admin_review_apply(text, uuid[]), public.admin_create_channel(jsonb, text), public.admin_restore_reset(boolean),
-  public.admin_restore_rows(text, jsonb), public.admin_restore_links(jsonb) to authenticated;
+  public.admin_restore_rows(text, jsonb), public.admin_restore_links(jsonb),
+  public.admin_mark_distinct(uuid[]), public.admin_stream_action(text, uuid[]) to authenticated;
 grant execute on function public.norm_name(text), public.server_of(text), public.touch_updated_at() to anon, authenticated;
+grant execute on function public.dup_key(public.channels) to authenticated;
 
 -- إعدادات افتراضية: تُضاف مرة واحدة فقط ولا تُستبدل عند إعادة التشغيل
 insert into public.site_settings (key, value, is_public) values

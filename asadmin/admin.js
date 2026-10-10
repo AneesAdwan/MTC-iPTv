@@ -654,66 +654,151 @@ async function editChannel(id) {
   d.showModal();
 }
 
-/* ═══════════════════ فحص الروابط ═══════════════════ */
+/* ═══════════════════ فحص الروابط ═══════════════════
+   يفحص روابط البث من المتصفح كما يراها المشاهد، ثم يعرض النتائج في تبويبات
+   (معطّلة، لم تُفحص، بطيئة، تعمل، معطّلة يدويًا) مع التحكم الكامل بكل رابط أو بمجموعة. */
+const HTABS = [
+  { k: 'offline', i: 'alert', t: 'معطّلة', h: 0, f: 'status=eq.offline&is_active=eq.true', d: 'روابط فشلت في آخر فحص. أعد فحصها، أو عطّلها لتبقى في القاعدة دون استخدام، أو احذفها نهائيًا.' },
+  { k: 'unknown', i: 'info', t: 'لم تُفحص', h: 45, f: 'status=eq.unknown&is_active=eq.true', d: 'روابط لم تُفحص بعد. شغّل الفحص لتصنيفها.' },
+  { k: 'slow', i: 'zap', t: 'بطيئة', h: 30, f: 'status=eq.online&is_active=eq.true&response_ms=gt.4000', d: 'تعمل لكن استجابتها أبطأ من 4 ثوانٍ — قد تتأخر في البدء. يمكنك خفض أولويتها أو تعطيلها إن وُجد بديل.' },
+  { k: 'online', i: 'check', t: 'تعمل', h: 145, f: 'status=eq.online&is_active=eq.true', d: 'روابط نجحت في آخر فحص ويستخدمها المشغّل.' },
+  { k: 'disabled', i: 'eyeoff', t: 'معطّلة يدويًا', h: 280, f: 'is_active=eq.false', d: 'روابط أوقفتها بنفسك: لا يستخدمها المشغّل ولا تظهر للمشاهدين، لكنها محفوظة ويمكن تفعيلها في أي وقت.' }
+];
+const HT = { tab: 'offline', page: 0, size: 50, q: '', sel: new Set() };
+const HACT = { recheck: ['zap', 'إعادة فحص'], disable: ['eyeoff', 'تعطيل'], enable: ['eye', 'تفعيل'], reset: ['refresh', 'إعادة ضبط'], delete: ['trash', 'حذف'] };
+
 async function health(c) {
   const st = await refreshStats();
   const H = S.health;
-  c.innerHTML = pageHead('فحص الروابط', 'يفحص روابط البث من متصفحك تمامًا كما يراها المشاهد (ملف M3U8 صالح + السماح بالتشغيل من الموقع). الرابط الذي يفشل هنا لن يعمل على الموقع.')
-    + `<section class="kpis k4">
-      ${kpi('كل الروابط', st.streams, 'link', 220, '', 'health')}
-      ${kpi('تعمل', st.online, 'check', 145, `<div class="meter"><i style="width:${st.streams ? st.online / st.streams * 100 : 0}%"></i></div>`, 'health')}
-      ${kpi('معطّلة', st.offline, 'alert', 0, '', 'health')}
-      ${kpi('لم تُفحص', st.unchecked, 'info', 45, '', 'health')}
-    </section>
-    <section class="panel hc">
-      <div class="panel-h"><h3>${ic('zap')} تشغيل الفحص</h3><small>يمكنك الاستمرار في استخدام اللوحة أثناء الفحص في هذه الصفحة</small></div>
+  const q = HT.q.trim(), search = q ? `&channels.name=ilike.${enc(`*${q.replace(/[*,()]/g, ' ')}*`)}` : '';
+  const cnt = f => rest(`streams?select=id,channels!inner(id)&${f}${search}`, { auth: true, prefer: 'count=exact', range: '0-0' }).then(r => r.total ?? 0).catch(() => 0);
+  const counts = Object.fromEntries(await Promise.all(HTABS.map(async t => [t.k, await cnt(t.f)])));
+  if (!counts[HT.tab] && !q) HT.tab = HTABS.find(t => counts[t.k])?.k || HT.tab;
+  const T = HTABS.find(t => t.k === HT.tab);
+  const res = await rest(`streams?select=id,url,host,status,is_active,priority,quality,response_ms,http_status,last_error,last_checked_at,fail_count,channel_id,channels!inner(id,name,number,logo_url,quality,is_published,hidden_reason)&${T.f}${search}&order=${HT.tab === 'slow' ? 'response_ms.desc' : 'last_checked_at.desc.nullslast'}`,
+    { auth: true, prefer: 'count=exact', range: `${HT.page * HT.size}-${HT.page * HT.size + HT.size - 1}` });
+  const rows = res.data || [], total = res.total ?? rows.length, pages = Math.max(1, Math.ceil(total / HT.size));
+  HT.sel.clear();
+
+  c.innerHTML = pageHead('فحص الروابط', 'يفحص روابط البث من متصفحك تمامًا كما يراها المشاهد (ملف M3U8 صالح + السماح بالتشغيل من الموقع)، ثم تتحكم بالنتائج: إعادة فحص، تعطيل، تفعيل، أو حذف.')
+    + `<section class="panel hc">
+      <div class="panel-h"><h3>${ic('zap')} تشغيل الفحص</h3><small>يمكنك متابعة النتائج في التبويبات بالأسفل أثناء الفحص</small></div>
       <div class="hc-opts">
-        <label class="fld"><span>ماذا نفحص؟</span><select id="h-scope"><option value="unknown">الروابط التي لم تُفحص (${num(st.unchecked)})</option><option value="offline">الروابط المعطّلة — إعادة فحص (${num(st.offline)})</option><option value="online">الروابط التي تعمل — تأكيد (${num(st.online)})</option><option value="all">كل الروابط (${num(st.streams)})</option></select></label>
-        <label class="fld"><span>الحد الأقصى</span><select id="h-limit">${[100, 500, 1000, 2500, 5000, 20000].map(n => `<option value="${n}" ${n === 500 ? 'selected' : ''}>${num(n)} رابط</option>`).join('')}</select></label>
-        <label class="fld"><span>فحوصات متزامنة</span><select id="h-par">${[4, 8, 16, 24].map(n => `<option ${n === 8 ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+        <label class="fld"><span>ماذا نفحص؟</span><select id="h-scope"><option value="unknown">الروابط التي لم تُفحص (${num(st.unchecked)})</option><option value="offline">المعطّلة — إعادة فحص (${num(st.offline)})</option><option value="online">التي تعمل — تأكيد (${num(st.online)})</option><option value="all">كل الروابط المفعّلة (${num(st.streams - (st.disabled || 0))})</option></select></label>
+        <label class="fld"><span>الحد الأقصى</span><select id="h-limit">${[100, 500, 1000, 2500, 5000, 20000].map(n => `<option value="${n}" ${n === 1000 ? 'selected' : ''}>${num(n)} رابط</option>`).join('')}</select></label>
+        <label class="fld"><span>فحوصات متزامنة</span><select id="h-par">${[4, 8, 16, 24].map(n => `<option ${n === 16 ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
         <label class="row-sw"><div><b>فحص الشعارات أيضًا</b><small>للقنوات المرتبطة بالروابط المفحوصة</small></div>${sw(true, 'id="h-logos"')}</label>
       </div>
       <div class="hc-run"><button class="btn2 primary" id="h-start">${ic('play')} بدء الفحص</button><button class="btn2 danger-ghost" id="h-stop" hidden>${ic('x')} إيقاف</button></div>
       <div class="prog2" id="h-prog" hidden><div class="prog2-t"><span></span><b></b></div><div class="prog2-b"><i></i></div>
         <div class="hc-live"><span class="ok">${ic('check')} <b id="h-ok">0</b> تعمل</span><span class="bad">${ic('alert')} <b id="h-bad">0</b> معطّلة</span><span>${ic('eye')} <b id="h-logo">0</b> شعار معطّل</span></div></div>
     </section>
+    <section class="rv-tabs">${HTABS.map(t => `<button class="rv-tab ${t.k === HT.tab ? 'on' : ''}" data-ht="${t.k}" style="--h:${t.h}" ${counts[t.k] ? '' : 'data-zero'}>
+      <span class="rv-ic">${ic(t.i)}</span><span><b>${num(counts[t.k])}</b><small>${t.t}</small></span></button>`).join('')}</section>
+    <div class="rv-head"><div><h3>${ic(T.i)} روابط «${T.t}» <em>${num(total)}</em></h3><p class="muted">${T.d}</p></div>
+      <label class="search2 sm">${ic('search')}<input id="h-q" type="search" placeholder="بحث باسم القناة…" value="${esc(HT.q)}"></label>
+      ${total ? `<details class="menu2"><summary class="btn2 ghost sm">${ic('dots')} على كل «${T.t}» (${num(total)})</summary><div class="menu2-list">
+        <button data-hall="recheck">${ic('zap')} إعادة فحص الكل</button>
+        ${HT.tab === 'disabled' ? `<button data-hall="enable">${ic('eye')} تفعيل الكل</button>` : `<button data-hall="disable">${ic('eyeoff')} تعطيل الكل</button>`}
+        <button data-hall="delete" class="bad">${ic('trash')} حذف الكل نهائيًا</button></div></details>` : ''}
+    </div>
+    <div class="panel tbl-panel">${rows.length ? `<div class="tbl-scroll"><table class="tbl2 h-tbl">
+      <thead><tr><th><label class="chk2"><input type="checkbox" id="h-all"><i></i></label></th><th>القناة</th><th>الرابط</th><th>النتيجة</th><th>الاستجابة</th><th>آخر فحص</th><th></th></tr></thead>
+      <tbody>${rows.map(r => { const ch = r.channels || {}, [tone, label] = r.is_active ? (SSTATUS[r.status] || SSTATUS.unknown) : ['off', 'معطّل يدويًا']; return `<tr data-sid="${r.id}" class="${r.is_active ? '' : 'off'}">
+        <td><label class="chk2"><input type="checkbox" class="h-sel" value="${r.id}"><i></i></label></td>
+        <td><div class="ch2 sm">${thumb(ch)}<div><b>${ch.number ? `${ch.number}. ` : ''}${esc(ch.name || '—')}</b><small>${ch.is_published ? chip('ok', 'منشورة') : ch.hidden_reason === 'pending' ? chip('warn', 'معلّقة') : chip('off', 'مخفية')}</small></div></div></td>
+        <td><button class="url2" data-h="copy" dir="ltr" data-u="${esc(r.url)}">${ic('copy')}<span>${esc(r.host || r.url)}</span></button><small class="muted">السيرفر ${r.priority + 1}${r.quality ? ` · ${esc(r.quality)}` : ''}</small></td>
+        <td>${chip(tone, label)}${r.last_error && r.status === 'offline' ? `<small class="badtxt h-err">${esc(r.last_error)}${r.fail_count > 1 ? ` · ×${r.fail_count}` : ''}</small>` : ''}</td>
+        <td>${r.response_ms ? `<b class="h-ms ${r.response_ms > 4000 ? 'slow' : ''}">${num(r.response_ms)} ms</b>` : '<span class="muted">—</span>'}</td>
+        <td><small class="muted">${ago(r.last_checked_at)}</small></td>
+        <td class="acts2">
+          <button class="icon2" data-h="play" data-cid="${ch.id}" data-n="${esc(ch.name || '')}" title="تشغيل القناة">${ic('play')}</button>
+          <button class="icon2" data-h="recheck" title="إعادة فحص">${ic('zap')}</button>
+          ${r.is_active ? `<button class="icon2" data-h="disable" title="تعطيل الرابط">${ic('eyeoff')}</button>` : `<button class="icon2 ok" data-h="enable" title="تفعيل الرابط">${ic('eye')}</button>`}
+          <button class="icon2" data-h="edit" data-cid="${ch.id}" title="فتح القناة">${ic('edit')}</button>
+          <button class="icon2 bad" data-h="delete" title="حذف الرابط">${ic('trash')}</button>
+        </td></tr>`; }).join('')}</tbody></table></div>`
+      : empty(T.i, `لا توجد روابط «${T.t}»`, q ? 'لا توجد نتائج مطابقة للبحث.' : HT.tab === 'offline' ? 'ممتاز! لا توجد روابط معطّلة حاليًا.' : 'اختر تبويبًا آخر.')}
+      <div class="pager2"><span class="sp"></span>${pager(HT.page, pages)}</div></div>
+    <div class="bulkbar" id="h-bar" hidden><b id="h-selc"></b>
+      <button data-hb="recheck">${ic('zap')} إعادة فحص</button>
+      ${HT.tab === 'disabled' ? `<button data-hb="enable">${ic('eye')} تفعيل</button>` : `<button data-hb="disable">${ic('eyeoff')} تعطيل</button>`}
+      <button data-hb="reset">${ic('refresh')} إعادة ضبط</button>
+      <button data-hb="delete" class="bad">${ic('trash')} حذف</button>
+      <button data-hb="clear" class="x" title="إلغاء التحديد">${ic('x')}</button></div>
     <section class="panel">
-      <div class="panel-h"><h3>${ic('trash')} تنظيف بعد الفحص</h3></div>
+      <div class="panel-h"><h3>${ic('tv')} القنوات بعد الفحص</h3><small>للقنوات التي لم يبقَ لها أي رابط يعمل</small></div>
       <div class="clean-grid">
-        ${cleanBtn('delete_offline_streams', 'trash', 'حذف الروابط المعطّلة', `${num(st.offline)} رابط من قاعدة البيانات`, st.offline)}
         ${cleanBtn('hide_dead_channels', 'eyeoff', 'إخفاء القنوات بلا روابط تعمل', `${num(st.no_stream)} قناة (تبقى في القاعدة)`, st.no_stream)}
         ${cleanBtn('delete_dead_channels', 'trash', 'حذف القنوات بلا روابط تعمل', `${num(st.no_stream)} قناة نهائيًا`, st.no_stream, true)}
         ${cleanBtn('clear_broken_logos', 'eyeoff', 'إزالة الشعارات المعطّلة', `${num(st.broken_logos)} شعار`, st.broken_logos)}
-        ${cleanBtn('reset_checks', 'refresh', 'إعادة ضبط نتائج الفحص', 'كل الروابط تصبح «لم تُفحص»', st.streams)}
+        ${cleanBtn('reset_checks', 'refresh', 'إعادة ضبط كل نتائج الفحص', 'كل الروابط تصبح «لم تُفحص»', st.streams)}
       </div>
-    </section>
-    <section class="panel tbl-panel"><div class="tbl-top"><h3>${ic('alert')} آخر الروابط المعطّلة</h3><span class="sp"></span><button class="btn2 ghost sm" id="h-reload">${ic('refresh')} تحديث</button></div><div id="h-dead"></div></section>`;
+    </section>`;
 
-  const drawDead = async () => {
-    const rows = (await rest('streams?select=id,url,host,last_error,http_status,last_checked_at,fail_count,channels(id,name,number)&status=eq.offline&order=last_checked_at.desc.nullslast&limit=100', { auth: true })).data || [];
-    c.querySelector('#h-dead').innerHTML = rows.length ? `<div class="tbl-scroll"><table class="tbl2"><thead><tr><th>القناة</th><th>الرابط</th><th>الخطأ</th><th>آخر فحص</th><th></th></tr></thead><tbody>${rows.map(r => `<tr data-sid="${r.id}">
-      <td><b>${r.channels?.number ? `${r.channels.number}. ` : ''}${esc(r.channels?.name || '—')}</b></td>
-      <td><button class="url2" data-h="copy" dir="ltr" data-u="${esc(r.url)}">${ic('copy')}<span>${esc(r.url)}</span></button></td>
-      <td><span class="chip2 bad"><i></i>${esc(r.last_error || 'معطّل')}</span>${r.fail_count > 1 ? `<small class="muted"> ×${r.fail_count}</small>` : ''}</td>
-      <td><small class="muted">${ago(r.last_checked_at)}</small></td>
-      <td class="acts2"><button class="icon2" data-h="edit" data-cid="${r.channels?.id}" title="فتح القناة">${ic('edit')}</button><button class="icon2 bad" data-h="del" title="حذف الرابط">${ic('trash')}</button></td></tr>`).join('')}</tbody></table></div>`
-      : empty('check', 'لا توجد روابط معطّلة', 'كل الروابط المفحوصة تعمل. شغّل فحصًا جديدًا للتأكد.');
+  /* ── التنقل والبحث ── */
+  c.querySelectorAll('[data-ht]').forEach(b => b.onclick = () => { HT.tab = b.dataset.ht; HT.page = 0; go('health'); });
+  c.querySelectorAll('[data-page]').forEach(b => b.onclick = () => { HT.page = +b.dataset.page; go('health'); });
+  let tq; c.querySelector('#h-q').oninput = e => { clearTimeout(tq); tq = setTimeout(() => { HT.q = e.target.value; HT.page = 0; go('health'); }, 450); };
+  if (HT.q) { const el = c.querySelector('#h-q'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+
+  /* ── تنفيذ إجراء على روابط ── */
+  const recheck = async (items, btn) => busy(btn, async () => {
+    let ok = 0, part = [];
+    await pool(items, 8, s => probeStream(s.url), s => { part.push({ id: s.id, ...s.res }); if (s.res.ok) ok++; });
+    for (const p of chunk(part, 200)) await rpc('admin_record_checks', { p_results: p });
+    toast(`أُعيد فحص ${num(items.length)} رابط: ${num(ok)} يعمل، ${num(items.length - ok)} معطّل`, ok ? 'success' : 'info');
+    go('health');
+  });
+  const act = async (action, ids, btn) => {
+    if (!ids.length) return;
+    if (action === 'recheck') return recheck(ids.map(id => ({ id, url: (rows.find(r => r.id === id) || {}).url })).filter(s => s.url), btn);
+    const [icon, label] = HACT[action];
+    if ((action === 'delete' || ids.length > 1) && !await modal({ title: `${label} ${num(ids.length)} رابط`, danger: action === 'delete', icon, ok: label, confirmWord: action === 'delete' && ids.length > 50 ? 'حذف' : '',
+      body: { delete: `<p>سيتم حذف ${num(ids.length)} رابط نهائيًا من قاعدة البيانات. القنوات التي لا يبقى لها رابط لن تظهر للمشاهدين.</p>`,
+              disable: `<p>سيتوقف المشغّل عن استخدام ${num(ids.length)} رابط، لكنها تبقى محفوظة في تبويب «معطّلة يدويًا» ويمكن تفعيلها لاحقًا.</p>`,
+              enable: `<p>سيعود ${num(ids.length)} رابط للاستخدام في المشغّل.</p>`,
+              reset: `<p>ستعود ${num(ids.length)} رابط إلى حالة «لم تُفحص» لتُفحص من جديد.</p>` }[action] })) return;
+    await busy(btn, async () => {
+      let n = 0;
+      for (const part of chunk(ids, 400)) n += await rpc('admin_stream_action', { p_action: action, p_ids: part });
+      toast(`${label}: ${num(n)} رابط`, 'success');
+      go('health');
+    });
   };
-  drawDead();
-  c.querySelector('#h-reload').onclick = drawDead;
-  c.querySelector('#h-dead').addEventListener('click', async e => {
+  const bar = c.querySelector('#h-bar');
+  const upd = () => { bar.hidden = !HT.sel.size; c.querySelector('#h-selc').textContent = `${num(HT.sel.size)} محددة`; };
+  c.querySelector('#h-all')?.addEventListener('change', e => { c.querySelectorAll('.h-sel').forEach(x => { x.checked = e.target.checked; x.checked ? HT.sel.add(x.value) : HT.sel.delete(x.value); }); upd(); });
+  c.querySelectorAll('[data-hb]').forEach(b => b.onclick = () => {
+    if (b.dataset.hb === 'clear') { HT.sel.clear(); c.querySelectorAll('.h-sel, #h-all').forEach(x => { x.checked = false; }); upd(); return; }
+    act(b.dataset.hb, [...HT.sel], b);
+  });
+  c.querySelectorAll('[data-hall]').forEach(b => b.onclick = async () => {
+    b.closest('details').open = false;
+    const all = await restAll(`streams?select=id,url,channels!inner(id)&${T.f}${search}`, { auth: true });
+    if (b.dataset.hall === 'recheck') {
+      if (!await modal({ title: `إعادة فحص ${num(all.length)} رابط`, icon: 'zap', ok: 'بدء', body: '<p>قد يستغرق ذلك بعض الوقت حسب عدد الروابط.</p>' })) return;
+      return recheck(all, b);
+    }
+    act(b.dataset.hall, all.map(x => x.id), b);
+  });
+  const tbody = c.querySelector('.h-tbl tbody');
+  tbody?.addEventListener('change', e => { if (e.target.classList.contains('h-sel')) { e.target.checked ? HT.sel.add(e.target.value) : HT.sel.delete(e.target.value); upd(); } });
+  tbody?.addEventListener('click', e => {
     const b = e.target.closest('[data-h]'); if (!b) return;
-    if (b.dataset.h === 'copy') navigator.clipboard?.writeText(b.dataset.u).then(() => toast('تم نسخ الرابط', 'success'));
-    if (b.dataset.h === 'edit') editChannel(b.dataset.cid);
-    if (b.dataset.h === 'del' && await busy(b, () => rest(`streams?id=eq.${b.closest('tr').dataset.sid}`, { method: 'DELETE', auth: true }))) { b.closest('tr').remove(); refreshStats(); }
+    const id = b.closest('tr').dataset.sid, a = b.dataset.h;
+    if (a === 'copy') return navigator.clipboard?.writeText(b.dataset.u).then(() => toast('تم نسخ الرابط', 'success'));
+    if (a === 'play') return previewChannel(b.dataset.cid, b.dataset.n);
+    if (a === 'edit') return editChannel(b.dataset.cid);
+    act(a, [id], b);
   });
   c.querySelectorAll('[data-clean]').forEach(b => b.onclick = async () => {
-    const card = b.closest('.clean');
-    const danger = b.dataset.danger === '1';
+    const card = b.closest('.clean'), danger = b.dataset.danger === '1';
     if (!await modal({ title: card.querySelector('b').textContent, danger, icon: b.dataset.icon, ok: 'تنفيذ', confirmWord: danger ? 'حذف' : '', body: `<p>${card.querySelector('small').textContent}</p>` })) return;
     busy(b, async () => { const n = await rpc('admin_cleanup', { p_action: b.dataset.clean }); toast(`تم التنفيذ (${num(n)})`, 'success'); go('health'); });
   });
 
+  /* ── تشغيل الفحص ── */
   const start = c.querySelector('#h-start'), stop = c.querySelector('#h-stop'), prog = c.querySelector('#h-prog');
   stop.onclick = () => { H.stop = true; stop.disabled = true; };
   start.onclick = async () => {
@@ -723,7 +808,7 @@ async function health(c) {
     let okN = 0, badN = 0, logoBad = 0;
     try {
       setP('جلب قائمة الروابط…', 1);
-      const filter = scope === 'all' ? '' : `&status=eq.${scope}`;
+      const filter = (scope === 'all' ? '' : `&status=eq.${scope}`) + '&is_active=eq.true';
       const items = [];
       for (let from = 0; items.length < limit; from += 1000) {
         const { data } = await rest(`streams?select=id,url,channel_id${filter}&order=last_checked_at.asc.nullsfirst`, { auth: true, range: `${from}-${from + Math.min(999, limit - items.length - 1)}` });
@@ -732,7 +817,7 @@ async function health(c) {
       if (!items.length) { toast('لا توجد روابط في هذا النطاق', 'info'); return; }
       let pending = [], done = 0;
       const flush = async () => { if (!pending.length) return; const part = pending; pending = []; await rpc('admin_record_checks', { p_results: part }); };
-      await pool(items, par, s => probeStream(s.url), async s => {
+      await pool(items, par, s => probeStream(s.url), s => {
         done++; s.res.ok ? okN++ : badN++;
         pending.push({ id: s.id, ...s.res });
         if (pending.length >= 50) flush().catch(() => {});
@@ -741,11 +826,10 @@ async function health(c) {
       });
       await flush();
       if (logos && !H.stop) {
-        const ids = [...new Set(items.map(s => s.channel_id))];
-        const chans = [];
+        const ids = [...new Set(items.map(s => s.channel_id))], chans = [];
         for (const part of chunk(ids, 150)) chans.push(...((await rest(`channels?select=id,logo_url&id=in.(${part.join(',')})&logo_url=not.is.null`, { auth: true })).data || []));
         let ld = 0; const results = [];
-        await pool(chans, 12, ch => probeLogo(ch.logo_url), ch => { ld++; results.push({ id: ch.id, ok: ch.res }); if (!ch.res) logoBad++; c.querySelector('#h-logo').textContent = num(logoBad); setP(`فحص الشعارات ${num(ld)} / ${num(chans.length)}`, 80 + ld / chans.length * 20); });
+        await pool(chans, 12, ch => probeLogo(ch.logo_url), ch => { ld++; results.push({ id: ch.id, ok: ch.res }); if (!ch.res) logoBad++; c.querySelector('#h-logo').textContent = num(logoBad); setP(`فحص الشعارات ${num(ld)} / ${num(chans.length)}`, 80 + ld / Math.max(1, chans.length) * 20); });
         for (const part of chunk(results, 200)) await rpc('admin_record_logos', { p_results: part });
       }
       setP(H.stop ? 'تم إيقاف الفحص' : 'اكتمل الفحص', 100);
@@ -753,7 +837,7 @@ async function health(c) {
     } catch (e) { toast(e.message, 'error'); }
     finally {
       H.running = false;
-      if (start.isConnected) { start.hidden = false; stop.hidden = true; await refreshStats(); drawDead(); }
+      if (start.isConnected && S.tab === 'health') { HT.tab = badN ? 'offline' : HT.tab; HT.page = 0; go('health'); }
     }
   };
 }
@@ -763,7 +847,7 @@ const cleanBtn = (k, i, t, s, n, danger) => `<div class="clean ${danger ? 'dange
 async function duplicates(c) {
   const [groups] = await Promise.all([rpc('admin_duplicates'), loadLookups()]);
   const co = code => S.countries.find(x => x.code === code);
-  c.innerHTML = pageHead('القنوات المكررة', 'قنوات بنفس الاسم (بعد تجاهل الجودة والرموز) في نفس الدولة. اختر القناة التي تريد الإبقاء عليها ثم ادمج أو أخفِ أو احذف البقية.',
+  c.innerHTML = pageHead('القنوات المكررة', 'قنوات بنفس الاسم (بعد تجاهل الجودة والرموز) في نفس الدولة. قارن بينها: إن كان البث نفسه فادمج أو أخفِ أو احذف، وإن كان بث كل واحدة مختلفًا فاختر «ليست مكررة» لتبقى كلها.',
     groups.length ? `<button class="btn2 ghost" id="d-hide-all">${ic('eyeoff')} إخفاء كل المكررات</button><button class="btn2 primary" id="d-merge-all">${ic('layers')} دمج الكل تلقائيًا</button>` : '')
     + (groups.length ? `<p class="muted">${num(groups.length)} مجموعة · الدمج ينقل روابط المكررات إلى القناة المختارة (سيرفرات إضافية) ثم يحذفها.</p>
     <section class="dup-grid">${groups.map((g, gi) => `<article class="dup" data-g="${gi}">
@@ -771,7 +855,7 @@ async function duplicates(c) {
       ${g.channels.map((x, i) => `<label class="dup-row"><input type="radio" name="keep${gi}" value="${x.id}" ${i ? '' : 'checked'}>
         ${thumb(x)}<div><b>${x.number ? `${x.number}. ` : ''}${esc(x.name)}</b><small class="muted" dir="ltr">${esc(x.uid)}</small>
         <div class="dup-tags">${x.is_published ? chip('ok', 'منشورة') : chip('off', 'مخفية')}<span class="tag-s">${x.online}/${x.streams} روابط تعمل</span>${x.quality ? `<span class="tag-s">${x.quality}</span>` : ''}</div></div></label>`).join('')}
-      <footer><button class="btn2 ghost sm" data-d="compare">${ic('compare')} مقارنة</button><button class="btn2 primary sm" data-d="merge">${ic('layers')} دمج</button><button class="btn2 ghost sm" data-d="hide">${ic('eyeoff')} إخفاء البقية</button><button class="btn2 danger-ghost sm" data-d="del">${ic('trash')} حذف البقية</button></footer>
+      <footer><button class="btn2 ghost sm" data-d="compare">${ic('compare')} مقارنة</button><button class="btn2 primary sm" data-d="merge">${ic('layers')} دمج</button><button class="btn2 ghost sm" data-d="hide">${ic('eyeoff')} إخفاء البقية</button><button class="btn2 danger-ghost sm" data-d="del">${ic('trash')} حذف البقية</button><button class="btn2 ghost sm" data-d="distinct" title="بث مختلف — تبقى كلها">${ic('copy')} ليست مكررة</button></footer>
     </article>`).join('')}</section>` : `<div class="panel">${empty('check', 'لا توجد قنوات مكررة', 'كل القنوات فريدة. ممتاز!')}</div>`);
 
   const pick = gi => { const g = groups[gi], keep = c.querySelector(`[name=keep${gi}]:checked`).value; return { keep, rest: g.channels.map(x => x.id).filter(id => id !== keep) }; };
@@ -783,8 +867,9 @@ async function duplicates(c) {
       if (a === 'merge') await rpc('admin_merge', { p_keep: keep, p_remove: others });
       if (a === 'hide') await rpc('admin_hide_duplicates', { p_keep: keep, p_hide: others });
       if (a === 'del') await rest(`channels?id=in.(${others.join(',')})`, { method: 'DELETE', auth: true });
+      if (a === 'distinct') await rpc('admin_mark_distinct', { p_ids: others });
     });
-    if (ok) { card.classList.add('done'); card.querySelector('footer').innerHTML = chip('ok', { merge: 'تم الدمج', hide: 'تم الإخفاء', del: 'تم الحذف' }[a]); refreshStats(); }
+    if (ok) { card.classList.add('done'); card.querySelector('footer').innerHTML = chip('ok', { merge: 'تم الدمج', hide: 'تم الإخفاء', del: 'تم الحذف', distinct: 'تبقى كلها — ليست مكررة' }[a]); refreshStats(); }
   });
   const all = async (btn, kind) => {
     if (!await modal({ title: kind === 'merge' ? 'دمج كل المكررات' : 'إخفاء كل المكررات', icon: 'layers', ok: 'تنفيذ', body: `<p>سيتم ${kind === 'merge' ? 'دمج' : 'إخفاء'} ${num(groups.length)} مجموعة مع الإبقاء على القناة المختارة في كل مجموعة (الأولى افتراضيًا: المنشورة صاحبة الرقم الأصغر).</p>` })) return;
@@ -806,7 +891,7 @@ async function duplicates(c) {
 const BUCKETS = [
   { k: 'unchecked', i: 'info', t: 'لم تُفحص', d: 'روابطها لم تُفحص بعد — شغّل الفحص لتُصنَّف تلقائيًا.', h: 45 },
   { k: 'ready', i: 'check', t: 'جاهزة للنشر', d: 'روابطها تعمل وغير مكررة. راجعها ثم وافق عليها.', h: 145 },
-  { k: 'duplicate', i: 'layers', t: 'مكررة', d: 'نسخة أخرى من قناة موجودة. قارن بينهما ثم ادمج أو احذف.', h: 35 },
+  { k: 'duplicate', i: 'layers', t: 'مكررة', d: 'بنفس اسم قناة موجودة. قارن بينهما: إن كان البث نفسه فادمج أو احذف، وإن كان بثًا مختلفًا فاختر «ليست مكررة» لتبقى القناتان.', h: 35 },
   { k: 'offline', i: 'alert', t: 'لا تعمل', d: 'لا يوجد رابط يعمل لهذه القنوات حاليًا.', h: 0 },
   { k: 'logo', i: 'eyeoff', t: 'شعار معطّل', d: 'القناة تعمل لكن شعارها لا يظهر. يمكنك تعديله أو نشرها بدونه.', h: 280 },
   { k: 'incomplete', i: 'edit', t: 'ناقصة', d: 'قنوات تعمل لكن بدون دولة. عدّلها قبل النشر.', h: 200 }
@@ -840,7 +925,7 @@ async function review(c) {
         <label class="search2 sm">${ic('search')}<input id="rv-q" type="search" placeholder="بحث بالاسم أو الرقم…" value="${esc(RV.q)}"></label>
         ${total ? `<details class="menu2"><summary class="btn2 ghost sm">${ic('dots')} على كل «${B.t}» (${num(total)})</summary><div class="menu2-list">
           ${RV.bucket !== 'offline' && RV.bucket !== 'unchecked' ? `<button data-allrv="approve">${ic('check')} موافقة ونشر الكل</button>` : ''}
-          ${RV.bucket === 'duplicate' ? `<button data-allrv="merge">${ic('layers')} دمج الكل في القنوات الأصلية</button>` : ''}
+          ${RV.bucket === 'duplicate' ? `<button data-allrv="merge">${ic('layers')} دمج الكل في القنوات الأصلية</button><button data-allrv="distinct">${ic('check')} الكل ليست مكررة — أبقِها كلها</button>` : ''}
           <button data-allrv="reject" class="bad">${ic('trash')} رفض وحذف الكل</button></div></details>` : ''}
       </div>
       <div class="panel tbl-panel">${rows.length ? `<div class="tbl-scroll"><table class="tbl2 rv-tbl">
@@ -853,7 +938,7 @@ async function review(c) {
           <td><span class="streams-b"><b class="ok">${r.online}</b>${r.total - r.online - r.unchecked ? `<b class="bad">${r.total - r.online - r.unchecked}</b>` : ''}${r.unchecked ? `<b class="off">${r.unchecked}</b>` : ''}<span>/ ${r.total}</span></span></td>
           ${RV.bucket === 'duplicate' ? `<td>${kp ? `<div class="ch2 sm">${thumb(kp)}<div><b>${kp.number ? `${kp.number}. ` : ''}${esc(kp.name)}</b><small>${kp.is_published ? chip('ok', 'منشورة') : chip('warn', 'معلّقة')}</small></div></div>` : '—'}</td>` : ''}
           <td class="acts2">
-            ${RV.bucket === 'duplicate' && kp ? `<button class="btn2 ghost sm" data-rv="compare" data-k="${kp.id}">${ic('compare')} مقارنة</button><button class="icon2" data-rv="merge" title="دمج في الأصلية">${ic('layers')}</button>` : ''}
+            ${RV.bucket === 'duplicate' && kp ? `<button class="btn2 ghost sm" data-rv="compare" data-k="${kp.id}">${ic('compare')} مقارنة</button><button class="icon2" data-rv="merge" title="دمج في الأصلية">${ic('layers')}</button><button class="icon2 ok" data-rv="distinct" title="ليست مكررة — بث مختلف، أبقِ القناتين">${ic('copy')}</button>` : ''}
             <button class="icon2" data-rv="play" title="تشغيل">${ic('play')}</button>
             <button class="icon2" data-rv="edit" title="تعديل">${ic('edit')}</button>
             ${RV.bucket !== 'offline' && RV.bucket !== 'unchecked' ? `<button class="icon2 ok" data-rv="approve" title="موافقة ونشر">${ic('check')}</button>` : ''}
@@ -863,7 +948,7 @@ async function review(c) {
         <div class="pager2"><span class="sp"></span>${pager(RV.page, pages)}</div></div>
       <div class="bulkbar" id="rv-bar" hidden><b id="rv-selc"></b>
         ${RV.bucket !== 'offline' && RV.bucket !== 'unchecked' ? `<button data-rvb="approve">${ic('check')} موافقة ونشر</button>` : ''}
-        ${RV.bucket === 'duplicate' ? `<button data-rvb="merge">${ic('layers')} دمج في الأصلية</button>` : ''}
+        ${RV.bucket === 'duplicate' ? `<button data-rvb="merge">${ic('layers')} دمج في الأصلية</button><button data-rvb="distinct">${ic('copy')} ليست مكررة</button>` : ''}
         <button data-rvb="reject" class="bad">${ic('trash')} رفض وحذف</button>
         <button data-rvb="clear" class="x" title="إلغاء التحديد">${ic('x')}</button></div>`
     : `<div class="panel">${empty('check', 'لا توجد قنوات بانتظار المراجعة', 'كل القنوات تمت مراجعتها. أي قناة جديدة — من استيراد مصدر أو ملف SQL أو استعادة نسخة — ستظهر هنا أولًا.', `<button class="btn2 ghost" data-go="maintenance">${ic('history')} استعادة نسخة الديمو</button>`)}</div>`);
@@ -876,7 +961,11 @@ async function review(c) {
 
   const apply = async (action, ids, btn) => {
     if (!ids.length) return;
-    const label = { approve: 'موافقة ونشر', reject: 'رفض وحذف', merge: 'دمج في الأصلية' }[action];
+    const label = { approve: 'موافقة ونشر', reject: 'رفض وحذف', merge: 'دمج في الأصلية', distinct: 'ليست مكررة' }[action];
+    if (action === 'distinct') return busy(btn, async () => { // القنوات تبقى وتنتقل لتبويبها الصحيح (غالبًا «جاهزة للنشر»)
+      let n = 0; for (const part of chunk(ids, 400)) n += await rpc('admin_mark_distinct', { p_ids: part });
+      toast(`${num(n)} قناة لم تعد تُعامل كمكررة — انتقلت للمراجعة العادية`, 'success'); go('review');
+    });
     if (action !== 'approve' && !await modal({ title: `${label} ${num(ids.length)} قناة`, danger: action === 'reject', icon: action === 'merge' ? 'layers' : 'trash', ok: label, confirmWord: action === 'reject' && ids.length > 50 ? 'حذف' : '',
       body: action === 'reject' ? `<p>سيتم حذف <b>${num(ids.length)} قناة</b> وروابطها نهائيًا من قاعدة البيانات.</p>` : `<p>ستنتقل روابط ${num(ids.length)} قناة مكررة إلى قنواتها الأصلية كسيرفرات إضافية، ثم تُحذف المكررات.</p>` })) return;
     await busy(btn, async () => {
@@ -906,7 +995,7 @@ async function review(c) {
     if (a === 'play') previewChannel(id, r.name);
     if (a === 'edit') editChannel(id);
     if (a === 'compare') compareChannels([b.dataset.k, id], { onDone: () => go('review') });
-    if (a === 'approve' || a === 'reject' || a === 'merge') apply(a, [id], b);
+    if (a === 'approve' || a === 'reject' || a === 'merge' || a === 'distinct') apply(a, [id], b);
   });
 
   // الفحص: روابط القنوات المعلّقة التي لم تُفحص (أو كلها عند الطلب)
@@ -992,6 +1081,7 @@ async function compareChannels(ids, { onDone } = {}) {
       <label class="cmp-keep"><input type="radio" name="keep" value="${ch.id}" ${i ? '' : 'checked'}><span>${ic('check')} أبقِ هذه القناة</span></label>
     </article>`).join('')}</div>
     <footer class="cmp-f"><span class="muted" id="cmp-hint">يتم القياس… انتظر 10 ثوانٍ تقريبًا ليتضح الفرق.</span><span class="sp"></span>
+      <button class="btn2 ghost" data-c="distinct" title="بث مختلف لكل قناة — تبقى كلها ولا تُعامل كمكررة">${ic('copy')} ليست مكررة — أبقِ الكل</button>
       <button class="btn2 primary" data-c="merge">${ic('layers')} دمج البقية في المختارة</button>
       <button class="btn2 ghost" data-c="hide">${ic('eyeoff')} إخفاء البقية</button>
       <button class="btn2 danger-ghost" data-c="del">${ic('trash')} حذف البقية</button></footer>`;
@@ -1055,7 +1145,11 @@ async function compareChannels(ids, { onDone } = {}) {
   d.onclose = () => { tiles.forEach(t => { clearInterval(t.timer); try { t.hls?.destroy(); } catch { /* ignore */ } }); d.remove(); };
   d.querySelectorAll('[data-c]').forEach(b => b.onclick = async () => {
     const keep = d.querySelector('[name=keep]:checked').value, others = chans.map(x => x.id).filter(x => x !== keep), kept = chans.find(x => x.id === keep), a = b.dataset.c;
-    const label = { merge: 'دمج', hide: 'إخفاء', del: 'حذف' }[a];
+    const label = { merge: 'دمج', hide: 'إخفاء', del: 'حذف', distinct: 'إبقاء' }[a];
+    if (a === 'distinct') {
+      if (await busy(b, () => rpc('admin_mark_distinct', { p_ids: others }))) { toast(`تبقى القنوات ${chans.length} كلها — لم تعد تُعامل كمكررة`, 'success'); close(); refreshStats(); onDone?.(); }
+      return;
+    }
     if (a === 'del' && !await modal({ title: 'حذف البقية', danger: true, ok: 'حذف', body: `<p>سيتم حذف ${others.length} قناة وروابطها نهائيًا والإبقاء على «${esc(kept.name)}».</p>` })) return;
     const ok = await busy(b, async () => {
       if (a === 'merge') await rpc('admin_merge', { p_keep: keep, p_remove: others });
