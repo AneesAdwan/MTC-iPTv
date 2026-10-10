@@ -34,8 +34,10 @@ drop function if exists public.admin_hide_duplicates(uuid, uuid[]) cascade;
 drop function if exists public.admin_renumber() cascade;
 drop view if exists public.review_queue cascade;
 drop function if exists public.channels_review_gate() cascade;
+drop function if exists public.channels_stamp_published() cascade;
 drop function if exists public.admin_review_apply(text, uuid[]) cascade;
 drop function if exists public.admin_create_channel(jsonb, text) cascade;
+drop function if exists public.admin_iptv_add(jsonb, boolean) cascade;
 drop function if exists public.admin_restore_reset(boolean) cascade;
 drop function if exists public.admin_restore_rows(text, jsonb) cascade;
 drop function if exists public.admin_restore_links(jsonb) cascade;
@@ -132,6 +134,7 @@ create table public.channels (
   is_manual        boolean not null default false,                    -- أضيفت يدويًا (لا تُحذف مع المصادر)
   hidden_reason    text check (hidden_reason in ('manual','duplicate','offline','reported','pending')),  -- pending = بانتظار مراجعة المدير
   duplicate_of     uuid references public.channels(id) on delete set null,
+  published_at     timestamptz,                                       -- أول نشر فعلي للمشاهدين (لقائمة «مضافة حديثًا»)
   dup_key          text,                                              -- يحدده المدير: «ليست مكررة» يعطي القناة مفتاحًا خاصًا بها
   sort_order       integer not null default 0,
   created_at       timestamptz not null default now(),
@@ -202,6 +205,15 @@ begin
 end $$;
 create trigger channels_review_gate before insert on public.channels for each row execute function public.channels_review_gate();
 
+-- تاريخ النشر: يُسجَّل مرة واحدة عند أول ظهور للقناة للمشاهدين (إضافة يدوية أو موافقة من المراجعة)
+-- ولا يتغير إذا أُخفيت القناة مؤقتًا ثم عادت — فلا تقفز القنوات القديمة إلى «مضافة حديثًا».
+create function public.channels_stamp_published() returns trigger language plpgsql as $$
+begin
+  if new.is_published and new.hidden_reason is null and new.published_at is null then new.published_at := now(); end if;
+  return new;
+end $$;
+create trigger channels_stamp_published before insert or update on public.channels for each row execute function public.channels_stamp_published();
+
 -- اسم مُطبَّع لكشف التكرار: "Al Jazeera (1080p) HD" → "aljazeera"
 create function public.norm_name(n text) returns text language sql immutable as $$
   select regexp_replace(
@@ -228,7 +240,7 @@ $$;
 -- ─── 9) واجهات العرض للمشاهدين (قراءة فقط) ─────────────────────────────────
 -- القنوات المنشورة التي لديها رابط واحد على الأقل غير معطّل
 create view public.catalog as
-select c.id, c.number, c.name, c.network, c.description, c.quality, c.is_featured, c.sort_order,
+select c.id, c.number, c.name, c.network, c.description, c.quality, c.is_featured, c.sort_order, c.published_at,
        case when c.logo_status = 'broken' then null else c.logo_url end as logo_url,
        c.country_code, co.name_ar as country_name, co.name_en as country_name_en, co.flag_url, co.is_arab, co.continent,
        c.category_slug, cat.name_ar as category_name, c.extra_categories,
@@ -650,6 +662,51 @@ begin
   return v_id;
 end $$;
 
+-- ─── الإضافة من البحث في iptv-org (صفحة «البحث في iptv-org» في اللوحة) ──────────
+-- لكل قناة مختارة: إن كانت موجودة (نفس معرّف iptv-org أو قناة حددها المدير) تُضاف روابطها الجديدة إليها،
+-- وإلا تُنشأ قناة جديدة. القنوات الجديدة تمر ببوابة المراجعة، إلا إذا اختار المدير «نشر مباشرة».
+-- الروابط المكررة (موجودة في أي قناة) تُتجاهل، ونتيجة الفحص من المتصفح تُحفظ مع الرابط.
+create function public.admin_iptv_add(p_items jsonb, p_publish boolean default false) returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare it jsonb; v_id uuid; v_new int := 0; v_merged int := 0; v_links int := 0; n int; v_pr int; v_country text;
+begin
+  if not is_mtc_admin() then raise exception 'forbidden'; end if;
+  for it in select * from jsonb_array_elements(coalesce(p_items, '[]')) loop
+    v_id := nullif(it->>'target', '')::uuid;
+    if v_id is null then select id into v_id from channels where uid = it->>'uid'; end if;
+    if v_id is null then
+      v_country := (select code from countries where code = upper(it->>'country'));
+      if p_publish then perform set_config('mtc.review_bypass', 'on', true); end if;
+      insert into channels (uid, number, name, alt_names, network, logo_url, country_code, category_slug, extra_categories,
+                            language_code, quality, website, is_published, is_manual)
+      values (it->>'uid', (select coalesce(max(number), 0) + 1 from channels), left(it->>'name', 250),
+              array(select jsonb_array_elements_text(coalesce(it->'alt', '[]'))),
+              nullif(it->>'network', ''), nullif(it->>'logo', ''), v_country,
+              coalesce((select slug from categories where slug = it->>'category'), 'general'),
+              array(select x from jsonb_array_elements_text(coalesce(it->'extra', '[]')) x where exists (select 1 from categories where slug = x)),
+              coalesce((select code from languages where code = it->>'language'), (select language_code from countries where code = v_country)),
+              case when it->>'quality' in ('SD', 'HD', 'FHD', '4K') then it->>'quality' end,
+              nullif(it->>'website', ''), true, true)
+      returning id into v_id;
+      perform set_config('mtc.review_bypass', 'off', true);
+      v_new := v_new + 1;
+    else
+      v_merged := v_merged + 1;
+    end if;
+    select coalesce(max(priority) + 1, 0) into v_pr from streams where channel_id = v_id;
+    insert into streams (channel_id, url, quality, priority, status, response_ms, last_checked_at)
+    select v_id, s->>'url', nullif(s->>'quality', ''), v_pr + o::int - 1,
+           case when s->>'status' in ('online', 'offline') then s->>'status' else 'unknown' end,
+           nullif(s->>'ms', '')::int, case when s->>'status' in ('online', 'offline') then now() end
+    from jsonb_array_elements(coalesce(it->'streams', '[]')) with ordinality as t(s, o)
+    where s->>'url' ~ '^https://' and length(s->>'url') <= 2000
+    on conflict (url) do nothing;
+    get diagnostics n = row_count;
+    v_links := v_links + n;
+  end loop;
+  return jsonb_build_object('created', v_new, 'merged', v_merged, 'streams', v_links);
+end $$;
+
 -- ─── الاستعادة من نسخة احتياطية (تُستدعى من اللوحة على دفعات) ───────────────
 -- 1) تفريغ البيانات: القنوات والروابط والمصادر والبلاغات (+ الجداول المرجعية إن طُلب)
 create function public.admin_restore_reset(p_refs boolean default false) returns void
@@ -792,7 +849,7 @@ grant execute on function public.is_mtc_admin(), public.admin_stats(), public.ad
   public.admin_restore_rows(text, jsonb), public.admin_restore_links(jsonb),
   public.admin_mark_distinct(uuid[]), public.admin_stream_action(text, uuid[]),
   public.admin_renumber_plan(text[], integer, integer, boolean), public.admin_renumber_preview(text[], integer, integer, boolean, integer),
-  public.admin_renumber_apply(text[], integer, integer, boolean) to authenticated;
+  public.admin_renumber_apply(text[], integer, integer, boolean), public.admin_iptv_add(jsonb, boolean) to authenticated;
 grant execute on function public.norm_name(text), public.server_of(text), public.touch_updated_at() to anon, authenticated;
 grant execute on function public.dup_key(public.channels) to authenticated;
 

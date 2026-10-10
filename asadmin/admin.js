@@ -41,6 +41,8 @@ const TABS = [
   { k: 'duplicates', i: 'layers', t: 'القنوات المكررة', badge: 'duplicates', warn: true },
   { k: 'reports', i: 'flag', t: 'بلاغات المشاهدين', badge: 'reports', warn: true },
   { k: 'sources', i: 'link', t: 'مصادر البث', badge: 'sources', sec: 'المحتوى' },
+  { k: 'iptv', i: 'search', t: 'البحث في iptv-org' },
+  { k: 'convert', i: 'upload', t: 'تحويل قائمة M3U' },
   { k: 'sections', i: 'grid', t: 'التقسيمات' },
   { k: 'numbering', i: 'sort', t: 'إعادة الترقيم' },
   { k: 'settings', i: 'edit', t: 'الإعدادات العامة', sec: 'النظام' },
@@ -273,7 +275,7 @@ function go(tab) {
   document.title = `${t.t} — لوحة تحكم MTC-iPTv`;
   const c = document.getElementById('content');
   c.innerHTML = '<div class="loading2"><i class="spin"></i><span>جارٍ التحميل…</span></div>';
-  ({ overview, review, channels, health, duplicates, reports, sources, sections, numbering, settings, maintenance })[t.k](c).catch(e => {
+  ({ overview, review, channels, health, duplicates, reports, sources, iptv, convert, sections, numbering, settings, maintenance })[t.k](c).catch(e => {
     const old = /admin_stats|does not exist|schema cache|function/i.test(e.message);
     c.innerHTML = `<div class="alert2 ${old ? 'warn' : 'bad'}">${ic('alert')}<div><b>${old ? 'قاعدة البيانات تحتاج تحديثًا' : 'تعذّر تحميل الصفحة'}</b><p>${old ? 'شغّل أحدث نسخة من supabase/01_schema.sql ثم supabase/02_data.sql في Supabase ← SQL Editor.' : ''} ${esc(e.message)}</p></div></div>`;
     if (/الجلسة/.test(e.message)) renderLogin();
@@ -1043,6 +1045,10 @@ async function review(c) {
 /* ═══════════════════ تشغيل قناة للمعاينة ═══════════════════ */
 async function previewChannel(id, name) {
   const list = (await rest(`streams?channel_id=eq.${id}&select=id,url,host,status,priority,quality,is_active&order=priority.asc`, { auth: true })).data || [];
+  previewStreams(list, name);
+}
+/** يشغّل قائمة روابط (من قاعدة البيانات أو من iptv-org) في نافذة معاينة مع التبديل بين السيرفرات */
+function previewStreams(list, name) {
   const d = document.createElement('dialog');
   d.className = 'modal wide pv-dlg';
   d.innerHTML = `<div class="pv-h"><h3>${ic('play')} ${esc(name || 'معاينة')}</h3><button class="icon2" data-x>${ic('x')}</button></div>
@@ -1521,6 +1527,404 @@ async function reports(c) {
     if (b.dataset.r === 'resolve' && await busy(b, () => rest(`reports?id=in.(${ids.join(',')})`, { method: 'PATCH', auth: true, body: { status: 'resolved' } }))) { card.remove(); refreshStats(); }
     if (b.dataset.r === 'del' && await busy(b, () => rest(`reports?id=in.(${ids.join(',')})`, { method: 'DELETE', auth: true }))) { card.remove(); refreshStats(); }
   }));
+}
+
+/* ═══════════════════ البحث في iptv-org ═══════════════════
+   يبحث في قاعدة بيانات iptv-org المفتوحة (قنوات + روابط + شعارات) مباشرة من المتصفح،
+   يحدد المدير قناة أو أكثر — حتى من عدة عمليات بحث — يفحص روابطها ويعاينها، ثم يضيفها دفعة واحدة. */
+const IPTV_API = 'https://iptv-org.github.io/api/';
+const IPTV_Q = q => { const h = parseInt(q) || 0; return h >= 2160 ? '4K' : h >= 1080 ? 'FHD' : h >= 720 ? 'HD' : h ? 'SD' : null; };
+const IPTV_RANK = { '4K': 4, FHD: 3, HD: 2, SD: 1 };
+// نفس norm_name في قاعدة البيانات: لكشف القنوات الموجودة عندك بنفس الاسم
+const normName = n => String(n || '').toLowerCase().replace(/\s*[([][^)\]]*[)\]]/g, '').replace(/(\s|[-_.:'"!?&*/\\|،]|\b(hd|fhd|sd|uhd|4k|tv)\b)+/g, '');
+
+async function loadIptv(set) {
+  if (S.iptv?.list) return S.iptv;
+  const get = async name => { const r = await fetch(IPTV_API + name + '.json'); if (!r.ok) throw new Error(`تعذّر تنزيل ${name}.json من iptv-org`); const j = await r.json(); set(`تم تنزيل ${name}`); return j; };
+  set('تنزيل القنوات والروابط والشعارات…');
+  const [channels, streams, logos, blocklist] = await Promise.all(['channels', 'streams', 'logos', 'blocklist'].map(get));
+  set('تجهيز الفهرس…');
+  const blocked = new Set(blocklist.map(b => b.channel));
+  const logo = new Map();
+  for (const l of logos) {
+    if (!/^https:/.test(l.url)) continue;
+    const sc = (l.feed ? 0 : 4) + (l.in_use ? 2 : 0) + (/PNG|SVG/i.test(l.format || '') ? 1 : 0);
+    if (!logo.has(l.channel) || sc > logo.get(l.channel).sc) logo.set(l.channel, { url: l.url, sc });
+  }
+  const byCh = new Map();
+  for (const s of streams) {
+    const key = s.channel || `stream:${normName(s.title)}`;
+    if (!byCh.has(key)) byCh.set(key, []);
+    // روابط لا تعمل في المتصفح: http على موقع https، أو تحتاج User-Agent/Referrer خاصًا.
+    // «محجوب جغرافيًا» يبقى قابلًا للإضافة: كثير منها يعمل في منطقتك، والفحص هو الحكم.
+    const why = !/^https:/.test(s.url) ? 'http' : s.user_agent || s.referrer ? 'ua' : '';
+    byCh.get(key).push({ url: s.url, quality: IPTV_Q(s.quality), why, geo: (s.labels || []).includes('Geo-blocked'), title: s.title });
+  }
+  const list = [];
+  for (const c of channels) {
+    if (c.is_nsfw || c.closed || blocked.has(c.id)) continue;
+    list.push({ uid: c.id, name: c.name, alt: c.alt_names || [], network: c.network || null, country: c.country || null,
+      categories: c.categories || [], website: c.website || null, logo: logo.get(c.id)?.url || null, streams: byCh.get(c.id) || [] });
+    byCh.delete(c.id);
+  }
+  // روابط بلا قناة معرّفة في iptv-org: تُجمع حسب عنوانها
+  for (const [k, st] of byCh) {
+    if (!k.startsWith('stream:') || !st[0]?.title) continue;
+    list.push({ uid: k, name: st[0].title.replace(/\s*\([^)]*\)|\s*\[[^\]]*\]/g, '').trim() || st[0].title, alt: [], network: null, country: null, categories: [], streams: st, orphan: true });
+  }
+  for (const x of list) { x.ok = x.streams.filter(s => !s.why); x.key = normName(x.name); x.hay = [x.name, ...x.alt, x.network || '', x.uid].join(' ').toLowerCase(); }
+
+  set('مطابقة مع قنواتك…');
+  const [mine, urls] = await Promise.all([
+    restAll('channels?select=id,uid,name,number', { auth: true }),
+    restAll('streams?select=url', { auth: true })
+  ]);
+  const byUid = new Map(mine.map(m => [m.uid, m])), byName = new Map();
+  for (const m of mine) { const k = normName(m.name); if (k && !byName.has(k)) byName.set(k, m); }
+  const prev = S.iptvF;
+  S.iptv = { list, byUid, byName, urls: new Set(urls.map(u => u.url)), sel: new Map(), probe: new Map(),
+    f: prev || { q: '', country: '', category: '', state: 'new', playable: true }, shown: 60 };
+  S.iptvF = S.iptv.f;
+  return S.iptv;
+}
+
+/** حالة القناة مقارنة بقنواتك: موجودة (نفس معرّف iptv-org) / اسم مشابه / جديدة — والروابط غير الموجودة عندك */
+function iptvState(x) {
+  const I = S.iptv, uid = x.orphan ? `iptv:${x.key || x.uid}` : x.uid;
+  const same = I.byUid.get(uid), like = !same && x.key ? I.byName.get(x.key) : null;
+  return { same, like, has: same || like, fresh: x.ok.filter(s => !I.urls.has(s.url)) };
+}
+
+async function iptv(c) {
+  await loadLookups();
+  if (!S.iptv?.list) {
+    c.innerHTML = pageHead('البحث في iptv-org', 'ابحث في مستودع iptv-org المفتوح وأضف القنوات التي تختارها.')
+      + `<div class="panel io-load"><i class="spin"></i><b>جارٍ تحميل فهرس iptv-org</b><small id="io-st">يُحمَّل مرة واحدة في الجلسة (~17 ميغابايت)…</small></div>`;
+    await loadIptv(t => { const e = c.querySelector('#io-st'); if (e) e.textContent = t; });
+    if (S.tab !== 'iptv') return;
+  }
+  const I = S.iptv, f = I.f;
+  const co = code => S.countries.find(x => x.code === code), cat = slug => S.cats.find(x => x.slug === slug);
+  const total = I.list.length, playable = I.list.filter(x => x.ok.length).length;
+  const find = uid => I.list.find(x => x.uid === uid);
+
+  const filtered = () => {
+    const q = f.q.trim().toLowerCase(), words = q.split(/\s+/).filter(Boolean), nq = normName(q);
+    let r = I.list.filter(x => (!f.playable || x.ok.length) && (!f.country || x.country === f.country) && (!f.category || x.categories.includes(f.category))
+      && (!words.length || words.every(w => x.hay.includes(w)) || (nq.length > 2 && x.key.includes(nq))));
+    if (f.state) r = r.filter(x => { const s = iptvState(x); return f.state === 'new' ? !s.has : f.state === 'links' ? s.has && s.fresh.length : s.has; });
+    const score = x => (q && x.name.toLowerCase() === q ? 0 : q && x.name.toLowerCase().startsWith(q) ? 1 : 2);
+    return r.sort((a, b) => score(a) - score(b) || (b.ok.length > 0) - (a.ok.length > 0) || (!!b.logo - !!a.logo) || a.name.localeCompare(b.name));
+  };
+
+  const rowHtml = x => {
+    const s = iptvState(x), k = cat(x.categories.find(v => v !== 'general') || x.categories[0]), cn = co(x.country), pr = I.probe.get(x.uid), sel = I.sel.has(x.uid);
+    const badge = s.same ? `<span class="tag-s ok">موجودة عندك #${s.same.number ?? '—'}</span>` : s.like ? `<span class="tag-s warn" title="عندك قناة بنفس الاسم">اسم مشابه: ${esc(s.like.name)}</span>` : '<span class="tag-s new">جديدة</span>';
+    const bad = x.streams.length - x.ok.length;
+    const prH = !pr ? '' : pr === 'run' ? '<span class="io-pr"><i class="spin"></i></span>' : `<span class="io-pr ${pr.on ? 'ok' : 'bad'}">${ic(pr.on ? 'check' : 'alert')} ${pr.on}/${pr.n} يعمل</span>`;
+    return `<tr data-uid="${esc(x.uid)}" class="${sel ? 'is-sel' : ''}">
+      <td><label class="chk2"><input type="checkbox" class="io-sel" ${sel ? 'checked' : ''} ${x.ok.length ? '' : 'disabled'}><i></i></label></td>
+      <td><div class="ch2">${thumb({ name: x.name, logo_url: x.logo })}<div><b>${esc(x.name)}</b><small class="muted" dir="ltr">${esc(x.orphan ? 'بدون معرّف في iptv-org' : x.uid)}</small>${x.alt.length ? `<small class="muted">${esc(x.alt.slice(0, 2).join(' · '))}</small>` : ''}</div></div></td>
+      <td>${k ? `<span class="cat2" style="--h:${k.hue}">${ic(k.icon)}${esc(k.name_ar)}</span>` : '<span class="muted">—</span>'}</td>
+      <td><div class="cl">${flag(cn?.flag_url)}<span>${esc(cn?.name_ar || x.country || '—')}</span></div></td>
+      <td><div class="io-links"><span><b class="${x.ok.length ? '' : 'bad'}">${x.ok.length}</b> رابط</span>${s.has && x.ok.length ? `<small class="${s.fresh.length ? 'ok' : 'muted'}">${s.fresh.length ? `${s.fresh.length} جديد عليك` : 'كلها عندك'}</small>` : ''}${x.ok.some(v => v.geo) ? `<small class="warn" title="iptv-org يصنّفها محجوبة في بعض الدول — افحصها لتعرف إن كانت تعمل عندك">${x.ok.filter(v => v.geo).length} محجوب جغرافيًا؟</small>` : ''}${bad ? `<small class="muted" title="روابط http أو تحتاج إعدادات خاصة (User-Agent / Referrer)">+${bad} لا يعمل بالمتصفح</small>` : ''}</div></td>
+      <td>${badge}${s.like ? `<div class="sel2 sm io-tgt"><select data-tgt title="أين تُضاف؟"><option value="">كقناة جديدة</option><option value="${s.like.id}" ${x.target ? 'selected' : ''}>روابطها إلى «${esc(s.like.name)}»</option></select></div>` : ''}</td>
+      <td class="acts2">${prH}
+        <button class="icon2" data-io="probe" title="فحص الروابط" ${x.ok.length ? '' : 'disabled'}>${ic('zap')}</button>
+        <button class="icon2" data-io="play" title="معاينة" ${x.ok.length ? '' : 'disabled'}>${ic('play')}</button></td>
+    </tr>`;
+  };
+
+  const bar = () => {
+    const n = I.sel.size, links = [...I.sel.values()].reduce((a, x) => a + iptvState(x).fresh.length, 0);
+    c.querySelector('#io-bar').hidden = !n;
+    c.querySelector('#io-selc').textContent = `تم تحديد ${num(n)} قناة · ${num(links)} رابط جديد`;
+    c.querySelector('#io-sel-list').innerHTML = [...I.sel.values()].slice(0, 10).map(x => `<button class="io-pill" data-un="${esc(x.uid)}" title="إزالة من التحديد">${esc(x.name)}${ic('x')}</button>`).join('') + (n > 10 ? `<span class="muted">+${num(n - 10)}</span>` : '');
+  };
+  const render = () => {
+    const r = filtered(), shown = r.slice(0, I.shown);
+    c.querySelector('#io-count').textContent = `${num(r.length)} نتيجة`;
+    c.querySelector('#io-body').innerHTML = shown.length ? `<div class="tbl-scroll"><table class="tbl2 io-tbl">
+      <thead><tr><th></th><th>القناة</th><th>الفئة</th><th>الدولة</th><th>الروابط</th><th>عندك؟</th><th></th></tr></thead>
+      <tbody>${shown.map(rowHtml).join('')}</tbody></table></div>
+      ${r.length > shown.length ? `<div class="io-more"><button class="btn2 ghost" id="io-more">عرض ${num(Math.min(60, r.length - shown.length))} نتيجة أخرى</button></div>` : ''}`
+      : empty('search', 'لا نتائج', f.q ? 'جرّب اسمًا آخر أو بالإنجليزية (مثل: MBC أو Al Jazeera أو Rotana)، أو غيّر الفلاتر.' : 'لا توجد قنوات مطابقة للفلاتر الحالية.');
+    const sh = shown.filter(x => x.ok.length);
+    c.querySelector('#io-all').checked = sh.length > 0 && sh.every(x => I.sel.has(x.uid));
+    c.querySelector('#io-more')?.addEventListener('click', () => { I.shown += 60; render(); });
+    bar();
+  };
+  const pick = (x, on) => { if (on && x.ok.length) I.sel.set(x.uid, x); else I.sel.delete(x.uid); };
+  const refreshRow = x => { const tr = c.querySelector(`tr[data-uid="${CSS.escape(x.uid)}"]`); if (tr) tr.outerHTML = rowHtml(x); };
+  const probeOne = async x => {
+    I.probe.set(x.uid, 'run'); refreshRow(x);
+    const res = await Promise.all(x.ok.slice(0, 8).map(async s => (s.res = await probeStream(s.url))));
+    I.probe.set(x.uid, { on: res.filter(r => r.ok).length, n: res.length }); refreshRow(x);
+  };
+
+  c.innerHTML = pageHead('البحث في iptv-org', `ابحث في ${num(total)} قناة من مستودع iptv-org المفتوح (${num(playable)} منها لها روابط تعمل في المتصفح)، حدّد ما تريد — ولو من عدة عمليات بحث — ثم أضفه دفعة واحدة.`,
+      `<button class="btn2 ghost" id="io-reload" title="تنزيل أحدث نسخة من iptv-org">${ic('refresh')} تحديث الفهرس</button>`)
+    + `<div class="seg">${[['new', 'جديدة عليك'], ['links', 'عندك وفيها روابط جديدة'], ['have', 'موجودة عندك'], ['', 'الكل']].map(([k, t]) => `<button data-st="${k}" class="${f.state === k ? 'on' : ''}">${t}</button>`).join('')}</div>
+    <div class="filters">
+      <label class="search2">${ic('search')}<input id="io-q" type="search" placeholder="اسم القناة… مثل MBC أو Al Jazeera أو beIN" value="${esc(f.q)}"></label>
+      <div class="sel2">${ic('globe')}<select id="io-country"><option value="">كل الدول</option>${opts(S.countries, f.country, 'code', x => `${x.flag_emoji || ''} ${x.name_ar}`)}</select></div>
+      <div class="sel2">${ic('grid')}<select id="io-cat">${opts(S.cats, f.category, 'slug', x => x.name_ar, 'كل الفئات')}</select></div>
+      <label class="chk2 io-play"><input type="checkbox" id="io-playable" ${f.playable ? 'checked' : ''}><i></i> لها روابط تعمل في المتصفح فقط</label>
+    </div>
+    <div class="panel tbl-panel">
+      <div class="tbl-top"><label class="chk2"><input type="checkbox" id="io-all"><i></i> تحديد الظاهر</label><span class="muted" id="io-count"></span><span class="sp"></span>
+        <small class="muted io-hint">${ic('info')} التحديد يبقى محفوظًا عند تغيير البحث</small></div>
+      <div id="io-body"></div>
+    </div>
+    <div class="bulkbar io-bar" id="io-bar" hidden>
+      <div class="io-bar-t"><b id="io-selc"></b><div class="io-sel-list" id="io-sel-list"></div></div>
+      <button data-iob="probe">${ic('zap')} فحص المحدد</button>
+      <button data-iob="add" class="pri">${ic('plus')} إضافة المحدد</button>
+      <button data-iob="clear" class="x" title="إلغاء التحديد">${ic('x')}</button>
+    </div>`;
+
+  let t;
+  c.querySelector('#io-q').oninput = e => { clearTimeout(t); t = setTimeout(() => { f.q = e.target.value; I.shown = 60; render(); }, 250); };
+  c.querySelector('#io-country').onchange = e => { f.country = e.target.value; I.shown = 60; render(); };
+  c.querySelector('#io-cat').onchange = e => { f.category = e.target.value; I.shown = 60; render(); };
+  c.querySelector('#io-playable').onchange = e => { f.playable = e.target.checked; render(); };
+  c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { f.state = b.dataset.st; c.querySelectorAll('[data-st]').forEach(x => x.classList.toggle('on', x === b)); I.shown = 60; render(); });
+  c.querySelector('#io-reload').onclick = () => { S.iptv = null; go('iptv'); };
+  c.querySelector('#io-all').onchange = e => { filtered().slice(0, I.shown).forEach(x => pick(x, e.target.checked)); render(); };
+
+  const body = c.querySelector('#io-body');
+  body.addEventListener('change', e => {
+    const tr = e.target.closest('tr[data-uid]'); if (!tr) return;
+    const x = find(tr.dataset.uid);
+    if (e.target.matches('.io-sel')) { pick(x, e.target.checked); tr.classList.toggle('is-sel', e.target.checked); bar(); }
+    if (e.target.matches('[data-tgt]')) { x.target = e.target.value || null; if (!I.sel.has(x.uid)) { pick(x, true); tr.querySelector('.io-sel').checked = true; tr.classList.add('is-sel'); } bar(); }
+  });
+  body.addEventListener('click', e => {
+    const b = e.target.closest('[data-io]'); if (!b) return;
+    const x = find(b.closest('tr').dataset.uid);
+    if (b.dataset.io === 'probe') probeOne(x);
+    if (b.dataset.io === 'play') previewStreams(x.ok.map(s => ({ url: s.url, quality: s.quality, host: new URL(s.url).host })), x.name);
+  });
+  c.querySelector('#io-sel-list').addEventListener('click', e => { const p = e.target.closest('[data-un]'); if (p) { I.sel.delete(p.dataset.un); render(); } });
+  c.querySelector('#io-bar').addEventListener('click', async e => {
+    const btn = e.target.closest('[data-iob]'), a = btn?.dataset.iob; if (!a) return;
+    if (a === 'clear') { I.sel.clear(); render(); }
+    if (a === 'probe') { S.health.stop = false; await busy(btn, () => pool([...I.sel.values()].map(x => ({ x })), 4, ({ x }) => probeOne(x))); }
+    if (a === 'add') addIptv();
+  });
+
+  async function addIptv() {
+    const list = [...I.sel.values()];
+    const isNew = x => { const s = iptvState(x); return !s.same && !(s.like && x.target); };
+    const nNew = list.filter(isNew).length;
+    const fd = await modal({ title: `إضافة ${num(list.length)} قناة من iptv-org`, icon: 'plus', ok: 'إضافة',
+      body: `<p>${num(nNew)} قناة جديدة${list.length - nNew ? `، و${num(list.length - nNew)} قناة موجودة تُضاف إليها روابطها الجديدة فقط` : ''}.</p>
+        <div class="io-opts">
+          <label class="io-opt"><input type="radio" name="pub" value="0" checked><span><b>إرسال إلى «قيد المراجعة»</b><small>تراجعها وتوافق عليها قبل أن يراها المشاهدون</small></span></label>
+          <label class="io-opt"><input type="radio" name="pub" value="1"><span><b>نشر مباشرة</b><small>اخترتها بنفسك — تظهر للمشاهدين فورًا</small></span></label>
+          <label class="chk2"><input type="checkbox" name="only" checked><i></i> فحص الروابط أولًا وإضافة العاملة فقط</label>
+        </div>` });
+    if (!fd) return;
+    const publish = fd.get('pub') === '1', only = !!fd.get('only');
+    const dlg = progressDialog('الإضافة من iptv-org');
+    try {
+      if (only) {
+        const jobs = list.flatMap(x => iptvState(x).fresh.filter(s => !s.res).map(s => ({ s })));
+        let done = 0; S.health.stop = false;
+        dlg.set('فحص الروابط', 0);
+        await pool(jobs, 8, async ({ s }) => { s.res = await probeStream(s.url); done++; dlg.set(`فحص الروابط ${num(done)} / ${num(jobs.length)}`, done / Math.max(1, jobs.length) * 80); return s.res; });
+      }
+      const skipped = [];
+      const items = list.map(x => {
+        const st = iptvState(x), links = st.fresh.filter(s => !only || s.res?.ok);
+        if (!links.length) { skipped.push(x.name); return null; }
+        const q = links.map(s => s.quality).filter(Boolean).sort((a, b) => IPTV_RANK[b] - IPTV_RANK[a])[0] || null;
+        const cats = x.categories.filter(k => S.cats.some(cc => cc.slug === k)), primary = cats.find(k => k !== 'general') || cats[0] || 'general';
+        return { uid: x.orphan ? `iptv:${x.key || x.uid}` : x.uid, target: st.same ? st.same.id : st.like && x.target ? x.target : null,
+          name: x.name, alt: x.alt, network: x.network, logo: x.logo, country: x.country, category: primary, extra: cats.filter(k => k !== primary),
+          quality: q, website: x.website, language: /arabic|عرب/i.test(`${x.name} ${x.alt.join(' ')}`) ? 'ara' : null,
+          streams: links.sort((a, b) => (a.res?.ms ?? 9e9) - (b.res?.ms ?? 9e9)).map(s => ({ url: s.url, quality: s.quality, status: s.res ? (s.res.ok ? 'online' : 'offline') : null, ms: s.res?.ms ?? null })) };
+      }).filter(Boolean);
+      if (!items.length) { await dlg.finish(only ? 'لا توجد روابط جديدة تعمل في القنوات المحددة — لم يُضف شيء' : 'لا توجد روابط جديدة في القنوات المحددة', false); return; }
+      const sum = { created: 0, merged: 0, streams: 0 }, parts = chunk(items, 50);
+      for (const [i, part] of parts.entries()) {
+        dlg.set(`الحفظ في قاعدة البيانات ${num(Math.min((i + 1) * 50, items.length))} / ${num(items.length)}`, 80 + 20 * (i + 1) / parts.length);
+        const r = await rpc('admin_iptv_add', { p_items: part, p_publish: publish });
+        for (const k in sum) sum[k] += r?.[k] || 0;
+      }
+      await dlg.finish(`تمت الإضافة: ${num(sum.created)} قناة جديدة · ${num(sum.streams)} رابط`);
+      S.iptv = null; // يُعاد بناء المطابقة مع قنواتك بعد الإضافة
+      await modal({ title: 'تمت الإضافة', icon: 'check', ok: sum.created && !publish ? 'فتح «قيد المراجعة»' : 'تم',
+        body: `<ul class="io-sum"><li><b>${num(sum.created)}</b> قناة جديدة${sum.created ? (publish ? ' — منشورة الآن' : ' — في «قيد المراجعة»') : ''}</li>
+          <li><b>${num(sum.merged)}</b> قناة موجودة أُضيفت إليها روابط</li><li><b>${num(sum.streams)}</b> رابط بث أُضيف</li>
+          ${skipped.length ? `<li class="bad">لم تُضف ${num(skipped.length)} قناة لعدم وجود روابط جديدة تعمل: ${esc(skipped.slice(0, 8).join('، '))}${skipped.length > 8 ? '…' : ''}</li>` : ''}</ul>` });
+      refreshStats().catch(() => {});
+      go(sum.created && !publish ? 'review' : 'iptv');
+    } catch (err) { await dlg.finish(err.message || 'تعذّرت الإضافة', false); }
+  }
+  render();
+  const qi = c.querySelector('#io-q'); qi.focus(); qi.setSelectionRange(qi.value.length, qi.value.length);
+}
+
+/* ═══════════════════ تحويل قائمة M3U ═══════════════════
+   يلصق المدير نص قائمة M3U (أو يختار ملفًا) ← تُجهَّز القنوات وتُجمع روابط القناة الواحدة،
+   وتُطابق مع قنواتك وتُفحص روابطها ← تُضاف المحددة إلى «قيد المراجعة» مثل استيراد رابط M3U تمامًا. */
+async function loadMine() {
+  const [mine, urls] = await Promise.all([
+    restAll('channels?select=id,uid,name,number', { auth: true }),
+    restAll('streams?select=url', { auth: true })
+  ]);
+  const byUid = new Map(mine.map(m => [m.uid, m])), byName = new Map();
+  for (const m of mine) { const k = normName(m.name); if (k && !byName.has(k)) byName.set(k, m); }
+  return { byUid, byName, urls: new Set(urls.map(u => u.url)) };
+}
+
+async function convert(c) {
+  await loadLookups();
+  const V = S.conv || (S.conv = { text: '', rows: null, country: '', category: '' });
+  const co = code => S.countries.find(x => x.code === code), cat = slug => S.cats.find(x => x.slug === slug);
+
+  c.innerHTML = pageHead('تحويل قائمة M3U', 'الصق نص قائمة M3U كما هو (أو اختر ملف .m3u) — تُجهَّز القنوات وتُفحص روابطها، ثم تُرسل المحددة إلى «قيد المراجعة».')
+    + `<div class="panel cv-in">
+      <textarea id="cv-text" dir="ltr" spellcheck="false" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-logo=&quot;https://…/logo.png&quot; group-title=&quot;News&quot;, اسم القناة&#10;https://…/index.m3u8">${esc(V.text)}</textarea>
+      <div class="cv-tools">
+        <label class="btn2 ghost sm cv-file">${ic('upload')} اختيار ملف<input type="file" id="cv-file" accept=".m3u,.m3u8,.txt,audio/x-mpegurl,application/vnd.apple.mpegurl" hidden></label>
+        <div class="sel2 sm" title="للقنوات التي لا تحدد القائمة دولتها">${ic('globe')}<select id="cv-country"><option value="">الدولة: من القائمة</option>${opts(S.countries, V.country, 'code', x => `${x.flag_emoji || ''} ${x.name_ar}`)}</select></div>
+        <div class="sel2 sm" title="للقنوات التي لا تحدد القائمة فئتها">${ic('grid')}<select id="cv-cat"><option value="">الفئة: من القائمة</option>${opts(S.cats, V.category, 'slug', x => x.name_ar)}</select></div>
+        <span class="sp"></span>
+        <button class="btn2 ghost sm" id="cv-clear">${ic('x')} مسح</button>
+        <button class="btn2 primary" id="cv-go">${ic('zap')} تجهيز القنوات</button>
+      </div>
+    </div>
+    <div id="cv-out"></div>`;
+
+  const out = c.querySelector('#cv-out'), ta = c.querySelector('#cv-text');
+  ta.oninput = () => { V.text = ta.value; };
+  c.querySelector('#cv-file').onchange = async e => { const f = e.target.files[0]; if (f) { ta.value = V.text = await f.text(); prepare(); } };
+  c.querySelector('#cv-country').onchange = e => { V.country = e.target.value; if (V.rows) prepare(); };
+  c.querySelector('#cv-cat').onchange = e => { V.category = e.target.value; if (V.rows) prepare(); };
+  c.querySelector('#cv-clear').onclick = () => { ta.value = V.text = ''; V.rows = null; out.innerHTML = ''; ta.focus(); };
+  c.querySelector('#cv-go').onclick = () => prepare();
+
+  async function prepare() {
+    const text = ta.value.trim();
+    if (!/#EXTINF/i.test(text)) { toast('النص ليس قائمة M3U: يجب أن يحتوي على أسطر #EXTINF يليها رابط البث', 'error'); return; }
+    out.innerHTML = '<div class="loading2"><i class="spin"></i><span>تجهيز القنوات…</span></div>';
+    const { items } = parseM3U(text, { skipHttp: false, skipGeo: false });
+    const mine = V.mine || (V.mine = await loadMine());
+    // روابط القناة الواحدة (نفس المعرّف) تُجمع في قناة واحدة بعدة سيرفرات
+    const groups = new Map();
+    for (const it of items) {
+      const country = it.country || V.country || null;
+      const uid = it.uid.startsWith('name:') ? `name:${normName(it.name)}|${country || ''}` : it.uid;
+      if (!groups.has(uid)) groups.set(uid, { uid, name: it.name, logo: it.logo, country, category: V.category || (it.category !== 'general' ? it.category : '') || 'general',
+        language: it.language, links: [] });
+      const g = groups.get(uid);
+      g.logo ||= it.logo;
+      g.links.push({ url: it.url, quality: it.quality, why: it.url.startsWith('http:') ? 'http' : mine.urls.has(it.url) ? 'have' : '' });
+    }
+    V.rows = [...groups.values()].map(g => {
+      const same = mine.byUid.get(g.uid), like = !same ? mine.byName.get(normName(g.name)) : null;
+      return { ...g, same, like, target: same?.id || like?.id || null, sel: g.links.some(l => !l.why) };
+    });
+    render();
+    probeAll();
+  }
+
+  const usable = r => r.links.filter(l => !l.why);
+  const rowHtml = (r, i) => {
+    const k = cat(r.category), cn = co(r.country), u = usable(r);
+    const on = u.filter(l => l.res?.ok).length, run = u.some(l => l.res === 'run'), done = u.length && u.every(l => l.res && l.res !== 'run');
+    const st = !u.length ? `<span class="io-pr bad">${ic('alert')} ${r.links.some(l => l.why === 'http') ? 'http لا يعمل على https' : 'الروابط موجودة عندك'}</span>`
+      : run ? '<span class="io-pr"><i class="spin"></i> فحص…</span>' : done ? `<span class="io-pr ${on ? 'ok' : 'bad'}">${ic(on ? 'check' : 'alert')} ${on}/${u.length} يعمل</span>` : '';
+    const where = r.same ? `<span class="tag-s ok">موجودة عندك #${r.same.number ?? '—'}</span>`
+      : r.like ? `<div class="sel2 sm io-tgt"><select data-tgt><option value="${r.like.id}" ${r.target ? 'selected' : ''}>روابطها إلى «${esc(r.like.name)}»</option><option value="" ${r.target ? '' : 'selected'}>كقناة جديدة</option></select></div>`
+      : '<span class="tag-s new">جديدة</span>';
+    return `<tr data-i="${i}" class="${r.sel ? 'is-sel' : ''}">
+      <td><label class="chk2"><input type="checkbox" class="cv-sel" ${r.sel ? 'checked' : ''} ${u.length ? '' : 'disabled'}><i></i></label></td>
+      <td><div class="ch2">${thumb({ name: r.name, logo_url: r.logo })}<div><input class="cv-name" value="${esc(r.name)}" aria-label="اسم القناة"><small class="muted" dir="ltr">${esc(r.links.map(l => { try { return new URL(l.url).host; } catch { return ''; } }).filter((h, j, a) => a.indexOf(h) === j).join(' · '))}</small></div></div></td>
+      <td><div class="sel2 sm"><select data-cat>${opts(S.cats, r.category, 'slug', x => x.name_ar)}</select></div></td>
+      <td><div class="sel2 sm"><select data-co><option value="">بدون دولة</option>${opts(S.countries, r.country, 'code', x => `${x.flag_emoji || ''} ${x.name_ar}`)}</select></div></td>
+      <td><div class="io-links"><span><b>${u.length}</b> رابط</span>${r.links.length > u.length ? `<small class="muted">+${r.links.length - u.length} مستبعد</small>` : ''}</div></td>
+      <td>${where}</td>
+      <td class="acts2">${st}<button class="icon2" data-cv="play" title="معاينة" ${u.length ? '' : 'disabled'}>${ic('play')}</button></td>
+    </tr>`;
+  };
+  const render = () => {
+    const R = V.rows || [];
+    if (!R.length) { out.innerHTML = `<div class="panel">${empty('alert', 'لم نجد قنوات', 'تأكد أن كل سطر #EXTINF يليه رابط البث في السطر التالي.')}</div>`; return; }
+    const links = R.reduce((a, r) => a + r.links.length, 0), sel = R.filter(r => r.sel);
+    out.innerHTML = `<div class="cv-sum">
+        <span>${ic('tv')} <b>${num(R.length)}</b> قناة</span><span>${ic('link')} <b>${num(links)}</b> رابط</span>
+        <span class="ok">${ic('plus')} <b>${num(R.filter(r => !r.same && !r.target).length)}</b> جديدة</span>
+        <span>${ic('layers')} <b>${num(R.filter(r => r.same || r.target).length)}</b> تُضاف روابطها لقنوات موجودة</span>
+        <span class="sp"></span><button class="btn2 ghost sm" id="cv-probe">${ic('refresh')} إعادة الفحص</button></div>
+      <div class="panel tbl-panel"><div class="tbl-top"><label class="chk2"><input type="checkbox" id="cv-all" ${sel.length === R.filter(r => usable(r).length).length ? 'checked' : ''}><i></i> تحديد الكل</label>
+        <span class="muted">يمكنك تعديل الاسم والفئة والدولة قبل الإضافة</span></div>
+        <div class="tbl-scroll"><table class="tbl2 io-tbl cv-tbl"><thead><tr><th></th><th>القناة</th><th>الفئة</th><th>الدولة</th><th>الروابط</th><th>عندك؟</th><th></th></tr></thead>
+        <tbody>${R.map(rowHtml).join('')}</tbody></table></div></div>
+      <div class="bulkbar io-bar" ${sel.length ? '' : 'hidden'}><b>تم تحديد ${num(sel.length)} قناة</b>
+        <label class="chk2 cv-only"><input type="checkbox" id="cv-only" ${V.only === false ? '' : 'checked'}><i></i> العاملة فقط</label>
+        <button class="pri" id="cv-add">${ic('shield')} إرسال إلى المراجعة</button></div>`;
+    bind();
+  };
+  const refreshRow = i => { const tr = out.querySelector(`tr[data-i="${i}"]`); if (tr) tr.outerHTML = rowHtml(V.rows[i], i); };
+
+  async function probeAll() {
+    const jobs = V.rows.flatMap((r, i) => usable(r).map(l => ({ l, i })));
+    jobs.forEach(j => { j.l.res = 'run'; }); V.rows.forEach((_, i) => refreshRow(i));
+    S.health.stop = false;
+    await pool(jobs, 8, async j => { j.l.res = await probeStream(j.l.url); refreshRow(j.i); return j.l.res; });
+  }
+
+  function bind() {
+    out.querySelector('#cv-probe').onclick = () => { V.rows.forEach(r => r.links.forEach(l => { delete l.res; })); probeAll(); };
+    out.querySelector('#cv-all').onchange = e => { V.rows.forEach(r => { r.sel = e.target.checked && usable(r).length > 0; }); render(); };
+    out.querySelector('#cv-only')?.addEventListener('change', e => { V.only = e.target.checked; });
+    const tb = out.querySelector('tbody');
+    tb.addEventListener('change', e => {
+      const tr = e.target.closest('tr'), r = V.rows[+tr.dataset.i];
+      if (e.target.matches('.cv-sel')) { r.sel = e.target.checked; render(); }
+      if (e.target.matches('[data-cat]')) r.category = e.target.value;
+      if (e.target.matches('[data-co]')) r.country = e.target.value || null;
+      if (e.target.matches('[data-tgt]')) { r.target = e.target.value || null; render(); }
+    });
+    tb.addEventListener('input', e => { if (e.target.matches('.cv-name')) V.rows[+e.target.closest('tr').dataset.i].name = e.target.value.trim() || V.rows[+e.target.closest('tr').dataset.i].name; });
+    tb.addEventListener('click', e => {
+      const b = e.target.closest('[data-cv=play]'); if (!b) return;
+      const r = V.rows[+b.closest('tr').dataset.i];
+      previewStreams(usable(r).map(l => ({ url: l.url, quality: l.quality, host: new URL(l.url).host, status: l.res?.ok ? 'online' : l.res && l.res !== 'run' ? 'offline' : 'unknown' })), r.name);
+    });
+    out.querySelector('#cv-add')?.addEventListener('click', e => add(e.currentTarget));
+  }
+
+  async function add(btn) {
+    const only = V.only !== false;
+    if (only && V.rows.some(r => r.sel && usable(r).some(l => l.res === 'run'))) { toast('انتظر حتى ينتهي فحص الروابط', 'info'); return; }
+    const skipped = [];
+    const items = V.rows.filter(r => r.sel).map(r => {
+      const links = usable(r).filter(l => !only || l.res?.ok);
+      if (!links.length) { skipped.push(r.name); return null; }
+      const q = links.map(l => l.quality).filter(Boolean).sort((a, b) => IPTV_RANK[b] - IPTV_RANK[a])[0] || null;
+      return { uid: r.uid, target: r.target, name: r.name, logo: r.logo, country: r.country, category: r.category, language: r.language, quality: q,
+        streams: links.sort((a, b) => (a.res?.ms ?? 9e9) - (b.res?.ms ?? 9e9)).map(l => ({ url: l.url, quality: l.quality, status: l.res?.ok ? 'online' : l.res ? 'offline' : null, ms: l.res?.ms ?? null })) };
+    }).filter(Boolean);
+    if (!items.length) { toast(`لا توجد روابط تعمل في القنوات المحددة${only ? ' — ألغِ خيار «العاملة فقط» لإرسالها للمراجعة رغم ذلك' : ''}`, 'error'); return; }
+    const r = await busy(btn, async () => {
+      const sum = { created: 0, merged: 0, streams: 0 };
+      for (const part of chunk(items, 50)) { const x = await rpc('admin_iptv_add', { p_items: part, p_publish: false }); for (const k in sum) sum[k] += x?.[k] || 0; }
+      return sum;
+    });
+    if (!r) return;
+    V.mine = null; V.rows = null; V.text = '';
+    await modal({ title: 'أُرسلت إلى المراجعة', icon: 'check', ok: r.created ? 'فتح «قيد المراجعة»' : 'تم',
+      body: `<ul class="io-sum"><li><b>${num(r.created)}</b> قناة جديدة — في «قيد المراجعة»</li><li><b>${num(r.merged)}</b> قناة موجودة أُضيفت إليها روابط</li><li><b>${num(r.streams)}</b> رابط بث أُضيف</li>
+        ${skipped.length ? `<li class="bad">لم تُضف ${num(skipped.length)} قناة لعدم وجود روابط تعمل: ${esc(skipped.slice(0, 8).join('، '))}${skipped.length > 8 ? '…' : ''}</li>` : ''}</ul>` });
+    refreshStats().catch(() => {});
+    go(r.created ? 'review' : 'convert');
+  }
+
+  if (V.rows) { render(); } else ta.focus();
 }
 
 /* ═══════════════════ مصادر البث ═══════════════════ */

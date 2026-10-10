@@ -63,7 +63,7 @@ const flagImg = (url, cls = 'flag') => url ? `<img class="${cls}" src="${esc(url
 const card = c => `<a class="card" href="#/watch/${c.id}" data-id="${c.id}" title="${esc(c.name)}">${thumb(c)}<b>${esc(c.name)}</b><small>${flagImg(c.flag_url)}${esc([c.country_name, c.category_name].filter(Boolean).join(' · '))}</small></a>`;
 const lrow = c => `<a class="lrow" href="#/watch/${c.id}" data-id="${c.id}"><span class="num">${c.number}</span><span class="lr-logo">${safeImg(c.logo_url) ? `<img src="${esc(c.logo_url)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : esc([...c.name][0])}</span><span class="lr-t"><b>${esc(c.name)}</b><small>${esc([c.category_name, c.language_name].filter(Boolean).join(' · '))}</small></span><span class="lr-c">${flagImg(c.flag_url)}${esc(c.country_name || '')}</span>${c.quality ? `<em class="q">${esc(c.quality)}</em>` : ''}</a>`;
 
-const row = (title, list, more, icon = '') => list.length ? `<section class="row">
+const row = (title, list, more, icon = '', cls = '') => list.length ? `<section class="row ${cls}">
   <div class="row-h"><h2>${icon}${esc(title)}</h2>${more ? `<a href="${more}">عرض الكل ${ic('next')}</a>` : ''}</div>
   <div class="rail-wrap"><button class="rail-btn prev" aria-label="السابق">${ic('back')}</button><div class="rail">${list.map(card).join('')}</div><button class="rail-btn nxt" aria-label="التالي">${ic('next')}</button></div>
 </section>` : '';
@@ -115,6 +115,7 @@ function home() {
   const countries = groupBy(S.ch, 'country').filter(g => g.flag).slice(0, 24);
   remember('كل القنوات', sorted(S.ch, 'number'));
   M.innerHTML = hero(pick) + '<div class="rows">'
+    + row('مضافة حديثًا', S.fresh || [], '', ic('plus'), 'fresh')
     + row('تابع المشاهدة', recent(), '', ic('refresh'))
     + row('قائمتي المفضلة', S.ch.filter(c => isFav(c.id)), '#/favorites', ic('heart'))
     + row('قنوات مميزة', featured.slice(0, 30), '', ic('star'))
@@ -247,7 +248,6 @@ function buildWatch() {
     <div class="tv-main">
       <div class="stage"><div id="pl"></div></div>
       <div class="tv-info" id="tv-info"></div>
-      <div class="rows" id="tv-rows"></div>
     </div>
     <aside class="tv-side" id="tv-side">
       <div class="ts-tabs"><button data-tab="family">${ic('layers')} <span>من نفس العائلة</span> <em id="fam-n"></em></button><button data-tab="guide">${ic('list')} <span>دليل القنوات</span></button></div>
@@ -333,10 +333,6 @@ async function switchTo(c) {
   $('#w-fav').onclick = e => { const on = toggleFav(c.id); e.currentTarget.classList.toggle('on', on); e.currentTarget.querySelector('span').textContent = on ? 'في المفضلة' : 'المفضلة'; toast(on ? 'أُضيفت إلى المفضلة' : 'أُزيلت من المفضلة'); };
   $('#w-share').onclick = () => share(c);
   $('#w-report').onclick = () => report(c, W.player.current);
-  const sameCountry = S.ch.filter(x => x.id !== c.id && x.country_code && x.country_code === c.country_code).slice(0, 24);
-  const sameCat = S.ch.filter(x => x.id !== c.id && x.category_slug === c.category_slug && x.country_code !== c.country_code).slice(0, 24);
-  $('#tv-rows').innerHTML = row(`المزيد من ${c.country_name || 'نفس الدولة'}`, sameCountry, c.country_code ? `#/country/${enc(c.country_code)}` : '')
-    + row(`المزيد من ${c.category_name || 'نفس الفئة'}`, sameCat, `#/category/${enc(c.category_slug)}`);
   drawFamily(c);
   drawGuide();
 
@@ -612,11 +608,13 @@ async function init() {
   M.innerHTML = '<section class="hero sk"></section><div class="rows"><section class="row"><div class="rail">' + '<div class="card sk"><div class="thumb"></div></div>'.repeat(8) + '</div></section></div>';
   if (!configured()) { finishIntro(); M.innerHTML = '<div class="page"><p class="empty">لم يتم إعداد الاتصال بقاعدة البيانات بعد (config.js).</p></div>'; return; }
   try {
-    const [rows, cats, countries, settings] = await Promise.all([
+    const [rows, cats, countries, settings, fresh] = await Promise.all([
       restAll('catalog?select=id,number,name,network,logo_url,quality,is_featured,description,country_code,country_name,flag_url,is_arab,continent,category_slug,category_name,language_code,language_name,server&order=number.asc'),
       rest('categories?select=slug,name_ar,icon,hue,sort_order&order=sort_order').then(r => r.data || []).catch(() => []),
       restAll('countries?select=code,name_ar,flag_url,is_arab,continent,sort_order&order=sort_order,name_ar').catch(() => []),
-      rest('site_settings?select=key,value').then(r => r.data || []).catch(() => [])
+      rest('site_settings?select=key,value').then(r => r.data || []).catch(() => []),
+      // طلب مستقل: لو كانت قاعدة البيانات أقدم من عمود published_at تختفي القائمة فقط ولا يتأثر الموقع
+      rest('catalog?select=id,published_at&published_at=not.is.null&order=published_at.desc,number.asc&limit=30').then(r => r.data || []).catch(() => [])
     ]);
     S.ch = rows.map(c => ({ ...c, number: c.number || 0 }));
     S.byId = new Map(S.ch.map(c => [c.id, c]));
@@ -624,6 +622,9 @@ async function init() {
     S.cats = new Map(cats.map(c => [c.slug, c]));
     S.countries = countries;
     S.settings = Object.fromEntries(settings.map(x => [x.key, x.value]));
+    // «مضافة حديثًا»: ما نُشر خلال آخر 30 يومًا (الأحدث أولًا)
+    const since = Date.now() - 30 * 864e5;
+    S.fresh = fresh.filter(r => Date.parse(r.published_at) > since).map(r => S.byId.get(r.id)).filter(Boolean);
     route();
     footerStats();
     footerCredit();
