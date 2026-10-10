@@ -1,0 +1,15 @@
+{
+  "name": "MTC-iPTv — بث مباشر",
+  "short_name": "MTC-iPTv",
+  "description": "آلاف القنوات المباشرة من كل دول العالم.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#08080c",
+  "theme_color": "#08080c",
+  "icons": [
+    { "src": "img/mtc-iptv-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

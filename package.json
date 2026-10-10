@@ -1,0 +1,10 @@
+{
+  "name": "mtc-tv",
+  "version": "2.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "start": "node dev-server.mjs"
+  }
+}

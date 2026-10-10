@@ -1,0 +1,4 @@
+window.MTC_CONFIG = {
+  supabaseUrl: 'https://nuxfcfyylzgipxdwbnyf.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51eGZjZnl5bHpnaXB4ZHdibnlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTk1NzgsImV4cCI6MjEwNzEzNTU3OH0.e_UGRfKLVwLWsyLSnoiPFQblC1XlpSpX_Klviqt7PAQ'
+};
