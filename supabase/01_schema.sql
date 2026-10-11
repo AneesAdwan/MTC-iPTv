@@ -856,6 +856,7 @@ grant execute on function public.dup_key(public.channels) to authenticated;
 -- إعدادات افتراضية: تُضاف مرة واحدة فقط ولا تُستبدل عند إعادة التشغيل
 insert into public.site_settings (key, value, is_public) values
   ('hero', '{"channel_id": null}', true),
+  ('proxy', '{"url": "", "hosts": []}', true),  -- وسيط البث للنطاقات المحمية (يُضبط من لوحة الإدارة)
   ('developer', '{"name_ar": "أنيس عدوان", "name_en": "Anees Adwan", "social": {
      "facebook": "AneesAdwan", "instagram": "AneesAdwan", "linkedin": "AneesAdwan", "snapchat": "AneesAdwan",
      "threads": "AneesAdwan", "x": "AneesAdwan", "tiktok": "AneesAdwan", "pinterest": "AneesAdwan",

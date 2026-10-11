@@ -9,6 +9,7 @@ import { createPlayer, loadHls } from '../src/player.js';
 import { SOCIAL, socialIcon, socialLinks, cleanHandle } from '../src/social.js';
 import { parseM3U } from './m3u.js';
 import { VERSION, RELEASE_DATE } from '../src/version.js';
+import { proxied } from '../src/proxy.js';
 
 const app = document.getElementById('app');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -55,7 +56,7 @@ const TABS = [
 
 const S = {
   tab: location.hash.slice(1) || 'overview',
-  stats: {}, sources: [], cats: [], countries: [], langs: [],
+  stats: {}, sources: [], cats: [], countries: [], langs: [], proxy: undefined,
   filter: { q: '', status: '', category: '', country: '', language: '', source: '' },
   page: 0, size: 50, total: 0, rows: [], selected: new Set(),
   health: { running: false, stop: false }
@@ -111,7 +112,8 @@ document.addEventListener('error', e => { if (e.target.tagName === 'IMG') e.targ
 
 /* ═══════════════════ الفحص من المتصفح ═══════════════════ */
 /** يفحص رابط البث كما يراه المشاهد: يجب أن يرجع M3U8 صالحًا ويسمح بالوصول (CORS) */
-async function probeStream(url) {
+async function probeStream(rawUrl) {
+  const url = proxied(rawUrl, S.proxy); // النطاقات المحمية تُفحص عبر وسيطك كما ستُشغَّل تمامًا
   const t0 = performance.now(), ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 10000);
   try {
     if (location.protocol === 'https:' && url.startsWith('http:')) return { ok: false, status: 0, ms: 0, err: 'http غير آمن' };
@@ -143,14 +145,16 @@ async function pool(items, n, fn, onEach) {
 /* ═══════════════════ البيانات المشتركة ═══════════════════ */
 async function loadLookups(force = false) {
   if (S.cats.length && !force) return;
-  const [cats, cos, langs] = await Promise.all([
+  const [cats, cos, langs, proxy] = await Promise.all([
     rest('categories?select=*&order=sort_order', { auth: true }).then(r => r.data || []),
     rest('countries?select=*&order=sort_order,name_ar', { auth: true }).then(r => r.data || []),
-    rest('languages?select=*&order=sort_order,name_ar', { auth: true }).then(r => r.data || [])
+    rest('languages?select=*&order=sort_order,name_ar', { auth: true }).then(r => r.data || []),
+    getSetting('proxy').catch(() => null)
   ]);
-  S.cats = cats; S.countries = cos; S.langs = langs;
+  S.cats = cats; S.countries = cos; S.langs = langs; S.proxy = proxy || null;
 }
 async function refreshStats() {
+  if (S.proxy === undefined) S.proxy = await getSetting('proxy').catch(() => null); // وسيط البث: يُحمَّل مرة
   S.stats = await rpc('admin_stats');
   app.querySelectorAll('[data-badge]').forEach(b => { const v = S.stats[b.dataset.badge] || 0; b.textContent = num(v); b.hidden = !v && b.dataset.warn === '1'; });
   return S.stats;
@@ -1060,7 +1064,7 @@ function previewStreams(list, name) {
     <div class="pv-list">${list.map((s, i) => `<button class="pv-s" data-i="${i}">${chip(...(SSTATUS[s.status] || SSTATUS.unknown))}<b>السيرفر ${i + 1}</b><small dir="ltr">${esc(s.host || '')}</small>${s.quality ? `<span class="tag-s">${esc(s.quality)}</span>` : ''}</button>`).join('') || '<p class="muted">لا توجد روابط.</p>'}</div>`;
   document.body.appendChild(d);
   const player = createPlayer(d.querySelector('#pv-pl'));
-  const load = i => player.load({ streams: list.map(s => ({ url: s.url, server: s.host, quality: s.quality })), title: name, startIndex: i });
+  const load = i => player.load({ streams: list.map(s => ({ url: proxied(s.url, S.proxy), server: s.host, quality: s.quality })), title: name, startIndex: i });
   if (list.length) load(0);
   d.querySelectorAll('[data-i]').forEach(b => b.onclick = () => load(+b.dataset.i));
   d.querySelector('[data-x]').onclick = () => d.close();
@@ -1176,7 +1180,8 @@ const getSetting = async key => (await rest(`site_settings?select=value&key=eq.$
 const saveSetting = (key, value, isPublic = true) => rest('site_settings', { method: 'POST', auth: true, prefer: 'resolution=merge-duplicates,return=minimal', body: { key, value, is_public: isPublic } });
 
 async function settings(c) {
-  const [hero, dev] = await Promise.all([getSetting('hero'), getSetting('developer')]);
+  const [hero, dev, proxy] = await Promise.all([getSetting('hero'), getSetting('developer'), getSetting('proxy')]);
+  const PX = { url: '', hosts: [], ...(proxy || {}) };
   let heroId = hero?.channel_id || null;
   const heroCh = heroId ? (await rest(`channels?id=eq.${heroId}&select=id,name,number,logo_url,quality,is_published`, { auth: true })).data?.[0] : null;
   const D = { name_ar: '', name_en: '', social: {}, ...(dev || {}) };
@@ -1196,7 +1201,14 @@ async function settings(c) {
       <div class="soc-grid">${SOCIAL.map(s => `<label class="soc-f" style="--c:${s.color}"><span class="soc-ic">${socialIcon(s, 18)}</span><span class="soc-n">${s.ar}</span>
         <input name="s_${s.key}" dir="ltr" maxlength="80" value="${esc(D.social?.[s.key] || '')}" placeholder="${s.key === 'whatsapp' || s.key === 'telegram' ? '+970599273296' : 'username'}"><a class="soc-go" target="_blank" rel="noopener" title="فتح الرابط">${ic('external')}</a></label>`).join('')}</div>
       <div class="dev-prev"><small class="muted">معاينة التذييل:</small><div class="ft-dev-prev" id="dev-prev"></div></div>
-      <div class="f-act"><button class="btn2 primary">${ic('check')} حفظ</button></div></form>`;
+      <div class="f-act"><button class="btn2 primary">${ic('check')} حفظ</button></div></form>
+    <form class="panel" id="px-f"><div class="panel-h"><h3>${ic('server')} وسيط البث (Proxy)</h3><small>لتشغيل قنوات نطاقات محمية (تفشل بسبب CORS أو http أو HTTP 403) عبر وسيطك الخاص على Cloudflare</small></div>
+      <label class="fld"><span>رابط الوسيط</span><div class="inp">${ic('link')}<input name="url" type="url" dir="ltr" placeholder="https://اسمك.workers.dev/" value="${esc(PX.url)}"></div></label>
+      <label class="fld"><span>النطاقات التي تمر عبر الوسيط <small class="muted">(نطاق في كل سطر، أو مفصولة بفاصلة)</small></span>
+        <textarea name="hosts" dir="ltr" rows="3" placeholder="hadara.ps&#10;alfajertv.com" class="px-hosts">${esc((PX.hosts || []).join('\n'))}</textarea></label>
+      <p class="muted sm">${ic('info')} أي رابط بثّ نطاقه ضمن القائمة يُشغَّل ويُفحص عبر الوسيط تلقائيًا — في المشغّل وفي «فحص الروابط». بقية القنوات تبقى على روابطها المباشرة. استعمل الوسيط للقنوات المرخّصة لك فقط.</p>
+      <div class="px-test" id="px-test" hidden></div>
+      <div class="f-act"><button type="button" class="btn2 ghost" id="px-check">${ic('zap')} اختبار الوسيط</button><button class="btn2 primary">${ic('check')} حفظ</button></div></form>`;
 
   // اختيار قناة الواجهة
   const setHero = async (id, btn) => busy(btn, async () => {
@@ -1236,6 +1248,34 @@ async function settings(c) {
       await saveSetting('developer', v);
       SOCIAL.forEach(x => { f[`s_${x.key}`].value = v.social[x.key] || ''; }); // نعرض اليوزر المنظّف بدل الرابط الكامل
       toast('تم حفظ بيانات المطوّر — تظهر في تذييل الموقع', 'success');
+    });
+  };
+
+  // وسيط البث
+  const pf = c.querySelector('#px-f');
+  const readProxy = () => ({ url: pf.url.value.trim(), hosts: pf.hosts.value.split(/[\n,]+/).map(s => s.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '')).filter(Boolean) });
+  c.querySelector('#px-check').onclick = e => busy(e.currentTarget, async () => {
+    const v = readProxy(), box = c.querySelector('#px-test');
+    box.hidden = false; box.className = 'px-test'; box.innerHTML = `<i class="spin"></i> جارٍ اختبار الوسيط…`;
+    if (!/^https?:\/\//.test(v.url)) { box.classList.add('bad'); box.innerHTML = `${ic('alert')} اكتب رابط الوسيط أولًا`; return; }
+    // نجرّب تمرير قناة معروفة عبره ونتأكد أنه يعيد قائمة m3u8 مع سماح CORS
+    const sample = 'https://live-hls-web-ajd.getaj.net/AJD/index.m3u8';
+    const test = v.url.replace(/\/+$/, '') + '/?url=' + encodeURIComponent(sample);
+    try {
+      const r = await fetch(test, { cache: 'no-store' });
+      const txt = (await r.text()).trimStart();
+      if (r.ok && txt.startsWith('#EXTM3U')) { box.classList.add('ok'); box.innerHTML = `${ic('check')} الوسيط يعمل ويعيد قوائم m3u8 مع سماح الوصول (CORS).`; }
+      else { box.classList.add('bad'); box.innerHTML = `${ic('alert')} استجاب الوسيط لكن لم يُعِد قائمة m3u8 صالحة (HTTP ${r.status}). تأكد أنه يقبل <code dir="ltr">?url=</code>.`; }
+    } catch { box.classList.add('bad'); box.innerHTML = `${ic('alert')} تعذّر الوصول للوسيط. تأكد من الرابط وأنه يضيف ترويسة CORS.`; }
+  });
+  pf.onsubmit = e => {
+    e.preventDefault();
+    busy(pf.querySelector('.btn2.primary'), async () => {
+      const v = readProxy();
+      await saveSetting('proxy', v);
+      S.proxy = v.url && v.hosts.length ? v : null;
+      pf.hosts.value = v.hosts.join('\n');
+      toast(v.url && v.hosts.length ? `تم حفظ الوسيط — ${v.hosts.length} نطاق يمر عبره` : 'تم حفظ إعدادات الوسيط', 'success');
     });
   };
 }

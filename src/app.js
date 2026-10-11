@@ -9,6 +9,7 @@ import { hash, familyKeys } from './catalog.js';
 import { VERSION, RELEASE_DATE, COMPANY, DEVELOPER } from './version.js';
 import { socialLinks, socialIcon } from './social.js';
 import { initInstall, openInstall } from './install.js';
+import { proxied } from './proxy.js';
 
 const $ = s => document.querySelector(s);
 const M = $('#main');
@@ -358,6 +359,8 @@ async function switchTo(c) {
   try {
     streams = (await rest(`catalog_streams?channel_id=eq.${c.id}&select=id,url,server,quality,status,priority`)).data || [];
     streams.sort((a, b) => (b.status === 'online') - (a.status === 'online') || a.priority - b.priority);
+    // روابط النطاقات المحمية تمر عبر وسيطك الخاص (إن ضُبط في الإعدادات) لتعمل رغم CORS/403
+    streams = streams.map(s => ({ ...s, url: proxied(s.url, S.settings.proxy) }));
   } catch { /* سيظهر خطأ في المشغّل */ }
   if (W.id !== c.id) return;
   W.player.load({ streams, title: c.name, subtitle: [c.country_name, c.category_name].filter(Boolean).join(' · '), logo: safeImg(c.logo_url), number: c.number });

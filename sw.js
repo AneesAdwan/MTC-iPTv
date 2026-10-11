@@ -3,9 +3,9 @@
 // الاستراتيجية: «الشبكة أولًا» لملفات الموقع (تصل التحديثات فورًا)، والنسخة المحفوظة عند انقطاع الاتصال.
 // لا يتدخل أبدًا في البث المباشر أو قاعدة البيانات أو لوحة الإدارة.
 // ════════════════════════════════════════════════════════════════════════════
-const CACHE = 'mtc-shell-v2';
+const CACHE = 'mtc-shell-v3';
 const SHELL = ['./', 'index.html', 'config.js', 'manifest.webmanifest', 'src/app.js', 'src/player.js', 'src/supabase.js', 'src/icons.js',
-  'src/catalog.js', 'src/social.js', 'src/version.js', 'src/install.js', 'src/styles.css', 'img/mtc-iptv-icon.svg', 'img/mtc-group-emblem.svg',
+  'src/catalog.js', 'src/social.js', 'src/version.js', 'src/install.js', 'src/proxy.js', 'src/styles.css', 'img/mtc-iptv-icon.svg', 'img/mtc-group-emblem.svg',
   'img/app-icon-192.png', 'img/app-icon-512.png'];
 
 self.addEventListener('install', e => {
