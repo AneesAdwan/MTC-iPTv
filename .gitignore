@@ -5,3 +5,7 @@ node_modules/
 supabase/.temp/
 supabase/.cache/
 PROJECT_FILES.md
+
+# مشروع التطبيق (React Native) — لا يُرفع مع الموقع
+MTCiPTv/
+phone/node_modules/
