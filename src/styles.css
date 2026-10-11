@@ -849,3 +849,10 @@ body.reveal .page>:nth-child(1){--rd:.6s}body.reveal .page>:nth-child(2){--rd:.7
 .yt-err-act button.app,.yt-err-act button.app:first-child{background:var(--grad);color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(255,45,85,.4)}
 .yt-err-act button.app:hover{filter:brightness(1.1)}
 .yt-err-act button.app .pi{width:17px;height:17px}
+
+/* رابط تحميل تطبيق أندرويد (APK) */
+#ft-apk svg{width:14px;height:14px;color:var(--ok)}
+.ins-apk{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:10px;border-radius:12px;background:var(--line);color:var(--txt);font:700 13.5px var(--font);text-decoration:none;transition:.2s}
+.ins-apk:hover{background:var(--line2,rgba(255,255,255,.14))}
+.ins-apk svg{width:17px;height:17px;color:var(--ok)}
+.ins.tv .ins-apk{font-size:18px;padding:16px}

@@ -408,7 +408,7 @@ function leaveWatch() {
 
 // فتح القناة في تطبيق MTC-iPTv: يحاول الرابط العميق، وإن لم يكن التطبيق مثبّتًا يحوّل لصفحة التحميل.
 const APP_SCHEME = 'mtciptv://watch/';
-const APP_GET_URL = 'https://aneesadwan.github.io/MTC-iPTv/app/'; // صفحة تحميل التطبيق (APK) — تُجهَّز لاحقًا
+const APP_GET_URL = 'https://github.com/AneesAdwan/MTC-iPTv/releases/latest/download/MTC-iPTv.apk'; // أحدث نسخة APK (GitHub Releases)
 function openInApp(c) {
   if (!c) return;
   const deep = APP_SCHEME + c.id;
@@ -552,6 +552,8 @@ $('#ft-group').innerHTML = `<div class="fg-emblem"><img data-src="img/mtc-group-
 $('#to-top').innerHTML = `${ic('back')}<span>للأعلى</span>`;
 $('#to-top').onclick = () => scrollTo({ top: 0, behavior: 'smooth' });
 $('#ft-install').onclick = e => { e.preventDefault(); openInstall(true); };
+$('#ft-install').innerHTML = `${ic('plus')}<span>ثبّت التطبيق</span>`;
+$('#ft-apk').innerHTML = `${ic('download')}<span>تحميل تطبيق أندرويد</span>`;
 // دخول بطاقة المجموعة بنفس أسلوب المقدمة عند الوصول إليها
 const groupIO = new IntersectionObserver(es => {
   if (!es[0].isIntersecting) return;

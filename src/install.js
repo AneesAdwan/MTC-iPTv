@@ -7,6 +7,7 @@
 // القرار يُحفظ: «لاحقًا» = نسأل بعد 7 أيام · «لا تسألني» = لا نسأل أبدًا · بعد التثبيت لا يظهر.
 // ════════════════════════════════════════════════════════════════════════════
 const KEY = 'mtc-install', SNOOZE_DAYS = 7;
+const APK_URL = 'https://github.com/AneesAdwan/MTC-iPTv/releases/latest/download/MTC-iPTv.apk';
 const ua = navigator.userAgent;
 const store = {
   get() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } },
@@ -85,6 +86,7 @@ export function openInstall(force = false) {
       <button class="ins-btn pri" data-i="${C.native ? 'install' : 'how'}">${ic(C.native ? 'download' : 'info')}<span>${C.native ? 'تثبيت' : 'كيف أثبّته؟'}</span></button>
       <button class="ins-btn" data-i="later">لاحقًا</button>
     </div>
+    ${device.android || device.tv ? `<a class="ins-apk" href="${APK_URL}" rel="noopener">${ic('download')}<span>أو حمّل تطبيق أندرويد (APK)</span></a>` : ''}
     ${force ? '' : '<button class="ins-never" data-i="never">لا تسألني مرة أخرى</button>'}
   </div>`;
   document.body.appendChild(box);

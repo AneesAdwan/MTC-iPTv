@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, ActivityIndicator, Platform, BackHandler } from 'react-native';
 import Video from 'react-native-video';
 import { fetchStreams, proxied } from '../lib/catalog';
+import Icon from '../ui/Icon';
 import { C } from '../theme';
 
 // شاشة المشاهدة: مشغّل HLS أصلي (ExoPlayer على أندرويد، AVPlayer على iOS/الأجهزة)،
@@ -88,10 +89,10 @@ export default function WatchScreen({ channel, settings, onBack, onZap, isFav, o
             </View>
           </View>
           <View style={s.ctrls}>
-            <Ctrl label="‹ السابقة" onPress={() => onZap(-1)} />
-            <Ctrl label={isFav ? '♥ في المفضلة' : '♡ المفضلة'} onPress={onToggleFav} />
-            <Ctrl label="رجوع" onPress={onBack} />
-            <Ctrl label="التالية ›" onPress={() => onZap(1)} focus />
+            <Ctrl icon="next" label="السابقة" onPress={() => onZap(-1)} />
+            <Ctrl icon="heart" label={isFav ? 'في المفضلة' : 'المفضلة'} active={isFav} onPress={onToggleFav} />
+            <Ctrl icon="back" label="رجوع" onPress={onBack} />
+            <Ctrl icon="play" label="التالية" onPress={() => onZap(1)} focus />
           </View>
         </View>
       )}
@@ -99,11 +100,12 @@ export default function WatchScreen({ channel, settings, onBack, onZap, isFav, o
   );
 }
 
-function Ctrl({ label, onPress, focus }) {
+function Ctrl({ icon, label, onPress, focus, active }) {
   const [f, setF] = useState(false);
   return (
     <Pressable onPress={onPress} onFocus={() => setF(true)} onBlur={() => setF(false)}
-      hasTVPreferredFocus={focus} style={[s.ctrl, f && s.ctrlOn]}>
+      hasTVPreferredFocus={focus} style={[s.ctrl, (f || active) && s.ctrlOn]}>
+      {!!icon && <Icon name={icon} size={18} color="#fff" />}
       <Text style={s.ctrlT}>{label}</Text>
     </Pressable>
   );
@@ -120,7 +122,7 @@ const s = StyleSheet.create({
   title: { color: '#fff', fontSize: 22, fontWeight: '800', textAlign: 'right' },
   meta: { color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 3, textAlign: 'right' },
   ctrls: { flexDirection: 'row-reverse', gap: 12, marginTop: 16 },
-  ctrl: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 10, paddingHorizontal: 20, paddingVertical: 12, borderWidth: 2, borderColor: 'transparent' },
+  ctrl: { flexDirection: 'row-reverse', alignItems: 'center', gap: 7, backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 12, paddingHorizontal: 18, paddingVertical: 12, borderWidth: 2, borderColor: 'transparent' },
   ctrlOn: { borderColor: '#fff', backgroundColor: C.ac },
   ctrlT: { color: '#fff', fontSize: 16, fontWeight: '700' },
   btn: { backgroundColor: C.ac, borderRadius: 12, paddingHorizontal: 28, paddingVertical: 14 },
