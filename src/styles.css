@@ -838,3 +838,14 @@ body.reveal .page>:nth-child(1){--rd:.6s}body.reveal .page>:nth-child(2){--rd:.7
 .yt-lt.on .lt-bar{animation:ltBar var(--lt-ms,7000ms) linear forwards}
 @keyframes ltBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 @container (max-width:560px){.yt-lt{font-size:10.5px}.lt-side,.lt-logo{display:none}.lt-num{min-width:3.6em;padding:.4em .6em}.lt-num b{font-size:1.9em}.lt-main{padding:.55em .8em;gap:.3em}.lt-name b{font-size:1.4em}.lt-meta{font-size:.95em}.yt.show .yt-lt,.yt.paused.started .yt-lt{bottom:52px}}
+
+/* شارة «الأفضل عبر التطبيق» للقنوات التي تعمل في التطبيق لا المتصفح */
+.badge-app{position:absolute;z-index:2;top:8px;inset-inline-start:8px;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;box-shadow:0 2px 8px rgba(255,45,85,.4)}
+.badge-app svg{width:13px;height:13px}
+.qb.app-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(255,45,85,.12);color:var(--ac2);border:1px solid rgba(255,122,26,.3)}
+.qb.app-tag svg{width:13px;height:13px}
+
+/* زر «فتح في التطبيق» في صندوق خطأ المشغّل */
+.yt-err-act button.app,.yt-err-act button.app:first-child{background:var(--grad);color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(255,45,85,.4)}
+.yt-err-act button.app:hover{filter:brightness(1.1)}
+.yt-err-act button.app .pi{width:17px;height:17px}

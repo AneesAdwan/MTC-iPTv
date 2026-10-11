@@ -85,7 +85,7 @@ export function createPlayer(host, opts = {}) {
     <button class="yt-big" aria-label="تشغيل">${pi('play')}</button>
     <div class="yt-ripple l"><span>${pi('rew')}<b>10 ثوانٍ</b></span></div><div class="yt-ripple r"><span>${pi('fwd')}<b>10 ثوانٍ</b></span></div>
     <div class="yt-err" hidden dir="rtl"><div class="yt-err-in">${pi('alert')}<h4></h4><p></p>
-      <div class="yt-err-act"><button data-e="retry">${pi('replay')} إعادة المحاولة</button><button data-e="server">${pi('server')} سيرفر آخر</button><button data-e="next">${pi('next')} القناة التالية</button><button data-e="report">${pi('flag')} إبلاغ</button></div></div></div>
+      <div class="yt-err-act"><button data-e="app" class="app">${pi('tv')} فتح في التطبيق</button><button data-e="retry">${pi('replay')} إعادة المحاولة</button><button data-e="server">${pi('server')} سيرفر آخر</button><button data-e="next">${pi('next')} القناة التالية</button><button data-e="report">${pi('flag')} إبلاغ</button></div></div></div>
     <div class="yt-stats" hidden><button class="yt-x" data-x="stats" aria-label="إغلاق">${pi('close')}</button><table></table></div>
     <div class="yt-help" hidden dir="rtl"><div class="yt-help-in"><header><b>اختصارات لوحة المفاتيح</b><button class="yt-x" data-x="help">${pi('close')}</button></header>
       <dl>${SHORTCUTS.map(([k, d]) => `<dt><kbd>${k}</kbd></dt><dd>${d}</dd>`).join('')}</dl></div></div>
@@ -177,6 +177,7 @@ export function createPlayer(host, opts = {}) {
     errBox.querySelector('[data-e=server]').hidden = !item || item.streams.length < 2;
     errBox.querySelector('[data-e=next]').hidden = !opts.onNext;
     errBox.querySelector('[data-e=report]').hidden = !opts.onReport;
+    errBox.querySelector('[data-e=app]').hidden = !opts.onOpenApp;
   }
 
   /** ينتقل إلى السيرفر التالي الذي لم يفشل بعد؛ يرجع false إذا انتهت الخيارات */
@@ -474,6 +475,7 @@ export function createPlayer(host, opts = {}) {
     if (er === 'retry') { failed.clear(); return start(si); }
     if (er === 'server') { failed.clear(); return start((si + 1) % item.streams.length); }
     if (er === 'next') return opts.onNext?.();
+    if (er === 'app') return opts.onOpenApp?.();
     if (er === 'report') return opts.onReport?.(item?.streams[si]);
     if (e.target.closest('.yt-menu, .yt-bottom, .yt-stats, .yt-help, .yt-err, .yt-chl')) return;
     if (!menu.hidden) { closeMenu(); return; }

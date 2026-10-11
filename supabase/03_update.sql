@@ -169,6 +169,7 @@ create table if not exists public.channels (
   is_published     boolean not null default true,
   is_featured      boolean not null default false,
   is_manual        boolean not null default false,                    -- أضيفت يدويًا (لا تُحذف مع المصادر)
+  prefer_app       boolean not null default false,                    -- تعمل في التطبيق لا المتصفح: تبقى ظاهرة رغم فشل فحص الويب، وعليها شارة «الأفضل عبر التطبيق»
   hidden_reason    text check (hidden_reason in ('manual','duplicate','offline','reported','pending')),  -- pending = بانتظار مراجعة المدير
   duplicate_of     uuid references public.channels(id) on delete set null,
   published_at     timestamptz,                                       -- أول نشر فعلي للمشاهدين (لقائمة «مضافة حديثًا»)
@@ -204,6 +205,7 @@ alter table public.channels add column if not exists website          text;
 alter table public.channels add column if not exists is_published     boolean not null default true;
 alter table public.channels add column if not exists is_featured      boolean not null default false;
 alter table public.channels add column if not exists is_manual        boolean not null default false;
+alter table public.channels add column if not exists prefer_app       boolean not null default false;
 alter table public.channels add column if not exists hidden_reason    text check (hidden_reason in ('manual','duplicate','offline','reported','pending'));
 alter table public.channels drop constraint if exists channels_hidden_reason_check;
 alter table public.channels add constraint channels_hidden_reason_check check (hidden_reason in ('manual','duplicate','offline','reported','pending')) not valid;
@@ -358,15 +360,16 @@ select c.id, c.number, c.name, c.network, c.description, c.quality, c.is_feature
        case when c.logo_status = 'broken' then null else c.logo_url end as logo_url,
        c.country_code, co.name_ar as country_name, co.name_en as country_name_en, co.flag_url, co.is_arab, co.continent,
        c.category_slug, cat.name_ar as category_name, c.extra_categories,
-       c.language_code, l.name_ar as language_name,
+       c.language_code, l.name_ar as language_name, c.prefer_app,
        s.server, s.stream_count, s.online
 from public.channels c
 join lateral (
+  -- كل قناة منشورة لها رابط مُفعّل تظهر — الفحص استشاري لا يُخفي شيئًا (الموقع يحاول، والتطبيق يضمن التشغيل)
   select count(*)::int as stream_count,
          bool_or(st.status = 'online') as online,
          (array_agg(coalesce(st.label, public.server_of(st.host)) order by (st.status = 'online') desc, st.priority))[1] as server
   from public.streams st
-  where st.channel_id = c.id and st.is_active and st.status <> 'offline'
+  where st.channel_id = c.id and st.is_active
 ) s on s.stream_count > 0
 left join public.countries  co  on co.code  = c.country_code
 left join public.categories cat on cat.slug = c.category_slug
@@ -379,7 +382,7 @@ select st.id, st.channel_id, st.url, st.quality, st.priority, st.status,
        coalesce(st.label, public.server_of(st.host)) as server
 from public.streams st
 join public.channels c on c.id = st.channel_id
-where c.is_published and st.is_active and st.status <> 'offline';
+where c.is_published and st.is_active;  -- كل الروابط المُفعّلة تُسلَّم للمشغّل (الفحص استشاري، والتطبيق يشغّل ما يعجز عنه المتصفح)
 
 -- ─── 9ب) قائمة المراجعة (للمدير فقط: تحترم صلاحيات جدول القنوات) ──────────
 -- كل قناة «بانتظار المراجعة» مع تصنيفها:
@@ -792,7 +795,7 @@ begin
       v_country := (select code from countries where code = upper(it->>'country'));
       if p_publish then perform set_config('mtc.review_bypass', 'on', true); end if;
       insert into channels (uid, number, name, alt_names, network, logo_url, country_code, category_slug, extra_categories,
-                            language_code, quality, website, is_published, is_manual)
+                            language_code, quality, website, is_published, is_manual, prefer_app)
       values (it->>'uid', (select coalesce(max(number), 0) + 1 from channels), left(it->>'name', 250),
               array(select jsonb_array_elements_text(coalesce(it->'alt', '[]'))),
               nullif(it->>'network', ''), nullif(it->>'logo', ''), v_country,
@@ -800,12 +803,13 @@ begin
               array(select x from jsonb_array_elements_text(coalesce(it->'extra', '[]')) x where exists (select 1 from categories where slug = x)),
               coalesce((select code from languages where code = it->>'language'), (select language_code from countries where code = v_country)),
               case when it->>'quality' in ('SD', 'HD', 'FHD', '4K') then it->>'quality' end,
-              nullif(it->>'website', ''), true, true)
+              nullif(it->>'website', ''), true, true, coalesce((it->>'prefer_app')::boolean, false))
       returning id into v_id;
       perform set_config('mtc.review_bypass', 'off', true);
       v_new := v_new + 1;
     else
       v_merged := v_merged + 1;
+      if coalesce((it->>'prefer_app')::boolean, false) then update channels set prefer_app = true where id = v_id; end if;
     end if;
     select coalesce(max(priority) + 1, 0) into v_pr from streams where channel_id = v_id;
     insert into streams (channel_id, url, quality, priority, status, response_ms, last_checked_at)

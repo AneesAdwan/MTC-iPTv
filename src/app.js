@@ -58,7 +58,7 @@ function groupBy(list, g) {
 /* ───────── البطاقات ───────── */
 const thumb = c => {
   const img = safeImg(c.logo_url);
-  return `<div class="thumb" style="--h:${hash(c.name) % 360}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="init">${esc([...c.name][0] || '•')}</span><em class="badge-live">مباشر</em>${c.quality ? `<em class="badge-q">${esc(c.quality)}</em>` : ''}<em class="badge-num">${c.number}</em></div>`;
+  return `<div class="thumb" style="--h:${hash(c.name) % 360}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="init">${esc([...c.name][0] || '•')}</span><em class="badge-live">مباشر</em>${c.prefer_app ? `<em class="badge-app" title="الأفضل عبر التطبيق">${ic('download')}</em>` : ''}${c.quality ? `<em class="badge-q">${esc(c.quality)}</em>` : ''}<em class="badge-num">${c.number}</em></div>`;
 };
 const flagImg = (url, cls = 'flag') => url ? `<img class="${cls}" src="${esc(url)}" alt="" loading="lazy">` : '';
 const card = c => `<a class="card" href="#/watch/${c.id}" data-id="${c.id}" title="${esc(c.name)}">${thumb(c)}<b>${esc(c.name)}</b><small>${flagImg(c.flag_url)}${esc([c.country_name, c.category_name].filter(Boolean).join(' · '))}</small></a>`;
@@ -268,6 +268,7 @@ function buildWatch() {
     watermark: 'img/mtc-iptv-logo-animated.svg', // شعار المنصة المتحرك في زاوية المشغّل
     onNext: () => zap(1), onPrev: () => zap(-1), onTheater: toggleTheater, onDigit: digit,
     onReport: s => report(S.byId.get(W.id), s),
+    onOpenApp: () => openInApp(S.byId.get(W.id)),
     // قائمة القنوات داخل المشغّل في ملء الشاشة (من اليسار) — نفس منطق دليل القنوات
     channels: {
       modes: [['ctx', 'القائمة الحالية'], ['family', 'نفس العائلة'], ['country', 'نفس الدولة'], ['category', 'نفس الفئة'], ['favs', 'المفضلة'], ['all', 'كل القنوات']],
@@ -326,6 +327,7 @@ async function switchTo(c) {
         ${c.server ? `<a href="#/server/${enc(c.server)}">${ic('server')}${esc(c.server)}</a>` : ''}
         ${c.network ? `<a href="#/network/${enc(c.network)}">${ic('tv')}${esc(c.network)}</a>` : ''}
         ${c.quality ? `<span class="qb">${esc(c.quality)}</span>` : ''}
+        ${c.prefer_app ? `<span class="qb app-tag">${ic('download')} الأفضل عبر التطبيق</span>` : ''}
       </div>${c.description ? `<p class="desc">${esc(c.description)}</p>` : ''}</div>
     <div class="ti-act">
       <button class="abtn ${fav ? 'on' : ''}" id="w-fav">${ic('heart')}<span>${fav ? 'في المفضلة' : 'المفضلة'}</span></button>
@@ -402,6 +404,27 @@ function leaveWatch() {
   if (!W.active) return;
   W.player?.destroy(); W.player = null; W.active = false; W.id = null;
   clearTimeout(W.digitT);
+}
+
+// فتح القناة في تطبيق MTC-iPTv: يحاول الرابط العميق، وإن لم يكن التطبيق مثبّتًا يحوّل لصفحة التحميل.
+const APP_SCHEME = 'mtciptv://watch/';
+const APP_GET_URL = 'https://aneesadwan.github.io/MTC-iPTv/app/'; // صفحة تحميل التطبيق (APK) — تُجهَّز لاحقًا
+function openInApp(c) {
+  if (!c) return;
+  const deep = APP_SCHEME + c.id;
+  let left = false;
+  const onHide = () => { left = true; };
+  document.addEventListener('visibilitychange', onHide, { once: true });
+  // جرّب فتح التطبيق
+  const t = Date.now();
+  location.href = deep;
+  // إن لم يُفتح التطبيق خلال ثانية (ما غادرت الصفحة) → صفحة التحميل
+  setTimeout(() => {
+    document.removeEventListener('visibilitychange', onHide);
+    if (!left && Date.now() - t < 2500 && document.visibilityState === 'visible') {
+      if (confirm('لا يبدو أن تطبيق MTC-iPTv مثبّت. هل تريد تحميله لتشغيل هذه القناة؟')) location.href = APP_GET_URL;
+    }
+  }, 1200);
 }
 
 /* ───────── مشاركة وإبلاغ وإشعارات ───────── */
@@ -629,7 +652,7 @@ async function init() {
   if (!configured()) { finishIntro(); M.innerHTML = '<div class="page"><p class="empty">لم يتم إعداد الاتصال بقاعدة البيانات بعد (config.js).</p></div>'; return; }
   try {
     const [rows, cats, countries, settings, fresh] = await Promise.all([
-      restAll('catalog?select=id,number,name,network,logo_url,quality,is_featured,description,country_code,country_name,flag_url,is_arab,continent,category_slug,category_name,language_code,language_name,server&order=number.asc'),
+      restAll('catalog?select=id,number,name,network,logo_url,quality,is_featured,description,country_code,country_name,flag_url,is_arab,continent,category_slug,category_name,language_code,language_name,server,prefer_app&order=number.asc'),
       rest('categories?select=slug,name_ar,icon,hue,sort_order&order=sort_order').then(r => r.data || []).catch(() => []),
       restAll('countries?select=code,name_ar,flag_url,is_arab,continent,sort_order&order=sort_order,name_ar').catch(() => []),
       rest('site_settings?select=key,value').then(r => r.data || []).catch(() => []),

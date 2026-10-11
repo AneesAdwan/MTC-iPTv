@@ -1766,10 +1766,10 @@ async function iptv(c) {
         <div class="io-opts">
           <label class="io-opt"><input type="radio" name="pub" value="0" checked><span><b>إرسال إلى «قيد المراجعة»</b><small>تراجعها وتوافق عليها قبل أن يراها المشاهدون</small></span></label>
           <label class="io-opt"><input type="radio" name="pub" value="1"><span><b>نشر مباشرة</b><small>اخترتها بنفسك — تظهر للمشاهدين فورًا</small></span></label>
-          <label class="chk2"><input type="checkbox" name="only" checked><i></i> فحص الروابط أولًا وإضافة العاملة فقط</label>
+          <label class="chk2" title="أضف كل القنوات دون فحص. ألغِ التحديد لإضافة ما يعمل في المتصفح فقط."><input type="checkbox" name="addall" checked><i></i> أضف الكل بدون فحص</label>
         </div>` });
     if (!fd) return;
-    const publish = fd.get('pub') === '1', only = !!fd.get('only');
+    const publish = fd.get('pub') === '1', only = !fd.get('addall');
     const dlg = progressDialog('الإضافة من iptv-org');
     try {
       if (only) {
@@ -1780,11 +1780,13 @@ async function iptv(c) {
       }
       const skipped = [];
       const items = list.map(x => {
-        const st = iptvState(x), links = st.fresh.filter(s => !only || s.res?.ok);
+        const st = iptvState(x), working = st.fresh.filter(s => s.res?.ok);
+        const links = only ? working : st.fresh;                 // الافتراضي: أضف الكل
         if (!links.length) { skipped.push(x.name); return null; }
+        const prefer = !only && working.length === 0 && links.some(s => s.res && !s.res.ok); // لم يعمل أي رابط في المتصفح
         const q = links.map(s => s.quality).filter(Boolean).sort((a, b) => IPTV_RANK[b] - IPTV_RANK[a])[0] || null;
         const cats = x.categories.filter(k => S.cats.some(cc => cc.slug === k)), primary = cats.find(k => k !== 'general') || cats[0] || 'general';
-        return { uid: x.orphan ? `iptv:${x.key || x.uid}` : x.uid, target: st.same ? st.same.id : st.like && x.target ? x.target : null,
+        return { uid: x.orphan ? `iptv:${x.key || x.uid}` : x.uid, target: st.same ? st.same.id : st.like && x.target ? x.target : null, prefer_app: prefer,
           name: x.name, alt: x.alt, network: x.network, logo: x.logo, country: x.country, category: primary, extra: cats.filter(k => k !== primary),
           quality: q, website: x.website, language: /arabic|عرب/i.test(`${x.name} ${x.alt.join(' ')}`) ? 'ara' : null,
           streams: links.sort((a, b) => (a.res?.ms ?? 9e9) - (b.res?.ms ?? 9e9)).map(s => ({ url: s.url, quality: s.quality, status: s.res ? (s.res.ok ? 'online' : 'offline') : null, ms: s.res?.ms ?? null })) };
@@ -1913,7 +1915,7 @@ async function convert(c) {
         <div class="tbl-scroll"><table class="tbl2 io-tbl cv-tbl"><thead><tr><th></th><th>القناة</th><th>الفئة</th><th>الدولة</th><th>الروابط</th><th>عندك؟</th><th></th></tr></thead>
         <tbody>${R.map(rowHtml).join('')}</tbody></table></div></div>
       <div class="bulkbar io-bar" ${sel.length ? '' : 'hidden'}><b>تم تحديد ${num(sel.length)} قناة</b>
-        <label class="chk2 cv-only"><input type="checkbox" id="cv-only" ${V.only === false ? '' : 'checked'}><i></i> العاملة فقط</label>
+        <label class="chk2 cv-only" title="أضف كل القنوات دون فحص (الافتراضي). ألغِ التحديد لإضافة ما يعمل في المتصفح فقط."><input type="checkbox" id="cv-all" ${V.only === true ? '' : 'checked'}><i></i> أضف الكل بدون فحص</label>
         <button class="pri" id="cv-add">${ic('shield')} إرسال إلى المراجعة</button></div>`;
     bind();
   };
@@ -1929,7 +1931,7 @@ async function convert(c) {
   function bind() {
     out.querySelector('#cv-probe').onclick = () => { V.rows.forEach(r => r.links.forEach(l => { delete l.res; })); probeAll(); };
     out.querySelector('#cv-all').onchange = e => { V.rows.forEach(r => { r.sel = e.target.checked && usable(r).length > 0; }); render(); };
-    out.querySelector('#cv-only')?.addEventListener('change', e => { V.only = e.target.checked; });
+    out.querySelector('#cv-all')?.addEventListener('change', e => { V.only = !e.target.checked; }); // «أضف الكل» مفعّل = only=false
     const tb = out.querySelector('tbody');
     tb.addEventListener('change', e => {
       const tr = e.target.closest('tr'), r = V.rows[+tr.dataset.i];
@@ -1948,17 +1950,20 @@ async function convert(c) {
   }
 
   async function add(btn) {
-    const only = V.only !== false;
-    if (only && V.rows.some(r => r.sel && usable(r).some(l => l.res === 'run'))) { toast('انتظر حتى ينتهي فحص الروابط', 'info'); return; }
+    const only = V.only === true; // الافتراضي «أضف الكل» (only=false)
     const skipped = [];
     const items = V.rows.filter(r => r.sel).map(r => {
-      const links = usable(r).filter(l => !only || l.res?.ok);
-      if (!links.length) { skipped.push(r.name); return null; }
+      const all = usable(r), working = all.filter(l => l.res?.ok);
+      let links;
+      if (only) { links = working; if (!links.length) { skipped.push(r.name); return null; } } // «العاملة فقط» اختياري
+      else { links = all; if (!links.length) { skipped.push(r.name); return null; } }            // أضف الكل بلا فحص
       const q = links.map(l => l.quality).filter(Boolean).sort((a, b) => IPTV_RANK[b] - IPTV_RANK[a])[0] || null;
-      return { uid: r.uid, target: r.target, name: r.name, logo: r.logo, country: r.country, category: r.category, language: r.language, quality: q,
+      // علامة «الأفضل عبر التطبيق» للقناة التي لم يتأكّد عمل أي رابط لها في المتصفح
+      const prefer = !only && working.length === 0 && links.some(l => l.res && !l.res.ok);
+      return { uid: r.uid, target: r.target, name: r.name, logo: r.logo, country: r.country, category: r.category, language: r.language, quality: q, prefer_app: prefer,
         streams: links.sort((a, b) => (a.res?.ms ?? 9e9) - (b.res?.ms ?? 9e9)).map(l => ({ url: l.url, quality: l.quality, status: l.res?.ok ? 'online' : l.res ? 'offline' : null, ms: l.res?.ms ?? null })) };
     }).filter(Boolean);
-    if (!items.length) { toast(`لا توجد روابط تعمل في القنوات المحددة${only ? ' — ألغِ خيار «العاملة فقط» لإرسالها للمراجعة رغم ذلك' : ''}`, 'error'); return; }
+    if (!items.length) { toast('لا توجد قنوات صالحة للإضافة (روابطها مكررة أو غير صالحة).', 'error'); return; }
     const r = await busy(btn, async () => {
       const sum = { created: 0, merged: 0, streams: 0 };
       for (const part of chunk(items, 50)) { const x = await rpc('admin_iptv_add', { p_items: part, p_publish: false }); for (const k in sum) sum[k] += x?.[k] || 0; }

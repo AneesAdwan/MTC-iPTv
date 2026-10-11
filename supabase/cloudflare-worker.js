@@ -56,17 +56,20 @@ export default {
     catch { return new Response('Upstream fetch failed', { status: 502, headers: CORS }); }
 
     const ct = (res.headers.get('Content-Type') || '').toLowerCase();
-    const isPlaylist = /mpegurl|m3u8/.test(ct) || /\.m3u8(\?|$)/i.test(t.pathname);
+    const looksPlaylist = /mpegurl|m3u8/.test(ct) || /\.m3u8(\?|$)/i.test(t.pathname);
 
     // إخراج الترويسات مع السماح بالوصول (CORS)
     const out = new Headers(res.headers);
     for (const [k, v] of Object.entries(CORS)) out.set(k, v);
     out.delete('Content-Security-Policy'); out.delete('X-Frame-Options');
 
-    if (!isPlaylist) return new Response(res.body, { status: res.status, headers: out }); // مقاطع الفيديو تُمرَّر كما هي
+    // غير قائمة، أو استجابة خطأ (403 وغيره): تُمرَّر كما هي بلا إعادة كتابة
+    if (!looksPlaylist || !res.ok) return new Response(res.body, { status: res.status, headers: out });
+
+    const text = await res.text();
+    if (!text.trimStart().startsWith('#EXTM3U')) return new Response(text, { status: res.status, headers: out });
 
     // إعادة كتابة قائمة m3u8: كل رابط داخلي يصبح عبر الوسيط بعنوان مطلق
-    const text = await res.text();
     const base = t.href;
     const prefix = self.origin + '/?url=';
     const abs = u => { try { return new URL(u, base).href; } catch { return u; } };
