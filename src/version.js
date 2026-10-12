@@ -1,7 +1,7 @@
 // رقم إصدار المنصة — المصدر الوحيد له (يظهر في تذييل الموقع ولوحة الإدارة).
 // عند أي تحديث: غيّر الرقم هنا وفي package.json.
-export const VERSION = '2.6.0';
-export const RELEASE_DATE = '2026-10-11';
+export const VERSION = '2.7.1';
+export const RELEASE_DATE = '2026-10-13';
 export const COMPANY = {
   product: 'MTC-iPTv',
   group: 'MTC-Group',
