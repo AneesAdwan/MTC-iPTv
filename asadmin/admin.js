@@ -1283,12 +1283,12 @@ async function settings(c) {
 }
 
 /* ═══════════════════ الإشعارات ═══════════════════ */
-async function sendPush({ title, body, url }) {
+async function sendPush({ title, body, url, check }) {
   const base = (window.MTC_CONFIG?.supabaseUrl || '').replace(/\/$/, '');
   const r = await fetch(`${base}/functions/v1/send-push`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${getSession()?.access_token || ''}`, 'Content-Type': 'application/json', apikey: window.MTC_CONFIG?.supabaseAnonKey || '' },
-    body: JSON.stringify({ title, body, url: url || undefined }),
+    body: JSON.stringify(check ? { check: true } : { title, body, url: url || undefined }),
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok || !j.ok) throw new Error(j.error === 'forbidden' ? 'صلاحية مرفوضة — سجّل الدخول كمشرف' : (typeof j.detail === 'object' ? JSON.stringify(j.detail) : j.error || 'تعذّر الإرسال'));
@@ -1311,8 +1311,8 @@ async function notify(c) {
       <label class="fld"><span>النص</span><textarea name="body" rows="2" maxlength="200" placeholder="نص الإشعار…" class="px-hosts"></textarea></label>
       <label class="fld"><span>رابط عند الضغط (اختياري)</span><div class="inp">${ic('link')}<input name="url" type="url" dir="ltr" placeholder="https://… (فارغ = يفتح التطبيق)"></div></label>
       <div class="px-test" id="np-res" hidden></div>
-      <div class="f-act"><button class="btn2 primary">${ic('live')} إرسال للجميع</button></div></form>
-    <div class="alert2 warn">${ic('alert')}<div><b>قبل الاستخدام</b><p>انشر دالة <code>send-push</code> على Supabase واضبط أسرار Firebase (التفاصيل في supabase/functions/send-push). التفعيل مرة واحدة.</p></div></div>`;
+      <div class="f-act"><button type="button" class="btn2 ghost" id="np-check">${ic('zap')} فحص الجاهزية</button><button class="btn2 primary">${ic('live')} إرسال للجميع</button></div></form>
+    <p class="muted sm" style="padding:0 14px">${ic('info')} يستقبل الإشعار فقط من ثبّت تطبيق أندرويد (نسخة 1.2.0 فأحدث) وفتحه مرة واحدة.</p>`;
 
   const f = c.querySelector('#np-f'), box = c.querySelector('#np-res');
   const TPL = {
@@ -1321,6 +1321,11 @@ async function notify(c) {
     welcome: { title: 'أهلًا بك في MTC-iPTv 🎉', body: 'آلاف القنوات المباشرة من كل العالم بين يديك. استمتع بالمشاهدة!' },
   };
   c.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { const t = TPL[b.dataset.t]; f.title.value = t.title; f.body.value = t.body; f.title.focus(); });
+  c.querySelector('#np-check').onclick = e => busy(e.currentTarget, async () => {
+    box.hidden = false; box.className = 'px-test'; box.innerHTML = `<i class="spin"></i> جارٍ الفحص…`;
+    try { await sendPush({ check: true }); box.className = 'px-test ok'; box.innerHTML = `${ic('check')} جاهز تمامًا: الدالة منشورة والأسرار ومفتاح Firebase سليمة. يمكنك الإرسال.`; }
+    catch (err) { box.className = 'px-test bad'; box.innerHTML = `${ic('alert')} ${esc(err.message)}`; }
+  });
   f.onsubmit = e => {
     e.preventDefault();
     const title = f.title.value.trim(), body = f.body.value.trim(), url = f.url.value.trim();

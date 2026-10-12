@@ -64,14 +64,19 @@ Deno.serve(async (req) => {
       if (!isAdmin) return json({ error: 'forbidden' }, 403);
     }
 
-    // 2) اقرأ العنوان والنص
-    const { title, body, url } = await req.json();
-    if (!title || !body) return json({ error: 'title and body required' }, 400);
+    // 2) اقرأ المدخلات
+    const { title, body, url, check } = await req.json().catch(() => ({}));
 
-    // 3) أرسل إلى FCM (الموضوع all)
-    const sa = JSON.parse(Deno.env.get('FIREBASE_SERVICE_ACCOUNT')!);
+    // 3) تحقّق من الإعداد (الأسرار + مفتاح الخدمة)
+    const saRaw = Deno.env.get('FIREBASE_SERVICE_ACCOUNT');
+    if (!saRaw) return json({ error: 'no_service_account', hint: 'اضبط السرّ FIREBASE_SERVICE_ACCOUNT' }, 400);
+    const sa = JSON.parse(saRaw);
     const projectId = Deno.env.get('FIREBASE_PROJECT_ID') || sa.project_id;
     const token = await getAccessToken(sa);
+
+    // وضع الفحص: نتأكد أن كل شيء جاهز دون إرسال إشعار
+    if (check) return json({ ok: true, ready: true, project: projectId });
+    if (!title || !body) return json({ error: 'title and body required' }, 400);
     const msg = {
       message: {
         topic: 'all',
