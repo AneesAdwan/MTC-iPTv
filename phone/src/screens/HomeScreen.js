@@ -1,12 +1,16 @@
 import React, { useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { Pressable } from 'react-native';
 import ChannelRow from '../components/ChannelRow';
 import Hero from '../components/Hero';
 import LogoMark from '../ui/LogoMark';
 import Wordmark from '../ui/Wordmark';
+import Icon from '../ui/Icon';
+import { num } from '../lib/format';
+import { rs } from '../ui/responsive';
 import { C } from '../theme';
 
-export default function HomeScreen({ channels, settings, onPick }) {
+export default function HomeScreen({ channels, settings, onPick, onAbout }) {
   const rows = useMemo(() => build(channels), [channels]);
   const hero = useMemo(() => pickHero(channels, settings), [channels, settings]);
   return (
@@ -16,7 +20,7 @@ export default function HomeScreen({ channels, settings, onPick }) {
           <LogoMark size={40} spin={false} />
           <Wordmark size={22} />
         </View>
-        <View style={s.live}><View style={s.dot} /><Text style={s.liveT}>{channels.length.toLocaleString('ar-EG')} قناة</Text></View>
+        <View style={s.live}><View style={s.dot} /><Text style={s.liveT}>{num(channels.length)} قناة</Text></View>
       </View>
       <Hero channel={hero} onPlay={onPick} />
       {rows.map((r, i) => (
@@ -59,6 +63,8 @@ const s = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: C.bg },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16 },
   brand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  headRight: { flexDirection: 'row-reverse', alignItems: 'center', gap: 8 },
+  aboutBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: C.surface, borderWidth: 1, borderColor: C.line },
   live: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6, backgroundColor: C.surface, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: C.line },
   dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: C.ac },
   liveT: { color: C.mut, fontSize: 12.5, fontWeight: '700' },

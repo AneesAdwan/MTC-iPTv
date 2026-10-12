@@ -50,7 +50,8 @@ const TABS = [
   { k: 'convert', i: 'upload', t: 'تحويل قائمة M3U' },
   { k: 'sections', i: 'grid', t: 'التقسيمات' },
   { k: 'numbering', i: 'sort', t: 'إعادة الترقيم' },
-  { k: 'settings', i: 'edit', t: 'الإعدادات العامة', sec: 'النظام' },
+  { k: 'notify', i: 'live', t: 'الإشعارات', sec: 'النظام' },
+  { k: 'settings', i: 'edit', t: 'الإعدادات العامة' },
   { k: 'maintenance', i: 'settings', t: 'النسخ الاحتياطي والصيانة' }
 ];
 
@@ -283,7 +284,7 @@ function go(tab) {
   document.title = `${t.t} — لوحة تحكم MTC-iPTv`;
   const c = document.getElementById('content');
   c.innerHTML = '<div class="loading2"><i class="spin"></i><span>جارٍ التحميل…</span></div>';
-  ({ overview, review, channels, health, duplicates, reports, sources, iptv, convert, sections, numbering, settings, maintenance })[t.k](c).catch(e => {
+  ({ overview, review, channels, health, duplicates, reports, sources, iptv, convert, sections, numbering, notify, settings, maintenance })[t.k](c).catch(e => {
     const old = /admin_stats|does not exist|schema cache|function/i.test(e.message);
     c.innerHTML = `<div class="alert2 ${old ? 'warn' : 'bad'}">${ic('alert')}<div><b>${old ? 'قاعدة البيانات تحتاج تحديثًا' : 'تعذّر تحميل الصفحة'}</b><p>${old ? 'شغّل أحدث نسخة من supabase/01_schema.sql ثم supabase/02_data.sql في Supabase ← SQL Editor.' : ''} ${esc(e.message)}</p></div></div>`;
     if (/الجلسة/.test(e.message)) renderLogin();
@@ -1276,6 +1277,58 @@ async function settings(c) {
       S.proxy = v.url && v.hosts.length ? v : null;
       pf.hosts.value = v.hosts.join('\n');
       toast(v.url && v.hosts.length ? `تم حفظ الوسيط — ${v.hosts.length} نطاق يمر عبره` : 'تم حفظ إعدادات الوسيط', 'success');
+    });
+  };
+
+}
+
+/* ═══════════════════ الإشعارات ═══════════════════ */
+async function sendPush({ title, body, url }) {
+  const base = (window.MTC_CONFIG?.supabaseUrl || '').replace(/\/$/, '');
+  const r = await fetch(`${base}/functions/v1/send-push`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${getSession()?.access_token || ''}`, 'Content-Type': 'application/json', apikey: window.MTC_CONFIG?.supabaseAnonKey || '' },
+    body: JSON.stringify({ title, body, url: url || undefined }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.ok) throw new Error(j.error === 'forbidden' ? 'صلاحية مرفوضة — سجّل الدخول كمشرف' : (typeof j.detail === 'object' ? JSON.stringify(j.detail) : j.error || 'تعذّر الإرسال'));
+  return j;
+}
+
+async function notify(c) {
+  const stats = S.stats || {};
+  c.innerHTML = pageHead('الإشعارات', 'أرسل إشعارًا يصل كل من ثبّت التطبيق (حتى لو مغلقًا). لاحقًا يصل متصفّح الموقع أيضًا بعد تفعيل إشعارات الويب.')
+    + `<section class="panel">
+      <div class="panel-h"><h3>${ic('live')} قوالب سريعة</h3><small>اضغط لتعبئة الحقول، ثم أرسل</small></div>
+      <div class="np-tpl">
+        <button class="np-chip" data-t="channels">${ic('tv')} قنوات جديدة</button>
+        <button class="np-chip" data-t="update">${ic('download')} تحديث التطبيق</button>
+        <button class="np-chip" data-t="welcome">${ic('star')} رسالة ترحيب</button>
+      </div></section>
+    <form class="panel" id="np-f">
+      <div class="panel-h"><h3>${ic('info')} إرسال إشعار</h3></div>
+      <label class="fld"><span>العنوان</span><div class="inp">${ic('info')}<input name="title" maxlength="80" placeholder="عنوان الإشعار"></div></label>
+      <label class="fld"><span>النص</span><textarea name="body" rows="2" maxlength="200" placeholder="نص الإشعار…" class="px-hosts"></textarea></label>
+      <label class="fld"><span>رابط عند الضغط (اختياري)</span><div class="inp">${ic('link')}<input name="url" type="url" dir="ltr" placeholder="https://… (فارغ = يفتح التطبيق)"></div></label>
+      <div class="px-test" id="np-res" hidden></div>
+      <div class="f-act"><button class="btn2 primary">${ic('live')} إرسال للجميع</button></div></form>
+    <div class="alert2 warn">${ic('alert')}<div><b>قبل الاستخدام</b><p>انشر دالة <code>send-push</code> على Supabase واضبط أسرار Firebase (التفاصيل في supabase/functions/send-push). التفعيل مرة واحدة.</p></div></div>`;
+
+  const f = c.querySelector('#np-f'), box = c.querySelector('#np-res');
+  const TPL = {
+    channels: { title: 'قنوات جديدة على MTC-iPTv 📺', body: `أُضيفت قنوات جديدة${stats.channels ? ` — ${num(stats.channels)} قناة متاحة الآن` : ''}. افتح التطبيق وشاهدها.` },
+    update: { title: 'تحديث جديد متوفّر ⬆️', body: 'نسخة أحدث من تطبيق MTC-iPTv متوفّرة بمزايا وتحسينات. افتح التطبيق وحدّثه.' },
+    welcome: { title: 'أهلًا بك في MTC-iPTv 🎉', body: 'آلاف القنوات المباشرة من كل العالم بين يديك. استمتع بالمشاهدة!' },
+  };
+  c.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { const t = TPL[b.dataset.t]; f.title.value = t.title; f.body.value = t.body; f.title.focus(); });
+  f.onsubmit = e => {
+    e.preventDefault();
+    const title = f.title.value.trim(), body = f.body.value.trim(), url = f.url.value.trim();
+    if (!title || !body) { toast('اكتب العنوان والنص', 'error'); return; }
+    busy(f.querySelector('.btn2.primary'), async () => {
+      box.hidden = false; box.className = 'px-test'; box.innerHTML = `<i class="spin"></i> جارٍ الإرسال…`;
+      try { await sendPush({ title, body, url }); box.className = 'px-test ok'; box.innerHTML = `${ic('check')} أُرسل الإشعار لكل الأجهزة المشتركة.`; f.reset(); }
+      catch (err) { box.className = 'px-test bad'; box.innerHTML = `${ic('alert')} ${esc(err.message)}`; }
     });
   };
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import ChannelCard from './ChannelCard';
 import Icon from '../ui/Icon';
+import { rs } from '../ui/responsive';
 import { C } from '../theme';
 
 // صف أفقي بعنوان وأيقونة ملوّنة وشريط صغير متدرّج (مثل صفوف الموقع).
@@ -32,7 +33,7 @@ export default function ChannelRow({ title, icon, data, onPick, firstFocus }) {
 const s = StyleSheet.create({
   row: { marginBottom: 22 },
   head: { flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginBottom: 10, paddingHorizontal: 16 },
-  accent: { width: 4, height: 18, borderRadius: 2, backgroundColor: C.ac },
-  title: { color: C.txt, fontSize: 17, fontWeight: '800' },
+  accent: { width: 4, height: rs(18), borderRadius: 2, backgroundColor: C.ac },
+  title: { color: C.txt, fontSize: rs(17), fontWeight: '800' },
   list: { paddingHorizontal: 10 },
 });

@@ -10,7 +10,9 @@ const TABS = [
   { k: 'countries', label: 'الدول', icon: 'globe' },
   { k: 'categories', label: 'الفئات', icon: 'grid' },
   { k: 'favorites', label: 'المفضلة', icon: 'heart' },
+  { k: 'about', label: 'حول', icon: 'info', blue: true },
 ];
+const BLUE = '#3b82f6';
 
 // شريط تنقّل سفلي فخم: الأيقونة النشطة داخل حبّة متدرّجة.
 export default function BottomNav({ tab, onChange }) {
@@ -21,13 +23,13 @@ export default function BottomNav({ tab, onChange }) {
         return (
           <Pressable key={t.k} style={s.item} onPress={() => onChange(t.k)}>
             {on ? (
-              <LinearGradient colors={GRAD2} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.pill}>
+              <LinearGradient colors={t.blue ? [BLUE, '#2563eb'] : GRAD2} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.pill}>
                 <Icon name={t.icon} size={21} color="#fff" />
               </LinearGradient>
             ) : (
-              <View style={s.pill}><Icon name={t.icon} size={21} color={C.dim} /></View>
+              <View style={s.pill}><Icon name={t.icon} size={21} color={t.blue ? BLUE : C.dim} /></View>
             )}
-            <Text style={[s.label, on && s.onC]}>{t.label}</Text>
+            <Text style={[s.label, on && (t.blue ? { color: BLUE } : s.onC)]}>{t.label}</Text>
           </Pressable>
         );
       })}
