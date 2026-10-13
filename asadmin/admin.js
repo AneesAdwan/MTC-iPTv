@@ -1925,7 +1925,8 @@ async function convert(c) {
       if (!groups.has(key)) groups.set(key, { key, name: it.name, logo: it.logo, country: it.country || null, category: cat0, language: it.language, links: [] });
       const g = groups.get(key);
       g.logo ||= it.logo; g.country ||= it.country; g.category ||= cat0; g.language ||= it.language;
-      g.links.push({ url: it.url, quality: it.quality, why: it.url.startsWith('http:') ? 'http' : mine.urls.has(it.url) ? 'have' : '' });
+      // روابط http تُضاف كما هي: تعمل في التطبيق، ولا تُفحص من الموقع (https يمنعها في المتصفح)
+      g.links.push({ url: it.url, quality: it.quality, http: it.url.startsWith('http:'), why: mine.urls.has(it.url) ? 'have' : '' });
     }
     for (const g of groups.values()) {
       g.country ||= V.country || null;
@@ -1941,11 +1942,13 @@ async function convert(c) {
   }
 
   const usable = r => r.links.filter(l => !l.why);
+  const probeable = r => usable(r).filter(l => !l.http || location.protocol !== 'https:');
   const rowHtml = (r, i) => {
-    const k = cat(r.category), cn = co(r.country), u = usable(r);
-    const on = u.filter(l => l.res?.ok).length, run = u.some(l => l.res === 'run'), done = u.length && u.every(l => l.res && l.res !== 'run');
-    const st = !u.length ? `<span class="io-pr bad">${ic('alert')} ${r.links.some(l => l.why === 'http') ? 'http لا يعمل على https' : 'الروابط موجودة عندك'}</span>`
-      : run ? '<span class="io-pr"><i class="spin"></i> فحص…</span>' : done ? `<span class="io-pr ${on ? 'ok' : 'bad'}">${ic(on ? 'check' : 'alert')} ${on}/${u.length} يعمل</span>` : '';
+    const k = cat(r.category), cn = co(r.country), u = usable(r), pu = probeable(r), app = u.length - pu.length;
+    const on = pu.filter(l => l.res?.ok).length, run = pu.some(l => l.res === 'run'), done = pu.length && pu.every(l => l.res && l.res !== 'run');
+    const appTag = app ? `<span class="io-pr" title="روابط http تعمل في التطبيق ولا يمكن فحصها أو تشغيلها من موقع https">${ic('tv')} ${app} http · للتطبيق</span>` : '';
+    const st = !u.length ? `<span class="io-pr bad">${ic('alert')} الروابط موجودة عندك</span>`
+      : run ? '<span class="io-pr"><i class="spin"></i> فحص…</span>' : done ? `<span class="io-pr ${on ? 'ok' : 'bad'}">${ic(on ? 'check' : 'alert')} ${on}/${pu.length} يعمل</span>${appTag}` : appTag;
     const where = r.same ? `<span class="tag-s ok">موجودة عندك #${r.same.number ?? '—'}</span>`
       : r.like ? `<div class="sel2 sm io-tgt"><select data-tgt><option value="${r.like.id}" ${r.target ? 'selected' : ''}>روابطها إلى «${esc(r.like.name)}»</option><option value="" ${r.target ? '' : 'selected'}>كقناة جديدة</option></select></div>`
       : '<span class="tag-s new">جديدة</span>';
@@ -1956,7 +1959,7 @@ async function convert(c) {
       <td><div class="sel2 sm"><select data-co><option value="">بدون دولة</option>${opts(S.countries, r.country, 'code', x => `${x.flag_emoji || ''} ${x.name_ar}`)}</select></div></td>
       <td><div class="io-links"><span><b>${u.length}</b> رابط</span>${r.links.length > u.length ? `<small class="muted">+${r.links.length - u.length} مستبعد</small>` : ''}</div></td>
       <td>${where}</td>
-      <td class="acts2">${st}<button class="icon2" data-cv="play" title="معاينة" ${u.length ? '' : 'disabled'}>${ic('play')}</button></td>
+      <td class="acts2">${st}<button class="icon2" data-cv="play" title="معاينة" ${pu.length ? '' : 'disabled'}>${ic('play')}</button></td>
     </tr>`;
   };
   const render = () => {
@@ -1973,14 +1976,14 @@ async function convert(c) {
         <div class="tbl-scroll"><table class="tbl2 io-tbl cv-tbl"><thead><tr><th></th><th>القناة</th><th>الفئة</th><th>الدولة</th><th>الروابط</th><th>عندك؟</th><th></th></tr></thead>
         <tbody>${R.map(rowHtml).join('')}</tbody></table></div></div>
       <div class="bulkbar io-bar" ${sel.length ? '' : 'hidden'}><b>تم تحديد ${num(sel.length)} قناة</b>
-        <label class="chk2 cv-only" title="أضف كل القنوات دون فحص (الافتراضي). ألغِ التحديد لإضافة ما يعمل في المتصفح فقط."><input type="checkbox" id="cv-all" ${V.only === true ? '' : 'checked'}><i></i> أضف الكل بدون فحص</label>
+        <label class="chk2 cv-only" title="أضف كل القنوات دون فحص (الافتراضي). ألغِ التحديد لإضافة ما يعمل في المتصفح فقط."><input type="checkbox" id="cv-noprobe" ${V.only === true ? '' : 'checked'}><i></i> أضف الكل بدون فحص</label>
         <button class="pri" id="cv-add">${ic('shield')} إرسال إلى المراجعة</button></div>`;
     bind();
   };
   const refreshRow = i => { const tr = out.querySelector(`tr[data-i="${i}"]`); if (tr) tr.outerHTML = rowHtml(V.rows[i], i); };
 
   async function probeAll() {
-    const jobs = V.rows.flatMap((r, i) => usable(r).map(l => ({ l, i })));
+    const jobs = V.rows.flatMap((r, i) => probeable(r).map(l => ({ l, i })));
     jobs.forEach(j => { j.l.res = 'run'; }); V.rows.forEach((_, i) => refreshRow(i));
     S.health.stop = false;
     await pool(jobs, 8, async j => { j.l.res = await probeStream(j.l.url); refreshRow(j.i); return j.l.res; });
@@ -1989,7 +1992,7 @@ async function convert(c) {
   function bind() {
     out.querySelector('#cv-probe').onclick = () => { V.rows.forEach(r => r.links.forEach(l => { delete l.res; })); probeAll(); };
     out.querySelector('#cv-all').onchange = e => { V.rows.forEach(r => { r.sel = e.target.checked && usable(r).length > 0; }); render(); };
-    out.querySelector('#cv-all')?.addEventListener('change', e => { V.only = !e.target.checked; }); // «أضف الكل» مفعّل = only=false
+    out.querySelector('#cv-noprobe')?.addEventListener('change', e => { V.only = !e.target.checked; }); // «أضف الكل» مفعّل = only=false
     const tb = out.querySelector('tbody');
     tb.addEventListener('change', e => {
       const tr = e.target.closest('tr'), r = V.rows[+tr.dataset.i];
@@ -2002,7 +2005,7 @@ async function convert(c) {
     tb.addEventListener('click', e => {
       const b = e.target.closest('[data-cv=play]'); if (!b) return;
       const r = V.rows[+b.closest('tr').dataset.i];
-      previewStreams(usable(r).map(l => ({ url: l.url, quality: l.quality, host: new URL(l.url).host, status: l.res?.ok ? 'online' : l.res && l.res !== 'run' ? 'offline' : 'unknown' })), r.name);
+      previewStreams(probeable(r).map(l => ({ url: l.url, quality: l.quality, host: new URL(l.url).host, status: l.res?.ok ? 'online' : l.res && l.res !== 'run' ? 'offline' : 'unknown' })), r.name);
     });
     out.querySelector('#cv-add')?.addEventListener('click', e => add(e.currentTarget));
   }
@@ -2017,7 +2020,7 @@ async function convert(c) {
       else { links = all; if (!links.length) { skipped.push(r.name); return null; } }            // أضف الكل بلا فحص
       const q = links.map(l => l.quality).filter(Boolean).sort((a, b) => IPTV_RANK[b] - IPTV_RANK[a])[0] || null;
       // علامة «الأفضل عبر التطبيق» للقناة التي لم يتأكّد عمل أي رابط لها في المتصفح
-      const prefer = !only && working.length === 0 && links.some(l => l.res && !l.res.ok);
+      const prefer = !only && working.length === 0 && links.some(l => l.http || (l.res && !l.res.ok));
       return { uid: r.uid, target: r.target, name: r.name, logo: r.logo, country: r.country, category: r.category, language: r.language, quality: q, prefer_app: prefer,
         streams: links.sort((a, b) => (a.res?.ms ?? 9e9) - (b.res?.ms ?? 9e9)).map(l => ({ url: l.url, quality: l.quality, status: l.res?.ok ? 'online' : l.res ? 'offline' : null, ms: l.res?.ms ?? null })) };
     }).filter(Boolean);

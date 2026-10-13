@@ -819,7 +819,7 @@ begin
            case when s->>'status' in ('online', 'offline') then s->>'status' else 'unknown' end,
            nullif(s->>'ms', '')::int, case when s->>'status' in ('online', 'offline') then now() end
     from jsonb_array_elements(coalesce(it->'streams', '[]')) with ordinality as t(s, o)
-    where s->>'url' ~ '^https://' and length(s->>'url') <= 2000
+    where s->>'url' ~ '^https?://' and length(s->>'url') <= 2000
     on conflict (url) do nothing;
     get diagnostics n = row_count;
     v_links := v_links + n;
