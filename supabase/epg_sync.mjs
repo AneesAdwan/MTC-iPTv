@@ -21,7 +21,6 @@ const SOURCES = [
   { name: 'epgshare01-AR', url: 'https://epgshare01.online/epgshare01/epg_ripper_AR1.xml.gz' },
   { name: 'epgshare01-SA', url: 'https://epgshare01.online/epgshare01/epg_ripper_SA1.xml.gz' },
   { name: 'epgshare01-AE', url: 'https://epgshare01.online/epgshare01/epg_ripper_AE1.xml.gz' },
-  { name: 'epgshare01-QA', url: 'https://epgshare01.online/epgshare01/epg_ripper_QA1.xml.gz' },
   { name: 'epgshare01-EG', url: 'https://epgshare01.online/epgshare01/epg_ripper_EG1.xml.gz' },
 ];
 
@@ -36,7 +35,9 @@ const rest = async (path, opts = {}) => {
     headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json', ...(opts.headers || {}) },
   });
   if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
-  return r.status === 204 ? null : r.json();
+  // الرفع بـ return=minimal يرجّع 201/204 بجسم فارغ — لا نحاول تحليله كـ JSON
+  const txt = await r.text();
+  return txt ? JSON.parse(txt) : null;
 };
 const rpc = (fn, body = {}) => rest(`rpc/${fn}`, { method: 'POST', body: JSON.stringify(body) });
 
