@@ -112,6 +112,8 @@ const opts = (list, val, key, label, all) => `${all ? `<option value="">${all}</
 document.addEventListener('error', e => { if (e.target.tagName === 'IMG') e.target.remove(); }, true);
 
 /* ═══════════════════ الفحص من المتصفح ═══════════════════ */
+/** روابط http لا يمكن فحصها من موقع https (المتصفح يمنعها) لكنها تعمل في التطبيق: لا تُفحص ولا تُسجَّل معطّلة */
+const webBlocked = u => location.protocol === 'https:' && /^http:/i.test(u || '');
 /** يفحص رابط البث كما يراه المشاهد: يجب أن يرجع M3U8 صالحًا ويسمح بالوصول (CORS) */
 async function probeStream(rawUrl) {
   const url = proxied(rawUrl, S.proxy); // النطاقات المحمية تُفحص عبر وسيطك كما ستُشغَّل تمامًا
@@ -597,6 +599,7 @@ async function editChannel(id) {
     }).join('') : `<p class="muted">لا توجد روابط لهذه القناة.</p>`;
   };
   const checkStream = async s => {
+    if (webBlocked(s.url)) { toast('رابط http: لا يمكن فحصه من الموقع، لكنه يعمل في التطبيق', 'info'); return { ok: false, err: 'http' }; }
     const r = await probeStream(s.url);
     await rpc('admin_record_checks', { p_results: [{ id: s.id, ...r }] });
     Object.assign(s, { status: r.ok ? 'online' : 'offline', response_ms: r.ms, last_error: r.err || null, last_checked_at: new Date().toISOString() });
@@ -754,6 +757,8 @@ async function health(c) {
 
   /* ── تنفيذ إجراء على روابط ── */
   const recheck = async (items, btn) => busy(btn, async () => {
+    items = items.filter(s => !webBlocked(s.url));
+    if (!items.length) return toast('روابط http لا تُفحص من الموقع (تعمل في التطبيق)', 'info');
     let ok = 0, part = [];
     await pool(items, 8, s => probeStream(s.url), s => { part.push({ id: s.id, ...s.res }); if (s.res.ok) ok++; });
     for (const p of chunk(part, 200)) await rpc('admin_record_checks', { p_results: p });
@@ -822,7 +827,7 @@ async function health(c) {
       const items = [];
       for (let from = 0; items.length < limit; from += 1000) {
         const { data } = await rest(`streams?select=id,url,channel_id${filter}&order=last_checked_at.asc.nullsfirst`, { auth: true, range: `${from}-${from + Math.min(999, limit - items.length - 1)}` });
-        items.push(...(data || [])); if (!data || data.length < 1000) break;
+        items.push(...(data || []).filter(s => !webBlocked(s.url))); if (!data || data.length < 1000) break;
       }
       if (!items.length) { toast('لا توجد روابط في هذا النطاق', 'info'); return; }
       let pending = [], done = 0;
@@ -934,7 +939,7 @@ async function review(c) {
       <div class="rv-head"><div><h3>${ic(B.i)} ${B.t} <em>${num(total)}</em></h3><p class="muted">${B.d}</p></div>
         <label class="search2 sm">${ic('search')}<input id="rv-q" type="search" placeholder="بحث بالاسم أو الرقم…" value="${esc(RV.q)}"></label>
         ${total ? `<details class="menu2"><summary class="btn2 ghost sm">${ic('dots')} على كل «${B.t}» (${num(total)})</summary><div class="menu2-list">
-          ${RV.bucket !== 'offline' && RV.bucket !== 'unchecked' ? `<button data-allrv="approve">${ic('check')} موافقة ونشر الكل</button>` : ''}
+          ${RV.bucket !== 'offline' && RV.bucket !== 'unchecked' ? `<button data-allrv="approve">${ic('check')} موافقة ونشر الكل</button>` : `<button data-allrv="approve_app">${ic('tv')} نشر الكل للتطبيق</button>`}
           ${RV.bucket === 'duplicate' ? `<button data-allrv="merge">${ic('layers')} دمج الكل في القنوات الأصلية</button><button data-allrv="distinct">${ic('check')} الكل ليست مكررة — أبقِها كلها</button>` : ''}
           <button data-allrv="reject" class="bad">${ic('trash')} رفض وحذف الكل</button></div></details>` : ''}
       </div>
@@ -951,13 +956,13 @@ async function review(c) {
             ${RV.bucket === 'duplicate' && kp ? `<button class="btn2 ghost sm" data-rv="compare" data-k="${kp.id}">${ic('compare')} مقارنة</button><button class="icon2" data-rv="merge" title="دمج في الأصلية">${ic('layers')}</button><button class="icon2 ok" data-rv="distinct" title="ليست مكررة — بث مختلف، أبقِ القناتين">${ic('copy')}</button>` : ''}
             <button class="icon2" data-rv="play" title="تشغيل">${ic('play')}</button>
             <button class="icon2" data-rv="edit" title="تعديل">${ic('edit')}</button>
-            ${RV.bucket !== 'offline' && RV.bucket !== 'unchecked' ? `<button class="icon2 ok" data-rv="approve" title="موافقة ونشر">${ic('check')}</button>` : ''}
+            ${RV.bucket !== 'offline' && RV.bucket !== 'unchecked' ? `<button class="icon2 ok" data-rv="approve" title="موافقة ونشر">${ic('check')}</button>` : `<button class="icon2 ok" data-rv="approve_app" title="نشر للتطبيق — لا تعمل في المتصفح، وتظهر بشارة «الأفضل عبر التطبيق»">${ic('tv')}</button>`}
             <button class="icon2 bad" data-rv="reject" title="رفض وحذف">${ic('trash')}</button>
           </td></tr>`; }).join('')}</tbody></table></div>`
         : empty(B.i, `لا توجد قنوات «${B.t}»`, q ? 'لا توجد نتائج مطابقة للبحث.' : 'اختر تبويبًا آخر من الأعلى.')}
         <div class="pager2"><span class="sp"></span>${pager(RV.page, pages)}</div></div>
       <div class="bulkbar" id="rv-bar" hidden><b id="rv-selc"></b>
-        ${RV.bucket !== 'offline' && RV.bucket !== 'unchecked' ? `<button data-rvb="approve">${ic('check')} موافقة ونشر</button>` : ''}
+        ${RV.bucket !== 'offline' && RV.bucket !== 'unchecked' ? `<button data-rvb="approve">${ic('check')} موافقة ونشر</button>` : `<button data-rvb="approve_app">${ic('tv')} نشر للتطبيق</button>`}
         ${RV.bucket === 'duplicate' ? `<button data-rvb="merge">${ic('layers')} دمج في الأصلية</button><button data-rvb="distinct">${ic('copy')} ليست مكررة</button>` : ''}
         <button data-rvb="reject" class="bad">${ic('trash')} رفض وحذف</button>
         <button data-rvb="clear" class="x" title="إلغاء التحديد">${ic('x')}</button></div>`
@@ -971,7 +976,16 @@ async function review(c) {
 
   const apply = async (action, ids, btn) => {
     if (!ids.length) return;
-    const label = { approve: 'موافقة ونشر', reject: 'رفض وحذف', merge: 'دمج في الأصلية', distinct: 'ليست مكررة' }[action];
+    const label = { approve: 'موافقة ونشر', approve_app: 'نشر للتطبيق', reject: 'رفض وحذف', merge: 'دمج في الأصلية', distinct: 'ليست مكررة' }[action];
+    // «نشر للتطبيق»: قنوات لا تعمل في المتصفح (مثل روابط http) تُنشر بشارة «الأفضل عبر التطبيق»
+    if (action === 'approve_app') return busy(btn, async () => {
+      let n = 0;
+      for (const part of chunk(ids, 150)) {
+        await rest(`channels?id=in.(${part.join(',')})`, { method: 'PATCH', auth: true, body: { prefer_app: true } });
+        n += await rpc('admin_review_apply', { p_action: 'approve', p_ids: part });
+      }
+      toast(`${label}: ${num(n)} قناة`, 'success'); go('review');
+    });
     if (action === 'distinct') return busy(btn, async () => { // القنوات تبقى وتنتقل لتبويبها الصحيح (غالبًا «جاهزة للنشر»)
       let n = 0; for (const part of chunk(ids, 400)) n += await rpc('admin_mark_distinct', { p_ids: part });
       toast(`${num(n)} قناة لم تعد تُعامل كمكررة — انتقلت للمراجعة العادية`, 'success'); go('review');
@@ -1005,7 +1019,7 @@ async function review(c) {
     if (a === 'play') previewChannel(id, r.name);
     if (a === 'edit') editChannel(id);
     if (a === 'compare') compareChannels([b.dataset.k, id], { onDone: () => go('review') });
-    if (a === 'approve' || a === 'reject' || a === 'merge' || a === 'distinct') apply(a, [id], b);
+    if (['approve', 'approve_app', 'reject', 'merge', 'distinct'].includes(a)) apply(a, [id], b);
   });
 
   // الفحص: روابط القنوات المعلّقة التي لم تُفحص (أو كلها عند الطلب)
@@ -1018,7 +1032,7 @@ async function review(c) {
     let okN = 0, badN = 0, logoBad = 0;
     try {
       setP('جلب روابط القنوات المعلّقة…', 1);
-      const items = await restAll(`streams?select=id,url,channel_id,channels!inner(hidden_reason)&channels.hidden_reason=eq.pending${scope === 'all' ? '' : '&status=eq.unknown'}&is_active=eq.true`, { auth: true });
+      const items = (await restAll(`streams?select=id,url,channel_id,channels!inner(hidden_reason)&channels.hidden_reason=eq.pending${scope === 'all' ? '' : '&status=eq.unknown'}&is_active=eq.true`, { auth: true })).filter(s => !webBlocked(s.url));
       if (!items.length) { toast('لا توجد روابط تحتاج فحصًا', 'info'); return; }
       let pending = [], done = 0;
       const flush = async () => { if (!pending.length) return; const part = pending; pending = []; await rpc('admin_record_checks', { p_results: part }); };
