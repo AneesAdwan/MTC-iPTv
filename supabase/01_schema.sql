@@ -129,6 +129,7 @@ create table public.channels (
   quality          text check (quality in ('SD','HD','FHD','4K')),
   description      text check (length(description) <= 1000),
   website          text,
+  epg_id           text,                                              -- معرّف EPG بديل لـ uid (لمطابقة XMLTV)؛ إن كان فاضيًا يُستعمل uid بعد حذف لاحقة @…
   is_published     boolean not null default true,
   is_featured      boolean not null default false,
   is_manual        boolean not null default false,                    -- أضيفت يدويًا (لا تُحذف مع المصادر)
@@ -241,7 +242,7 @@ $$;
 -- ─── 9) واجهات العرض للمشاهدين (قراءة فقط) ─────────────────────────────────
 -- القنوات المنشورة التي لديها رابط واحد على الأقل غير معطّل
 create view public.catalog as
-select c.id, c.number, c.name, c.network, c.description, c.quality, c.is_featured, c.sort_order, c.published_at,
+select c.id, c.uid, c.epg_id, c.number, c.name, c.network, c.description, c.quality, c.is_featured, c.sort_order, c.published_at,
        case when c.logo_status = 'broken' then null else c.logo_url end as logo_url,
        c.country_code, co.name_ar as country_name, co.name_en as country_name_en, co.flag_url, co.is_arab, co.continent,
        c.category_slug, cat.name_ar as category_name, c.extra_categories,
@@ -650,9 +651,9 @@ begin
   if coalesce(p_url, '') !~ '^https?://' then raise exception 'رابط البث غير صالح'; end if;
   perform set_config('mtc.review_bypass', 'on', true);
   v_num := coalesce((p_channel->>'number')::int, (select coalesce(max(number), 0) + 1 from channels));
-  insert into channels (uid, number, name, logo_url, network, website, description, category_slug, country_code, language_code,
+  insert into channels (uid, epg_id, number, name, logo_url, network, website, description, category_slug, country_code, language_code,
                         quality, sort_order, is_published, is_featured, is_manual, hidden_reason)
-  values ('manual:' || gen_random_uuid(), v_num, p_channel->>'name', nullif(p_channel->>'logo_url', ''), nullif(p_channel->>'network', ''),
+  values ('manual:' || gen_random_uuid(), nullif(p_channel->>'epg_id', ''), v_num, p_channel->>'name', nullif(p_channel->>'logo_url', ''), nullif(p_channel->>'network', ''),
           nullif(p_channel->>'website', ''), nullif(p_channel->>'description', ''), coalesce(nullif(p_channel->>'category_slug', ''), 'general'),
           nullif(p_channel->>'country_code', ''), nullif(p_channel->>'language_code', ''), nullif(p_channel->>'quality', ''),
           coalesce((p_channel->>'sort_order')::int, 0), coalesce((p_channel->>'is_published')::boolean, true),
@@ -1275,6 +1276,80 @@ insert into public.categories (slug, name_ar, name_en, icon, hue, sort_order) va
   ('public', 'حكومية', 'Public', 'shield', 230, 27),
   ('general', 'عامة', 'General', 'tv', 240, 28);
 -- @@REFERENCE_DATA_END
+
+-- ─── 14) جدول البث (EPG) ────────────────────────────────────────────────────
+-- برامج القنوات (XMLTV). channel_uid يقابل channels.uid. تُحدَّث تلقائيًا عبر GitHub Actions.
+create table public.epg_programmes (
+  id           bigint generated always as identity primary key,
+  channel_uid  text not null,
+  start_at     timestamptz not null,
+  end_at       timestamptz not null,
+  title        text not null,
+  description  text,
+  category     text,
+  icon_url     text,
+  source       text,
+  unique (channel_uid, start_at)
+);
+create index epg_prog_idx on public.epg_programmes (channel_uid, start_at);
+
+-- سجلّ كل تحديث EPG
+create table public.epg_runs (
+  id           bigint generated always as identity primary key,
+  ran_at       timestamptz not null default now(),
+  source       text,
+  channels_ok  integer not null default 0,
+  programmes   integer not null default 0,
+  errors       text
+);
+
+alter table public.epg_programmes enable row level security;
+alter table public.epg_runs       enable row level security;
+create policy "anon read" on public.epg_programmes for select to anon using (true);
+create policy "auth read" on public.epg_programmes for select to authenticated using (true);
+create policy "auth read runs" on public.epg_runs for select to authenticated using (true);
+
+revoke all on public.epg_programmes, public.epg_runs from anon, authenticated;
+grant select on public.epg_programmes to anon, authenticated;
+grant select on public.epg_runs to authenticated;
+grant select, insert, update, delete on public.epg_programmes, public.epg_runs to service_role;
+
+-- السابق/الحالي/التالي لكل قناة باستعلام واحد (لشاشة القنوات)
+create or replace function public.epg_now(p_uids text[])
+returns table (channel_uid text, slot text, title text, start_at timestamptz, end_at timestamptz, category text, description text)
+language sql stable security definer set search_path = public, pg_temp as $$
+  (select channel_uid, 'now'::text as slot, title, start_at, end_at, category, description
+     from public.epg_programmes where channel_uid = any(p_uids) and now() >= start_at and now() < end_at)
+  union all
+  (select distinct on (channel_uid) channel_uid, 'next' as slot, title, start_at, end_at, category, description
+     from public.epg_programmes where channel_uid = any(p_uids) and start_at > now()
+     order by channel_uid, start_at)
+  union all
+  (select distinct on (channel_uid) channel_uid, 'prev' as slot, title, start_at, end_at, category, description
+     from public.epg_programmes where channel_uid = any(p_uids) and end_at <= now()
+     order by channel_uid, end_at desc)
+$$;
+
+-- جدول يوم كامل لقناة
+create or replace function public.epg_day(p_uid text, p_day date)
+returns setof public.epg_programmes
+language sql stable security definer set search_path = public, pg_temp as $$
+  select * from public.epg_programmes
+   where channel_uid = p_uid and start_at >= p_day::timestamptz and start_at < (p_day + 1)::timestamptz
+   order by start_at
+$$;
+
+-- حذف البرامج المنتهية قبل أكثر من يوم
+create or replace function public.epg_cleanup() returns integer
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare n integer;
+begin
+  delete from public.epg_programmes where end_at < now() - interval '1 day';
+  get diagnostics n = row_count; return n;
+end $$;
+
+grant execute on function public.epg_now(text[]), public.epg_day(text, date) to anon, authenticated;
+grant execute on function public.epg_cleanup() to service_role, authenticated;
 
 commit;
 
