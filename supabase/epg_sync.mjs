@@ -11,6 +11,7 @@
 // Node 20+ (fetch مدمج). لا مكتبات خارجية.
 // ════════════════════════════════════════════════════════════════════════════
 import zlib from 'node:zlib';
+import fs from 'node:fs';
 
 const URL = process.env.SUPABASE_URL?.replace(/\/$/, '');
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -53,6 +54,7 @@ function parseXmltvTime(s) {
 }
 
 async function fetchXml(src) {
+  if (src.file) return fs.readFileSync(src.file, 'utf8');   // ملف محلّي (ناتج grabber)
   const r = await fetch(src.url, { headers: { 'User-Agent': 'MTC-iPTv-EPG/1.0' } });
   if (!r.ok) throw new Error(`${r.status}`);
   const buf = Buffer.from(await r.arrayBuffer());
@@ -102,7 +104,14 @@ async function main() {
   const errors = [];
   const usedSource = new Set();
 
-  for (const src of SOURCES) {
+  // المصدر الأول: ملف guide.xml المحلّي من grabber مشروع iptv-org (مطابقة بالمعرّف مباشرة)،
+  // ثم المصادر العامة تُكمّل الناقص.
+  const sources = [];
+  const local = process.env.EPG_LOCAL_FILE;
+  if (local && fs.existsSync(local)) sources.push({ name: 'iptv-org', file: local });
+  sources.push(...SOURCES);
+
+  for (const src of sources) {
     // القنوات التي ما زالت بلا بيانات
     const pending = channels.filter(c => !collected.has(c.uid));
     if (!pending.length) break;

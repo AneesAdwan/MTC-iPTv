@@ -13,14 +13,37 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 55
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Sync EPG from XMLTV sources
+
+      # 1) استنساخ grabber مشروع iptv-org/epg وتثبيت اعتمادياته
+      - name: Clone iptv-org/epg
+        run: git clone --depth 1 https://github.com/iptv-org/epg.git epg
+      - name: Install grabber deps
+        working-directory: epg
+        run: npm install --no-audit --no-fund
+
+      # 2) توليد channels.xml بقنواتنا فقط (من ملفات sites في iptv-org/epg)
+      - name: Build channels.xml
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          EPG_DIR: epg
+        run: node supabase/epg_channels.mjs
+
+      # 3) جلب الجدول (لا نُفشل العملية إن تعثّر مصدر — نكمل بما توفّر)
+      - name: Grab EPG
+        working-directory: epg
+        continue-on-error: true
+        run: npm run grab -- --channels=channels.xml --output=guide.xml --days=2 --maxConnections=20 --timeout=30000
+
+      # 4) مزامنة guide.xml + المصادر العامة إلى Supabase
+      - name: Sync to Supabase
+        env:
+          EPG_LOCAL_FILE: epg/guide.xml
         run: node supabase/epg_sync.mjs
