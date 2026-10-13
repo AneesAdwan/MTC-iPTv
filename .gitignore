@@ -6,10 +6,19 @@ supabase/.temp/
 supabase/.cache/
 PROJECT_FILES.md
 
-# مشروع التطبيق (React Native) — لا يُرفع مع الموقع
+# مشروع تطبيق الأندرويد (React Native) — خاص بالجهاز فقط، لا يُرفع على GitHub
+app/
 MTCiPTv/
-phone/node_modules/
+phone/
 
-# دليل بناء APK — خاص بك، لا يُرفع
+# مخطّطات ووثائق داخلية — لا تُرفع
+md/
+
+# دليل بناء APK ومفتاح التوقيع — خاص بك، لا يُرفع
 APK_BUILD_GUIDE.md
 RUN_GUIDE.md
+app-keystore/
+
+# نسخ التطبيق APK — مستثناة من GitHub
+apk-releases/
+*.apk

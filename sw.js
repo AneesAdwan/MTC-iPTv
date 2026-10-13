@@ -18,7 +18,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request, url = new URL(req.url);
   // فقط ملفات الموقع نفسه (GET) — بدون البث وSupabase واللوحة وملف الديمو الكبير
-  if (req.method !== 'GET' || url.origin !== location.origin || /\/asadmin\/|\/data\/|\.m3u8?$/i.test(url.pathname)) return;
+  if (req.method !== 'GET' || url.origin !== location.origin || /\/asadmin(\/|$)|\/data\/|\.m3u8?$/i.test(url.pathname)) return;
   e.respondWith(fetch(req).then(res => {
     if (res.ok && res.type === 'basic') { const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); }
     return res;
