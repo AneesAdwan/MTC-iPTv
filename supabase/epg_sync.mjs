@@ -139,9 +139,14 @@ async function main() {
     }
   }
 
-  // رفع على دفعات
+  // رفع على دفعات — مع إزالة التكرار بنفس (channel_uid, start_at) لتفادي خطأ ON CONFLICT
   let total = 0;
-  const all = [...collected.values()].flat();
+  const seen = new Set();
+  const all = [...collected.values()].flat().filter(r => {
+    const k = r.channel_uid + '|' + r.start_at;
+    if (seen.has(k)) return false;
+    seen.add(k); return true;
+  });
   for (let i = 0; i < all.length; i += 500) {
     const batch = all.slice(i, i + 500);
     try {
