@@ -1500,6 +1500,27 @@ end $$;
 grant execute on function public.epg_now(text[]), public.epg_day(text, date) to anon, authenticated;
 grant execute on function public.epg_cleanup() to service_role, authenticated;
 
+-- ─── 15) مزامنة المفضلة عبر الأجهزة (برمز بسيط بلا حساب) ─────────────────────
+create table if not exists public.favorite_sets (
+  code       text primary key check (code ~ '^[A-Z0-9]{6}$'),
+  favorites  jsonb not null default '[]',
+  updated_at timestamptz not null default now()
+);
+alter table public.favorite_sets add column if not exists favorites  jsonb not null default '[]';
+alter table public.favorite_sets add column if not exists updated_at timestamptz not null default now();
+alter table public.favorite_sets enable row level security;
+drop policy if exists "fav read" on public.favorite_sets;
+create policy "fav read"   on public.favorite_sets for select to anon, authenticated using (true);
+drop policy if exists "fav write" on public.favorite_sets;
+create policy "fav write"  on public.favorite_sets for insert to anon, authenticated with check (true);
+drop policy if exists "fav update" on public.favorite_sets;
+create policy "fav update" on public.favorite_sets for update to anon, authenticated using (true) with check (true);
+revoke all on public.favorite_sets from anon, authenticated;
+grant select, insert, update on public.favorite_sets to anon, authenticated;
+drop trigger if exists favsets_touch on public.favorite_sets;
+drop trigger if exists favsets_touch on public.favorite_sets;
+create trigger favsets_touch before update on public.favorite_sets for each row execute function public.touch_updated_at();
+
 commit;
 
 -- تحديث ذاكرة واجهة API فورًا حتى ترى الجداول الجديدة (يمنع خطأ schema cache)

@@ -1,0 +1,551 @@
+#EXTM3U
+#EXTINF:-1 group-title="أخبار",Al Arabiya
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/255.ts
+#EXTINF:-1 group-title="أخبار",Al Arabiya Al Hadath (1080p)
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/256.ts
+#EXTINF:-1 group-title="أخبار",Al Jazeera
+https://live-hls-web-aja.getaj.net/aja/index.m3u8
+#EXTINF:-1 group-title="أخبار",Al Jazeera Arabic
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/257.ts
+#EXTINF:-1 group-title="أخبار",Al Jazeera Mubashe
+http://live-hls-web-ajm.getaj.net/ajm/02.m3u8
+#EXTINF:-1 group-title="أخبار",Al Jazeera Mubasher
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/258.ts
+#EXTINF:-1 group-title="أخبار",Alarabiya Net
+http://av.alarabiya.net/alarabiapublish/alhadath_720p/chunks.m3u8
+#EXTINF:-1 group-title="أخبار",Almayadeen
+http://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8
+#EXTINF:-1 group-title="أخبار",Alnajah Hd Tv
+https://streaming.najah.edu:8443/hls/alnajah.m3u8
+#EXTINF:-1 group-title="أخبار",Aqsa Tv
+https://live-1.linuxway.info/aqsatv/live/tv/playlist.m3u8
+#EXTINF:-1 group-title="أخبار",Aqsa Tv 1080
+https://live01.iflex.ps/aqsa/index.m3u8
+#EXTINF:-1 group-title="أخبار",I24 News Arabic
+https://bcovlive-a.akamaihd.net/773a2fa387914315ad11e6957cd54f6e/eu-central-1/5377161796001/playlist-all_dvr.m3u8
+#EXTINF:-1 group-title="أخبار",Kan11 Hd
+https://kan11.media.kan.org.il/hls/live/2024514/2024514/master.m3u8
+#EXTINF:-1 group-title="أخبار",Maan Tv
+http://htvmada.mada.ps:8888/maannews/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="أخبار",Makan Hd
+https://makan.media.kan.org.il/hls/live/2024680-b/2024680/source1_1.2k/chunklist.m3u8
+#EXTINF:-1 group-title="أخبار",Pal Today 059
+https://live.paltodaytv.com/paltv/live/chunklist.m3u8
+#EXTINF:-1 group-title="أخبار",Pbc Tv
+http://htvpalsat.mada.ps:8888/pbc/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="أخبار",Pbclive
+http://htvpalsat.mada.ps:8888/pbclive/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="أخبار",Skynewsarabia
+http://stream.skynewsarabia.com/hls/sna_360.m3u8
+#EXTINF:-1 group-title="أخبار",Trt Arabi
+http://tv-trtarabi.live.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="أخبار",Wattanhd Mada
+http://htvmada.mada.ps:8888/wattan/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="أطفال",Abu Dhabi Majid
+http://admdn4.cdn.mangomolo.com/majid/smil:majid.stream.smil/playlist.m3u8
+#EXTINF:-1 group-title="أطفال",Cartoon Ar Fhd
+http://shls-cartoon-net-prod-dub.shahid.net/out/v1/dc4aa87372374325a66be458f29eab0f/index_3.m3u8
+#EXTINF:-1 group-title="أطفال",Majid Kids Tv
+http://37.235.38.138:4000/play/a0cd/index_3.m3u8
+#EXTINF:-1 group-title="أطفال",Majid Tv
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/377.ts
+#EXTINF:-1 group-title="أطفال",Rotana Kids
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/410.ts
+#EXTINF:-1 group-title="أطفال",Spacetoon : :
+http://stream.spacetoon.com:1935/live/stchannel/smil:livesmil.smil/chunklist_w693439211_b346000_slar.m3u8
+#EXTINF:-1 group-title="أطفال",Spacetoon Fhd
+http://shls-spacetoon-prod-dub.shahid.net/out/v1/6240b773a3f34cca95d119f9e76aec02/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Abu Dhabi Drama
+http://admdn5.cdn.mangomolo.com/drama/smil:drama.stream.smil/h.o.ss.a.m-0599618001.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Aflam Tv 7
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/480.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Alfajer2 Movies Hd
+http://two.alfajertv.com:8081/alfajertvhdtwo_web/web/chunks.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc 1
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/387.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc 2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/388.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc 3
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/389.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc 4
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/390.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc 5
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/391.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Action
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/397.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Bollywood
+http://shls-mbcbollywood-prod-dub.shahid.net/out/v1/a79c9d7ef2a64a54a64d5c4567b3462a/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Bollywood
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/393.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Drama
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/400.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Drama Ksa
+http://shls-mbcdramaksa-prod-dub.shahid.net/out/v1/ce0f0762d89e4394a856c5fd13e43645/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Drama Plus
+http://shls-mbcplusdrama-prod-dub.shahid.net/out/v1/97ca0ce6fc6142f4b14c0a694af59eab/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Iraq
+http://shls-iraq-prod-dub.shahid.net/out/v1/c9bf1e87ea66478bb20bc5c93c9d41ea/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Iraq
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/394.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Masr
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/396.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Masr 2
+http://shls-masr2-prod-dub.shahid.net/out/v1/f683685242b549f48ea8a5171e3e993a/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Masr2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/395.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Max
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/392.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Max Hd
+http://shls-mbcmax-prod-dub.shahid.net/out/v1/13815a7cda864c249a88c38e66a2e653/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc Persia
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/402.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc2
+http://149.100.10.202:4225/bysid/1.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc3
+http://shls-mbc3-prod-dub.shahid.net/out/v1/d5bbe570e1514d3d9a142657d33d85e6/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc4
+http://shls-mbc4-prod-dub.shahid.net/out/v1/c08681f81775496ab4afa2bac7ae7638/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Mbc5
+http://shls-mbc5-prod-dub.shahid.net/out/v1/2720564b6a4641658fdfb6884b160da2/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Netflix Arabic
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/427.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Netflix Drama
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/428.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Cinema
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/404.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Cinema (1080p)
+https://shls-rotanacinema-egy-prod-dub.shahid.net/out/v1/c39c0ecbcbdb46e890e91106776397a8/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Cinema (1080p) [Geo Blocked]
+https://hiplayer.hibridcdn.net/t/rotana-cinema.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Cinema Hd Ksa (1080p)
+http://shls-rotanacinema-ksa-prod-dub.shahid.net/out/v1/6cee1c57ea7841e697eb15cefc98e0a6/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Cinema Ksa
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/409.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Cinema Ksa (1080p)
+https://shls-rotanacinema-ksa-prod-dub.shahid.net/out/v1/6cee1c57ea7841e697eb15cefc98e0a6/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Classic
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/403.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Classic (1080p)
+https://shls-rotanaclassic-prod-dub.shahid.net/out/v1/4eebed211c8441228321b4f67a46c5a5/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Classic Hd (1080p)
+http://shls-rotanaclassic-prod-dub.shahid.net/out/v1/4eebed211c8441228321b4f67a46c5a5/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Drama
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/405.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Drama Hd
+http://shls-rotanadrama-prod-dub.shahid.net/out/v1/20c617b40dc743589ecc9d08d9d3345d/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Khalijia
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/406.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Khalijia (1080p)
+https://shls-rotanakhalijia-prod-dub.shahid.net/out/v1/a639fd49db684f1b8c063d398101a888/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Khalijia Hd
+http://shls-rotanakhalijia-prod-dub.shahid.net/out/v1/a639fd49db684f1b8c063d398101a888/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Rotana Plus
+http://shls-rotanaplus-prod-dub.shahid.net/out/v1/1fc6103458be480b96e6a574b00fe1c0/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Shahid Arabia
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/416.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Shahid Scifi
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/413.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Shahid Turkish
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/415.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Star Movies Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/465.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Star World Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/464.ts
+#EXTINF:-1 group-title="أفلام ومسلسلات",Wanasah Fhd
+http://shls-wanasah-prod-dub.shahid.net/out/v1/c84ef3128e564b74a6a796e8b6287de6/index_3.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Water Movies
+http://vstream3.hadara.ps:8081/7alafm2020/7alafm2020/chunks.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Weyyak Action Black
+http://weyyak-live.akamaized.net/weyyak_action/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Weyyak Drama Black
+http://weyyak-live.akamaized.net/weyyak_drama/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Weyyak Mix Black
+http://weyyak-live.akamaized.net/weyyak_mix/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Weyyak Nawaem Black
+http://weyyak-live.akamaized.net/weyyak_nawaem/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Zee Aflam Black
+https://weyyak-live.akamaized.net/weyyak_zee_aflam/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="أفلام ومسلسلات",Zee Alwan Black
+https://weyyak-live.akamaized.net/weyyak_zee_alwan/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="ديني",Al Majd Quran
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/499.ts
+#EXTINF:-1 group-title="ديني",Al Quran (Medina)
+http://m.live.net.sa:1935/live/quran/h.o.ss.a.m.0599618001.m3u8
+#EXTINF:-1 group-title="ديني",Al Quran Al Kareem Tv (Mecca)
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/370.ts
+#EXTINF:-1 group-title="ديني",Al Sunnah (Medina)
+http://m.live.net.sa:1935/live/sunnah/h.o.ss.a.m.0599618001.m3u8
+#EXTINF:-1 group-title="ديني",Almajd Kids
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/500.ts
+#EXTINF:-1 group-title="ديني",Almanar Tv
+http://manar.live/iptv/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="ديني",Bahrain Quran
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/369.ts
+#EXTINF:-1 group-title="ديني",Daawahtv
+http://51.15.246.58:8081/daawahtv/daawahtv2/playlist.m3u8
+#EXTINF:-1 group-title="ديني",Iqraa
+http://iqraac.cdn.mangomolo.com/iqraa/smil:iqraar1.stream.smil/playlist.m3u8
+#EXTINF:-1 group-title="ديني",Islam Channel
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/274.ts
+#EXTINF:-1 group-title="ديني",Makkah Tv
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/259.ts
+#EXTINF:-1 group-title="ديني",Quranfm
+http://streaming.zaytonatube.com:8080/holyquran/holyquran/index.m3u8
+#EXTINF:-1 group-title="راديو",Abdulbasit Abdulsamad Mjawwad Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/270.ts
+#EXTINF:-1 group-title="راديو",Abdulrahman Alsudaes Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/368.ts
+#EXTINF:-1 group-title="راديو",Abdulrasheed Soufi Rewayat Khalaf An Hamzah Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/264.ts
+#EXTINF:-1 group-title="راديو",Ahmed Amer Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/265.ts
+#EXTINF:-1 group-title="راديو",Ajyal Fm
+http://46.43.64.50:8008/ajyal
+#EXTINF:-1 group-title="راديو",Albalad Ar Hd
+http://streaming.zaytonatube.com:8080/radioalbalad/radioalbalad/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="راديو",Aloyoon Alkoshi Rewayat Warsh An Nafi Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/267.ts
+#EXTINF:-1 group-title="راديو",Alzain Mohammad Ahmad Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/269.ts
+#EXTINF:-1 group-title="راديو",Angham Fm
+http://streamer.mada.ps:8010/angham
+#EXTINF:-1 group-title="راديو",Classic Fm
+http://streamer.mada.ps:8037/classic
+#EXTINF:-1 group-title="راديو",Gaza Fm
+http://173.212.226.153:8000/ho.ssa.m-sat
+#EXTINF:-1 group-title="راديو",Idrees Abkr Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/266.ts
+#EXTINF:-1 group-title="راديو",Islam2daymp3
+http://islam2day.tv:8000/;stream.mp3
+#EXTINF:-1 group-title="راديو",Mbc Fm
+http://mbcfm-riyadh-prod-dub.shahid.net/out/v1/69c8a03f507e422f99cf5c07291c9e3a/index_3.m3u8
+#EXTINF:-1 group-title="راديو",Mishary Alafasi Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/272.ts
+#EXTINF:-1 group-title="راديو",Mohammed Siddiq Alminshawi Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/268.ts
+#EXTINF:-1 group-title="راديو",Orient Fm
+http://streamer.mada.ps:8034/orient
+#EXTINF:-1 group-title="راديو",Pal Quraan1 Radio
+http://www.quran-radio.org:8002/;stream.mp3
+#EXTINF:-1 group-title="راديو",Quraan Ahmad Alajmi Mp3
+http://server2.quraan.us:9852/;*.mp3
+#EXTINF:-1 group-title="راديو",Quraan Athkar Masa
+http://qurango.net/radio/athkar_masa
+#EXTINF:-1 group-title="راديو",Quraan Athkar Sabah
+http://qurango.net/radio/athkar_sabah
+#EXTINF:-1 group-title="راديو",Quraan Ramalah Fm
+http://streamer.mada.ps:8029/quranfm
+#EXTINF:-1 group-title="راديو",Quraan Roqiah Mp3
+http://qurango.net/radio/roqiah
+#EXTINF:-1 group-title="راديو",Quraan Saad Alghamdi Mp3
+http://qurango.net/radio/saad_alghamdi
+#EXTINF:-1 group-title="راديو",Quraan Sakeenah Mp3
+http://qurango.net/radio/sakeenah
+#EXTINF:-1 group-title="راديو",Quraan Salma Mp3
+http://qurango.net/radio/salma
+#EXTINF:-1 group-title="راديو",Quraan Tarateel Mp3
+http://qurango.net/radio/tarateel
+#EXTINF:-1 group-title="راديو",Raya Fm
+http://live.raya.ps:8064/;stream.mp3
+#EXTINF:-1 group-title="راديو",Rotana Radio Jordan: City View (180p)
+http://188.247.86.66/rotanaradio/cityview1/playlist.m3u8
+#EXTINF:-1 group-title="راديو",Saad Alghamdi Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/273.ts
+#EXTINF:-1 group-title="راديو",Saud Alshuraim Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/263.ts
+#EXTINF:-1 group-title="راديو",Sawt Anajah
+http://rs.hadara.ps:8550/stream/;stream.mp3
+#EXTINF:-1 group-title="راديو",Tarab Fm
+http://streamer.mada.ps:8012/tarab
+#EXTINF:-1 group-title="راديو",Yasser Aldosari Radio
+http://mo3ad.xyz:80/live/mo3ad3030sd/mo3ad3030sd/271.ts
+#EXTINF:-1 group-title="راديو",Zmn Fm
+http://rs.hadara.ps:8608/stream/;stream.mp3
+#EXTINF:-1 group-title="رياضة",Abu Dhabi Sport 1
+http://admdn1.cdn.mangomolo.com/adsports1/smil:adsports1.stream.smil/playlist.m3u8
+#EXTINF:-1 group-title="رياضة",Abu Dhabi Sport 1
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/144.ts
+#EXTINF:-1 group-title="رياضة",Abu Dhabi Sport 2
+http://admdn5.cdn.mangomolo.com/adsports2/smil:adsports2.stream.smil/playlist.m3u8
+#EXTINF:-1 group-title="رياضة",Abu Dhabi Sport 2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/143.ts
+#EXTINF:-1 group-title="رياضة",Abu Dhabi Sport 3
+http://admdn3.cdn.mangomolo.com/adsports3/smil:adsports3.stream.smil/playlist.m3u8
+#EXTINF:-1 group-title="رياضة",Abu Dhabi Sport 3
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/142.ts
+#EXTINF:-1 group-title="رياضة",Abu Dhabi Sport 4
+http://admdn4.cdn.mangomolo.com/adsports4/smil:adsports4.stream.smil/playlist.m3u8
+#EXTINF:-1 group-title="رياضة",Abu Dhabi Sport 4
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/141.ts
+#EXTINF:-1 group-title="رياضة",Ad Sports Premieum 1 Seria A
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/137.ts
+#EXTINF:-1 group-title="رياضة",Ad Sports Premieum 2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/483.ts
+#EXTINF:-1 group-title="رياضة",Ad Sports Premieum 2 Seria A
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/371.ts
+#EXTINF:-1 group-title="رياضة",Ad Starzplay Sport 2 Fhd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/139.ts
+#EXTINF:-1 group-title="رياضة",Al Ahly
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/171.ts
+#EXTINF:-1 group-title="رياضة",Al Rabiaa Iraq Sport
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/178.ts
+#EXTINF:-1 group-title="رياضة",Al Zamalek
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/172.ts
+#EXTINF:-1 group-title="رياضة",Alkass 1
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/479.ts
+#EXTINF:-1 group-title="رياضة",Alkass 5
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/156.ts
+#EXTINF:-1 group-title="رياضة",Alkass2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/155.ts
+#EXTINF:-1 group-title="رياضة",Alkass4
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/154.ts
+#EXTINF:-1 group-title="رياضة",Arriadia Tv
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/149.ts
+#EXTINF:-1 group-title="رياضة",Bahrain Sports
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/150.ts
+#EXTINF:-1 group-title="رياضة",Bein News Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/277.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport 1 Sd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/289.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport 2 Sd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/290.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport 3 Sd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/291.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport 4 Sd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/293.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport 5 Sd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/294.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport 6 Sd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/295.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport 7 Sd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/296.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport 8 Sd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/297.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport 9 Sd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/298.ts
+#EXTINF:-1 group-title="رياضة",Bein Sport Open
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/159.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 1 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/314.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 1 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/278.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 2 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/315.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 2 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/280.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 3 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/316.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 3 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/281.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 4 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/317.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 4 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/282.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 5 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/318.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 5 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/283.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 6 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/319.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 6 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/284.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 7 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/320.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 7 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/285.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 8 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/321.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 8 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/286.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 9 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/322.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports 9 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/509.ts
+#EXTINF:-1 group-title="رياضة",Bein Sports News 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/276.ts
+#EXTINF:-1 group-title="رياضة",Bein Xtra 1 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/323.ts
+#EXTINF:-1 group-title="رياضة",Bein Xtra 2 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/324.ts
+#EXTINF:-1 group-title="رياضة",Bein Xtra 3 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/325.ts
+#EXTINF:-1 group-title="رياضة",Beinsports Nba
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/510.ts
+#EXTINF:-1 group-title="رياضة",Dubai Sport 1
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/147.ts
+#EXTINF:-1 group-title="رياضة",Dubai Sport 2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/146.ts
+#EXTINF:-1 group-title="رياضة",Dubai Sport 3
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/145.ts
+#EXTINF:-1 group-title="رياضة",Horyaa Sport1
+http://vstream3.hadara.ps:8081/hrhd_web/web/chunks.m3u8
+#EXTINF:-1 group-title="رياضة",Horyaa Sport2
+http://vstream3.hadara.ps:8081/hrhd1_web/web/playlist.m3u8
+#EXTINF:-1 group-title="رياضة",Iraqia Sport
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/174.ts
+#EXTINF:-1 group-title="رياضة",Jordan Sport
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/140.ts
+#EXTINF:-1 group-title="رياضة",Kass Three
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/175.ts
+#EXTINF:-1 group-title="رياضة",Ksa Sport 2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/158.ts
+#EXTINF:-1 group-title="رياضة",Ksa Sport 4
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/169.ts
+#EXTINF:-1 group-title="رياضة",Ksa Sports 1
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/153.ts
+#EXTINF:-1 group-title="رياضة",Ksa Sports 3
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/168.ts
+#EXTINF:-1 group-title="رياضة",Kuwait Sport Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/170.ts
+#EXTINF:-1 group-title="رياضة",Libya Sport 2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/167.ts
+#EXTINF:-1 group-title="رياضة",Libya Sports
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/152.ts
+#EXTINF:-1 group-title="رياضة",Nile Sport
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/163.ts
+#EXTINF:-1 group-title="رياضة",Oman Sports
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/151.ts
+#EXTINF:-1 group-title="رياضة",On Sports 1
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/160.ts
+#EXTINF:-1 group-title="رياضة",On Sports 2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/161.ts
+#EXTINF:-1 group-title="رياضة",On Time Sport 3hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/166.ts
+#EXTINF:-1 group-title="رياضة",Post Sport
+https://tv.qmedia.ps/hls/tv_sd/index.m3u8
+#EXTINF:-1 group-title="رياضة",Sharjah Sports
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/148.ts
+#EXTINF:-1 group-title="رياضة",Ssc 1
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/123.ts
+#EXTINF:-1 group-title="رياضة",Ssc 1 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/130.ts
+#EXTINF:-1 group-title="رياضة",Ssc 2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/122.ts
+#EXTINF:-1 group-title="رياضة",Ssc 2 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/131.ts
+#EXTINF:-1 group-title="رياضة",Ssc 3
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/124.ts
+#EXTINF:-1 group-title="رياضة",Ssc 3 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/132.ts
+#EXTINF:-1 group-title="رياضة",Ssc 4
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/125.ts
+#EXTINF:-1 group-title="رياضة",Ssc 4 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/133.ts
+#EXTINF:-1 group-title="رياضة",Ssc 5
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/127.ts
+#EXTINF:-1 group-title="رياضة",Ssc 5 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/134.ts
+#EXTINF:-1 group-title="رياضة",Ssc 6 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/135.ts
+#EXTINF:-1 group-title="رياضة",Ssc 6 Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/126.ts
+#EXTINF:-1 group-title="رياضة",Ssc 7
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/128.ts
+#EXTINF:-1 group-title="رياضة",Ssc 7 4k
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/136.ts
+#EXTINF:-1 group-title="رياضة",Ssc Sd1
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/129.ts
+#EXTINF:-1 group-title="رياضة",Sudan Sport
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/164.ts
+#EXTINF:-1 group-title="رياضة",Ufc Fight Pass Uhd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/177.ts
+#EXTINF:-1 group-title="رياضة",Ufc Fightpass Fhd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/176.ts
+#EXTINF:-1 group-title="رياضة",Watar Sportshd1 Mada
+http://htvmada.mada.ps:8888/orient2/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="رياضة",Watar Sportshd2 Paltel
+http://vstream3.hadara.ps:8081/watar/watar/chunks.m3u8
+#EXTINF:-1 group-title="عامة",2m Monde
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/381.ts
+#EXTINF:-1 group-title="عامة",Abu Dhabi Alemarat
+http://admdn3.cdn.mangomolo.com/emarat/smil:emarat.stream.smil/h.o.ss.a.m-0599618001.m3u8
+#EXTINF:-1 group-title="عامة",Abu Dhabi Aloula
+http://admdn2.cdn.mangomolo.com/adtv/smil:adtv.stream.smil/h.o.ss.a.m-0599618001.m3u8
+#EXTINF:-1 group-title="عامة",Adwa Tv
+http://htvmada.mada.ps:8888/adwa2tv/index.m3u8
+#EXTINF:-1 group-title="عامة",Ajyal Hd
+http://htvajyal.mada.ps:8888/ajyal/index.m3u8
+#EXTINF:-1 group-title="عامة",Ajyal Sd
+http://htvajyal.mada.ps:8888/ajyalsd/index.m3u8
+#EXTINF:-1 group-title="عامة",Al Aoula
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/382.ts
+#EXTINF:-1 group-title="عامة",Al Fajer 2
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/495.ts
+#EXTINF:-1 group-title="عامة",Al Fajer 3
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/496.ts
+#EXTINF:-1 group-title="عامة",Al Fajer 4
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/497.ts
+#EXTINF:-1 group-title="عامة",Al Fajer 5
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/498.ts
+#EXTINF:-1 group-title="عامة",Al Maghribia
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/383.ts
+#EXTINF:-1 group-title="عامة",Alkofiya Tv
+http://217.138.142.245:8080/hls/alkofiya.m3u8
+#EXTINF:-1 group-title="عامة",Almadinahd
+http://streaming.zaytonatube.com:8080/almadinatv/almadina21/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="عامة",Almadinatv
+http://streaming.zaytonatube.com:8081/almadinatv/almadina21/index_3.m3u8
+#EXTINF:-1 group-title="عامة",Almahd
+http://lon.rtsp.me/afuneyqpzemsr-ypt2y2ya/1644754261/hls/black sat.m3u8
+#EXTINF:-1 group-title="عامة",Art Action Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/466.ts
+#EXTINF:-1 group-title="عامة",Baladna Hd
+http://htvmada.mada.ps:8888/baladna/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="عامة",Black Rajeen
+http://mn-nl.mncdn.com/palabroad/live/chunks.m3u8
+#EXTINF:-1 group-title="عامة",Dubai One Hd
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/379.ts
+#EXTINF:-1 group-title="عامة",Dubai Racing
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/378.ts
+#EXTINF:-1 group-title="عامة",Dubai Zaman
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/375.ts
+#EXTINF:-1 group-title="عامة",Dubaione
+http://dminnvll.cdn.mangomolo.com/dubaione/smil:dubaione.stream.smil/playlist.m3u8
+#EXTINF:-1 group-title="عامة",Hala Ramallah 9
+https://halaramallahtv.com:8444/hramallah-tv/halaramallah/chunklist_w246911314.m3u8
+#EXTINF:-1 group-title="عامة",Halatv
+http://gstream4.panet.co.il/edge/halatv/chunks.m3u8
+#EXTINF:-1 group-title="عامة",Halatv 360p
+http://live1.panet.co.il/edge_abr/halatv/edge_abr/halatv_360p/chunks.m3u8
+#EXTINF:-1 group-title="عامة",Hekaya
+http://streaming.zaytonatube.com:8081/hekaya/hekayamix/tracks-v2a1/mono.m3u8
+#EXTINF:-1 group-title="عامة",Hettin
+https://live.hettin.tv/stream/hls/hettin.m3u8
+#EXTINF:-1 group-title="عامة",Impact Wrestling Tv
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/173.ts
+#EXTINF:-1 group-title="عامة",Kol Alnas
+http://htvmada.mada.ps:8888/kolalnas/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="عامة",Love Nature
+https://d18dyiwu97wm6q.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/lovenature4k2-prod/playlist.m3u8
+#EXTINF:-1 group-title="عامة",Mawwalhd
+http://vstream3.hadara.ps:8081/mawwalhd_web/web/playlist.m3u8
+#EXTINF:-1 group-title="عامة",Mazaj Hd
+https://htvmada.mada.ps:4443/royalgroup/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="عامة",Musawa
+http://htvpalsat.mada.ps:8888/musawa/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="عامة",Nabluslive Hd
+http://htvmada.mada.ps:8888/nabluslive/tracks-v1a1/index.m3u8
+#EXTINF:-1 group-title="عامة",Natgeotami
+http://198.16.100.90:8278/natgeotamil_raj/playlist.m3u8?tid=mc8c8508198685081986&ct=19249&tsum=211a7c56c1dd113e10eae565520483d0
+#EXTINF:-1 group-title="عامة",National Geographic Abu Dhabi (1080p)
+http://admdn2.cdn.mangomolo.com/nagtv/smil:nagtv.stream.smil/playlist.m3u8
+#EXTINF:-1 group-title="عامة",Noor Dubai (576p)
+http://mo3ad.xyz:80/live/mo3ad6gl00/mo3ad6gl00/376.ts
+#EXTINF:-1 group-title="عامة",Nubarplus Hd
+http://stream.nubar.tv:1935/private/nubarplus/chunklist_w2142222133.m3u8
+#EXTINF:-1 group-title="عامة",Nubartv Hd
+http://stream.nubar.tv:1935/private/nubartv/chunklist_w1323980318.m3u8
+#EXTINF:-1 group-title="عامة",Pnn Tv
+https://vstream3.hadara.ps:8443/pnn/pnn/chunks.m3u8
+#EXTINF:-1 group-title="عامة",Post Tv Hd
+https://tv.qmedia.ps/hls/post_sd/index.m3u8
+#EXTINF:-1 group-title="عامة",Raya1 Black
+http://htvmada.mada.ps:8888/raya/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="عامة",Rehan Hd
+http://vstream3.hadara.ps:8081/rehan_web/web/playlist.m3u8
+#EXTINF:-1 group-title="عامة",Salam Tv
+http://htvmada.mada.ps:8888/salamtv/tracks-v1a1/mono.m3u8
+#EXTINF:-1 group-title="عامة",Trt Cocuk
+http://tv-trtcocuk.live.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="عامة",Watar Orient Tv
+http://htvint.mada.ps:8889//orient/tracks-v1a1/mono.m3u8
