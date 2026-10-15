@@ -240,6 +240,7 @@ class _InfoTabState extends ConsumerState<_InfoTab> {
             TextField(controller: epg, decoration: InputDecoration(labelText: t.fEpgId)),
             TextField(controller: offset, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: t.fEpgOffset)),
           ]),
+          _MergedSection(keepId: widget.ch.id, onChanged: widget.onSaved),
           SwitchListTile(title: Text(t.fFeatured), value: featured, onChanged: (v) => setState(() => featured = v)),
           SwitchListTile(title: Text(t.fParental), value: parental, onChanged: (v) => setState(() => parental = v)),
           const SizedBox(height: Space.md),
@@ -263,6 +264,51 @@ class _InfoTabState extends ConsumerState<_InfoTab> {
               label: Text(t.aDelete),
             ),
           ]),
+        ]),
+      ),
+    );
+  }
+}
+
+final _mergedProvider = FutureProvider.autoDispose.family<List<AdminChannel>, String>((ref, id) async => await ref.watch(adminRepoProvider)?.mergedInto(id) ?? const []);
+
+/// القنوات المدموجة في هذه القناة مع «تراجع عن الدمج» (§11.4).
+class _MergedSection extends ConsumerWidget {
+  final String keepId;
+  final VoidCallback onChanged;
+  const _MergedSection({required this.keepId, required this.onChanged});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = L10n.of(context), c = context.colors;
+    final lang = Localizations.localeOf(context).languageCode;
+    final list = ref.watch(_mergedProvider(keepId)).value ?? const <AdminChannel>[];
+    if (list.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: Space.md),
+      child: SectionCard(
+        title: t.mergedHere,
+        child: Column(children: [
+          for (final m in list)
+            ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: Text('${m.displayName(lang)} · ${m.uid}', style: TextStyle(color: c.text)),
+              trailing: OutlinedButton.icon(
+                icon: const Icon(Icons.undo_rounded, size: 18),
+                label: Text(t.aUnmerge),
+                onPressed: () async {
+                  try {
+                    await ref.read(adminRepoProvider)?.unmerge(m.id);
+                    if (context.mounted) toast(context, t.saved);
+                  } catch (e) {
+                    if (context.mounted) toast(context, t.saveFailed('$e'));
+                  }
+                  ref.invalidate(_mergedProvider(keepId));
+                  ref.invalidate(_streamsProvider(keepId));
+                  onChanged();
+                },
+              ),
+            ),
         ]),
       ),
     );

@@ -495,6 +495,109 @@ class AdminRepository {
     return [for (final e in total.entries) (e.key, e.value, ok[e.key] ?? 0)]..sort((a, b) => b.$2.compareTo(a.$2));
   }
 
+  // ── المكررات والدمج (ADM-D2، §11.4) ──────────────────────────────────────
+  /// مجموعات (نفس الاسم المطبّع + الدولة) من admin_duplicates في الإنتاج.
+  Future<List<Map<String, dynamic>>> duplicates() async => [for (final g in (await db.rpc('admin_duplicates') as List)) Map<String, dynamic>.from(g as Map)];
+
+  /// دمج **قابل للتراجع** (§11.4): الروابط والبلاغات المفتوحة تنتقل للأساسية، والمدموجة تبقى مخفية بـ merged_into
+  /// (لا تُحذف كما في admin_merge القديمة). [keepFields]: الحقول المختارة من المدموجة لتُكتب على الأساسية.
+  Future<void> mergeChannels(String keep, List<String> remove, {Map<String, dynamic> keepFields = const {}}) async {
+    final others = remove.where((x) => x != keep).toList();
+    if (others.isEmpty) return;
+    // رقم مأخوذ من مدموجة: يُفرغ منها أولًا (الأرقام فريدة)
+    if (keepFields.containsKey('number')) await db.from('channels').update({'number': null}).inFilter('id', others).eq('number', keepFields['number']);
+    await db.from('streams').update({'channel_id': keep}).inFilter('channel_id', others);
+    await db.from('reports').update({'channel_id': keep}).inFilter('channel_id', others).eq('status', 'open');
+    await db.from('channels').update({'publish_state': 'hidden', 'hidden_reason': 'duplicate', 'merged_into': keep}).inFilter('id', others);
+    if (keepFields.isNotEmpty) await updateChannel(keep, keepFields);
+  }
+
+  /// التراجع عن دمج: تُعاد الروابط التي نقلها الدمج (من سجل التدقيق) وتُستعاد حالة النشر السابقة.
+  Future<int> unmerge(String mergedId) async {
+    final ch = await db.from('channels').select('merged_into').eq('id', mergedId).single();
+    final keep = ch['merged_into'] as String?;
+    if (keep == null) return 0;
+    final moves = await db
+        .from('audit_logs')
+        .select('row_id,before,after')
+        .eq('table_name', 'streams')
+        .eq('action', 'UPDATE')
+        .eq('before->>channel_id', mergedId)
+        .eq('after->>channel_id', keep)
+        .limit(5000);
+    final ids = {for (final m in moves) m['row_id'] as String}.toList();
+    if (ids.isNotEmpty) await db.from('streams').update({'channel_id': mergedId}).inFilter('id', ids).eq('channel_id', keep);
+    final before = await db
+        .from('audit_logs')
+        .select('before')
+        .eq('table_name', 'channels')
+        .eq('row_id', mergedId)
+        .eq('after->>merged_into', keep)
+        .order('at', ascending: false)
+        .limit(1);
+    final prev = before.isEmpty ? 'pending' : '${(before.first['before'] as Map?)?['publish_state'] ?? 'pending'}';
+    await db.from('channels').update({'merged_into': null, 'duplicate_of': null, 'publish_state': prev == 'hidden' ? 'pending' : prev}).eq('id', mergedId);
+    return ids.length;
+  }
+
+  Future<List<AdminChannel>> mergedInto(String keep) async =>
+      [for (final r in await db.from('channels').select('$_channelCols,streams(health_state)').eq('merged_into', keep)) AdminChannel.fromJson(r)];
+
+  Future<int> hideDuplicates(String keep, List<String> hide) async => ((await db.rpc('admin_hide_duplicates', params: {'p_keep': keep, 'p_hide': hide})) as num).toInt();
+
+  Future<List<AdminChannel>> channelsByIds(List<String> ids) async =>
+      ids.isEmpty ? const [] : [for (final r in await db.from('channels').select('$_channelCols,streams(health_state)').inFilter('id', ids)) AdminChannel.fromJson(r)];
+
+  // ── الشعارات (ADM-D5) ────────────────────────────────────────────────────
+  /// [status]: broken | unknown | ok | missing (بلا شعار).
+  Future<List<AdminChannel>> channelsByLogo(String status, {int limit = 1000}) async {
+    var f = db.from('channels').select('$_channelCols,logo_status,streams(health_state)');
+    f = status == 'missing' ? f.isFilter('logo_url', null) : f.eq('logo_status', status).not('logo_url', 'is', null);
+    final rows = await f.order('number', ascending: true, nullsFirst: false).limit(limit);
+    return [for (final r in rows) AdminChannel.fromJson(r)];
+  }
+
+  Future<Map<String, int>> logoCounts() async {
+    final m = <String, int>{};
+    await Future.wait([
+      for (final s in ['ok', 'broken', 'unknown']) db.from('channels').count().eq('logo_status', s).not('logo_url', 'is', null).then((n) => m[s] = n),
+      db.from('channels').count().isFilter('logo_url', null).then((n) => m['missing'] = n),
+    ]);
+    return m;
+  }
+
+  Future<int> recordLogos(List<(String, bool)> results) async =>
+      ((await db.rpc('admin_record_logos', params: {'p_results': [for (final (id, ok) in results) {'id': id, 'ok': ok}]})) as num).toInt();
+
+  // ── الشبكات (ADM-B6) ─────────────────────────────────────────────────────
+  /// (الشبكة، عدد القنوات، شعار ممثّل).
+  Future<List<(String, int, String?)>> networks() async {
+    final rows = await db.from('channels').select('network,logo_url').not('network', 'is', null).limit(50000);
+    final n = <String, int>{}, logo = <String, String?>{};
+    for (final r in rows) {
+      final k = '${r['network']}'.trim();
+      if (k.isEmpty) continue;
+      n[k] = (n[k] ?? 0) + 1;
+      logo[k] ??= r['logo_url'] as String?;
+    }
+    return [for (final e in n.entries) (e.key, e.value, logo[e.key])]..sort((a, b) => b.$2.compareTo(a.$2));
+  }
+
+  Future<void> renameNetwork(String from, String? to) => db.from('channels').update({'network': (to == null || to.trim().isEmpty) ? null : to.trim()}).eq('network', from);
+
+  // ── العرض في الرئيسية (ADM-B4): site_settings.home_layout (عام للتطبيقات) ──
+  Future<Map<String, dynamic>?> homeLayout() async {
+    final r = await db.from('site_settings').select('value').eq('key', 'home_layout').maybeSingle();
+    return (r?['value'] as Map?)?.cast<String, dynamic>();
+  }
+
+  Future<void> saveHomeLayout(Map<String, dynamic> layout) async {
+    await db.from('site_settings').upsert({'key': 'home_layout', 'value': layout, 'is_public': true, 'updated_at': DateTime.now().toUtc().toIso8601String()});
+    // توافق: الموقع القديم يقرأ hero.channel_id (قناة واحدة)
+    final hero = (layout['hero'] as List?)?.cast<String>() ?? const [];
+    await db.from('site_settings').upsert({'key': 'hero', 'value': {'channel_id': hero.isEmpty ? null : hero.first}, 'is_public': true});
+  }
+
   // ── المهام (ADM-A2) ──────────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> taskRuns({int limit = 100}) =>
       db.from('task_runs').select('id,task_key,device,started_at,finished_at,status,summary,error').order('started_at', ascending: false).limit(limit);

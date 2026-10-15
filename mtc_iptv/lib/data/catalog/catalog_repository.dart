@@ -88,6 +88,15 @@ class CatalogRepository {
     return [for (final r in rows) r.read(db.channels.id)!];
   }
 
+  /// قنوات بمعرّفاتها بنفس ترتيب القائمة (صفوف المدير اليدوية و«يعرض الآن»)؛ غير المنشورة غير موجودة محليًا فتُتجاوز.
+  Stream<List<ChannelRow>> watchByIds(List<String> ids) {
+    if (ids.isEmpty) return Stream.value(const []);
+    return (db.select(db.channels)..where((c) => c.id.isIn(ids))).watch().map((rows) {
+      final byId = {for (final r in rows) r.id: r};
+      return [for (final id in ids) ?byId[id]];
+    });
+  }
+
   Future<ChannelRow?> byNumber(int n) => (db.select(db.channels)..where((c) => c.number.equals(n))).getSingleOrNull();
 
   Stream<List<CountWith<CountryRow>>> watchCountries() {

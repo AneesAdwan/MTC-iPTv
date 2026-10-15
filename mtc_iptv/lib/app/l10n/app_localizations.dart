@@ -2502,6 +2502,300 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'المُجدوِل الذي يشغّلها تلقائيًا يأتي مع المرحلة 6 (ADM-H2). الفحوص اليدوية تُسجَّل هنا.'**
   String get schedulerNote;
+
+  /// No description provided for @hlHero.
+  ///
+  /// In ar, this message translates to:
+  /// **'يعرض الآن (الواجهة)'**
+  String get hlHero;
+
+  /// No description provided for @hlHeroHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'قناة أو أكثر تظهر كبيرة أعلى الرئيسية؛ إن كانت أكثر من واحدة تتناوب كل 8 ثوانٍ.'**
+  String get hlHeroHint;
+
+  /// No description provided for @hlRows.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفوف الرئيسية'**
+  String get hlRows;
+
+  /// No description provided for @hlAddRow.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة صف'**
+  String get hlAddRow;
+
+  /// No description provided for @hlPublishHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'التغييرات المحفوظة تصل للمشاهدين في مزامنتهم التالية.'**
+  String get hlPublishHint;
+
+  /// No description provided for @hlReset.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعادة الافتراضي'**
+  String get hlReset;
+
+  /// No description provided for @rtFeatured.
+  ///
+  /// In ar, this message translates to:
+  /// **'المميزة'**
+  String get rtFeatured;
+
+  /// No description provided for @rtHistory.
+  ///
+  /// In ar, this message translates to:
+  /// **'تابع المشاهدة (لكل مشاهد)'**
+  String get rtHistory;
+
+  /// No description provided for @rtFavorites.
+  ///
+  /// In ar, this message translates to:
+  /// **'المفضلة (لكل مشاهد)'**
+  String get rtFavorites;
+
+  /// No description provided for @rtRecent.
+  ///
+  /// In ar, this message translates to:
+  /// **'المضافة حديثًا'**
+  String get rtRecent;
+
+  /// No description provided for @rtCategoriesAuto.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفوف الفئات (تلقائي)'**
+  String get rtCategoriesAuto;
+
+  /// No description provided for @rtCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'فئة واحدة'**
+  String get rtCategory;
+
+  /// No description provided for @rtCountry.
+  ///
+  /// In ar, this message translates to:
+  /// **'دولة واحدة'**
+  String get rtCountry;
+
+  /// No description provided for @rtManual.
+  ///
+  /// In ar, this message translates to:
+  /// **'قنوات مختارة يدويًا'**
+  String get rtManual;
+
+  /// No description provided for @rtAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل القنوات'**
+  String get rtAll;
+
+  /// No description provided for @fTitleAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'العنوان بالعربية (اختياري)'**
+  String get fTitleAr;
+
+  /// No description provided for @fTitleEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'العنوان بالإنجليزية (اختياري)'**
+  String get fTitleEn;
+
+  /// No description provided for @fCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'عدد القنوات في الصف'**
+  String get fCount;
+
+  /// No description provided for @fFrom.
+  ///
+  /// In ar, this message translates to:
+  /// **'يظهر من'**
+  String get fFrom;
+
+  /// No description provided for @fTo.
+  ///
+  /// In ar, this message translates to:
+  /// **'يظهر حتى'**
+  String get fTo;
+
+  /// No description provided for @addChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة قنوات'**
+  String get addChannels;
+
+  /// No description provided for @pickChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر قناة'**
+  String get pickChannel;
+
+  /// No description provided for @netChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} قناة'**
+  String netChannels(int n);
+
+  /// No description provided for @netRename.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة تسمية'**
+  String get netRename;
+
+  /// No description provided for @netNewName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم الجديد (فارغ = إزالة الشبكة)'**
+  String get netNewName;
+
+  /// No description provided for @logoLibraryLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتبة الشعارات (الرفع للتخزين وأحجام WebP) تأتي مع إعداد التخزين في المرحلة 6.'**
+  String get logoLibraryLater;
+
+  /// No description provided for @dupGroups.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} مجموعة مكررة'**
+  String dupGroups(int n);
+
+  /// No description provided for @noDuplicates.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا مكررات.'**
+  String get noDuplicates;
+
+  /// No description provided for @aCompare.
+  ///
+  /// In ar, this message translates to:
+  /// **'مقارنة'**
+  String get aCompare;
+
+  /// No description provided for @aHideOthers.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء البقية'**
+  String get aHideOthers;
+
+  /// No description provided for @aMergeHere.
+  ///
+  /// In ar, this message translates to:
+  /// **'ادمج فيها'**
+  String get aMergeHere;
+
+  /// No description provided for @mergeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدمج في: {name}'**
+  String mergeTitle(String name);
+
+  /// No description provided for @mergePreview.
+  ///
+  /// In ar, this message translates to:
+  /// **'{s} رابط ينتقل إليها · {c} قناة تُخفى (لا تُحذف)'**
+  String mergePreview(int s, int c);
+
+  /// No description provided for @mergeFieldsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحقول المختلفة: اختر القيمة التي تبقى.'**
+  String get mergeFieldsHint;
+
+  /// No description provided for @mergeUndoHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'القنوات المدموجة تبقى مخفية مع إشارة لهذه القناة، ويمكن التراجع عن الدمج من صفحتها.'**
+  String get mergeUndoHint;
+
+  /// No description provided for @mergedHere.
+  ///
+  /// In ar, this message translates to:
+  /// **'قنوات مدموجة في هذه القناة'**
+  String get mergedHere;
+
+  /// No description provided for @aUnmerge.
+  ///
+  /// In ar, this message translates to:
+  /// **'تراجع عن الدمج'**
+  String get aUnmerge;
+
+  /// No description provided for @compareHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر 2–4 قنوات من «المكررات» أو «القنوات» لمقارنتها هنا.'**
+  String get compareHint;
+
+  /// No description provided for @playSideBySide.
+  ///
+  /// In ar, this message translates to:
+  /// **'تشغيل جنبًا إلى جنب'**
+  String get playSideBySide;
+
+  /// No description provided for @diffOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاختلافات فقط'**
+  String get diffOnly;
+
+  /// No description provided for @compareMoreLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'مقارنة المصادر واللقطات تأتي مع الاستيراد (المرحلة 5).'**
+  String get compareMoreLater;
+
+  /// No description provided for @lgBroken.
+  ///
+  /// In ar, this message translates to:
+  /// **'معطّلة'**
+  String get lgBroken;
+
+  /// No description provided for @lgMissing.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا شعار'**
+  String get lgMissing;
+
+  /// No description provided for @lgUnchecked.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تُفحص'**
+  String get lgUnchecked;
+
+  /// No description provided for @lgOk.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعمل'**
+  String get lgOk;
+
+  /// No description provided for @checkLogos.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص الشعارات'**
+  String get checkLogos;
+
+  /// No description provided for @logoChecking.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص الشعارات {done}/{total}…'**
+  String logoChecking(int done, int total);
+
+  /// No description provided for @logoMoreLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقتراحات الشعارات من iptv-org ونسخها للتخزين تأتي مع المرحلتين 5 و6.'**
+  String get logoMoreLater;
+
+  /// No description provided for @setLogo.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعيين الشعار'**
+  String get setLogo;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

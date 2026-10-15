@@ -149,4 +149,61 @@ void main() {
     expect(runs.firstWhere((x) => x['id'] == run)['status'], 'ok');
     expect(await repo.scheduledTasks(), isNotEmpty);
   }, skip: skip);
+
+  test('batch 4c: reversible merge, duplicates, logos, networks, home layout', () async {
+    // مجموعة مكررة: نفس الاسم والدولة
+    final ids = <String>[];
+    for (var i = 0; i < 2; i++) {
+      final r = await admin('POST', '/rest/v1/channels', {'uid': 'dup:$stamp:$i', 'name': 'Dup Channel $stamp', 'country_code': null, 'network': 'Net$stamp', 'logo_url': i == 0 ? 'https://example.com/none-$stamp.png' : null});
+      ids.add(((jsonDecode(r.body) as List).single as Map)['id'] as String);
+      await admin('POST', '/rest/v1/streams', {'channel_id': ids.last, 'url': 'https://example.com/dup/$stamp/$i.m3u8'});
+    }
+    addTearDown(() async {
+      for (final id in ids) {
+        await admin('DELETE', '/rest/v1/channels?id=eq.$id');
+      }
+    });
+    final groups = await repo.duplicates();
+    expect(groups.any((g) => (g['channels'] as List).map((c) => (c as Map)['id']).toSet().containsAll(ids)), isTrue);
+
+    // الدمج: الروابط تنتقل، والمدموجة مخفية (لا تُحذف) مع merged_into
+    await repo.mergeChannels(ids[0], [ids[1]], keepFields: {'name_en': 'Dup Merged $stamp'});
+    expect((await repo.streamsOf(ids[0])).length, 2);
+    final merged = (await repo.channel(ids[1]))!;
+    expect(merged.publishState, 'hidden');
+    expect((await repo.mergedInto(ids[0])).map((c) => c.id), [ids[1]]);
+    expect((await repo.channel(ids[0]))!.nameEn, 'Dup Merged $stamp');
+
+    // التراجع: تعود روابطها، وتُزال الإشارة
+    expect(await repo.unmerge(ids[1]), 1);
+    expect((await repo.streamsOf(ids[0])).length, 1);
+    expect((await repo.streamsOf(ids[1])).length, 1);
+    expect(await repo.mergedInto(ids[0]), isEmpty);
+
+    // الشعارات: تسجيل النتيجة والعدّ
+    await repo.recordLogos([(ids[0], false)]);
+    expect((await repo.channelsByLogo('broken')).map((c) => c.id), contains(ids[0]));
+    expect((await repo.logoCounts())['broken'], greaterThanOrEqualTo(1));
+
+    // الشبكات: العدّ وإعادة التسمية
+    expect((await repo.networks()).firstWhere((n) => n.$1 == 'Net$stamp').$2, 2);
+    await repo.renameNetwork('Net$stamp', 'Renamed$stamp');
+    expect((await repo.networks()).map((n) => n.$1), contains('Renamed$stamp'));
+
+    // تخطيط الرئيسية: يحفظه المدير ويقرؤه الزائر (عام)، و«hero» القديم يتحدث للموقع
+    final before = await repo.homeLayout();
+    addTearDown(() async {
+      if (before == null) {
+        await admin('DELETE', '/rest/v1/site_settings?key=eq.home_layout');
+      } else {
+        await repo.saveHomeLayout(before);
+      }
+    });
+    await repo.saveHomeLayout({'version': 1, 'hero': [ids[0]], 'rows': [{'type': 'featured'}]});
+    final anon = SupabaseClient(url, anonKey);
+    final pub = await anon.from('site_settings').select('value').eq('key', 'home_layout').single();
+    expect(((pub['value'] as Map)['hero'] as List).single, ids[0]);
+    final hero = await anon.from('site_settings').select('value').eq('key', 'hero').single();
+    expect((hero['value'] as Map)['channel_id'], ids[0]);
+  }, skip: skip);
 }

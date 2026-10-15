@@ -1296,4 +1296,168 @@ class L10nAr extends L10n {
   @override
   String get schedulerNote =>
       'المُجدوِل الذي يشغّلها تلقائيًا يأتي مع المرحلة 6 (ADM-H2). الفحوص اليدوية تُسجَّل هنا.';
+
+  @override
+  String get hlHero => 'يعرض الآن (الواجهة)';
+
+  @override
+  String get hlHeroHint =>
+      'قناة أو أكثر تظهر كبيرة أعلى الرئيسية؛ إن كانت أكثر من واحدة تتناوب كل 8 ثوانٍ.';
+
+  @override
+  String get hlRows => 'صفوف الرئيسية';
+
+  @override
+  String get hlAddRow => 'إضافة صف';
+
+  @override
+  String get hlPublishHint =>
+      'التغييرات المحفوظة تصل للمشاهدين في مزامنتهم التالية.';
+
+  @override
+  String get hlReset => 'استعادة الافتراضي';
+
+  @override
+  String get rtFeatured => 'المميزة';
+
+  @override
+  String get rtHistory => 'تابع المشاهدة (لكل مشاهد)';
+
+  @override
+  String get rtFavorites => 'المفضلة (لكل مشاهد)';
+
+  @override
+  String get rtRecent => 'المضافة حديثًا';
+
+  @override
+  String get rtCategoriesAuto => 'صفوف الفئات (تلقائي)';
+
+  @override
+  String get rtCategory => 'فئة واحدة';
+
+  @override
+  String get rtCountry => 'دولة واحدة';
+
+  @override
+  String get rtManual => 'قنوات مختارة يدويًا';
+
+  @override
+  String get rtAll => 'كل القنوات';
+
+  @override
+  String get fTitleAr => 'العنوان بالعربية (اختياري)';
+
+  @override
+  String get fTitleEn => 'العنوان بالإنجليزية (اختياري)';
+
+  @override
+  String get fCount => 'عدد القنوات في الصف';
+
+  @override
+  String get fFrom => 'يظهر من';
+
+  @override
+  String get fTo => 'يظهر حتى';
+
+  @override
+  String get addChannels => 'إضافة قنوات';
+
+  @override
+  String get pickChannel => 'اختر قناة';
+
+  @override
+  String netChannels(int n) {
+    return '$n قناة';
+  }
+
+  @override
+  String get netRename => 'إعادة تسمية';
+
+  @override
+  String get netNewName => 'الاسم الجديد (فارغ = إزالة الشبكة)';
+
+  @override
+  String get logoLibraryLater =>
+      'مكتبة الشعارات (الرفع للتخزين وأحجام WebP) تأتي مع إعداد التخزين في المرحلة 6.';
+
+  @override
+  String dupGroups(int n) {
+    return '$n مجموعة مكررة';
+  }
+
+  @override
+  String get noDuplicates => 'لا مكررات.';
+
+  @override
+  String get aCompare => 'مقارنة';
+
+  @override
+  String get aHideOthers => 'إخفاء البقية';
+
+  @override
+  String get aMergeHere => 'ادمج فيها';
+
+  @override
+  String mergeTitle(String name) {
+    return 'الدمج في: $name';
+  }
+
+  @override
+  String mergePreview(int s, int c) {
+    return '$s رابط ينتقل إليها · $c قناة تُخفى (لا تُحذف)';
+  }
+
+  @override
+  String get mergeFieldsHint => 'الحقول المختلفة: اختر القيمة التي تبقى.';
+
+  @override
+  String get mergeUndoHint =>
+      'القنوات المدموجة تبقى مخفية مع إشارة لهذه القناة، ويمكن التراجع عن الدمج من صفحتها.';
+
+  @override
+  String get mergedHere => 'قنوات مدموجة في هذه القناة';
+
+  @override
+  String get aUnmerge => 'تراجع عن الدمج';
+
+  @override
+  String get compareHint =>
+      'اختر 2–4 قنوات من «المكررات» أو «القنوات» لمقارنتها هنا.';
+
+  @override
+  String get playSideBySide => 'تشغيل جنبًا إلى جنب';
+
+  @override
+  String get diffOnly => 'الاختلافات فقط';
+
+  @override
+  String get compareMoreLater =>
+      'مقارنة المصادر واللقطات تأتي مع الاستيراد (المرحلة 5).';
+
+  @override
+  String get lgBroken => 'معطّلة';
+
+  @override
+  String get lgMissing => 'بلا شعار';
+
+  @override
+  String get lgUnchecked => 'لم تُفحص';
+
+  @override
+  String get lgOk => 'تعمل';
+
+  @override
+  String get checkLogos => 'فحص الشعارات';
+
+  @override
+  String logoChecking(int done, int total) {
+    return 'فحص الشعارات $done/$total…';
+  }
+
+  @override
+  String get logoMoreLater =>
+      'اقتراحات الشعارات من iptv-org ونسخها للتخزين تأتي مع المرحلتين 5 و6.';
+
+  @override
+  String get setLogo => 'تعيين الشعار';
 }

@@ -1306,4 +1306,167 @@ class L10nEn extends L10n {
   @override
   String get schedulerNote =>
       'The scheduler that runs these automatically arrives with phase 6 (ADM-H2). Manual checks are recorded here.';
+
+  @override
+  String get hlHero => 'Now showing (hero)';
+
+  @override
+  String get hlHeroHint =>
+      'One or more channels shown large at the top of Home; several rotate every 8 seconds.';
+
+  @override
+  String get hlRows => 'Home rows';
+
+  @override
+  String get hlAddRow => 'Add row';
+
+  @override
+  String get hlPublishHint => 'Saved changes reach viewers at their next sync.';
+
+  @override
+  String get hlReset => 'Reset to default';
+
+  @override
+  String get rtFeatured => 'Featured';
+
+  @override
+  String get rtHistory => 'Continue watching (per viewer)';
+
+  @override
+  String get rtFavorites => 'Favorites (per viewer)';
+
+  @override
+  String get rtRecent => 'Recently added';
+
+  @override
+  String get rtCategoriesAuto => 'Category rows (automatic)';
+
+  @override
+  String get rtCategory => 'One category';
+
+  @override
+  String get rtCountry => 'One country';
+
+  @override
+  String get rtManual => 'Hand-picked channels';
+
+  @override
+  String get rtAll => 'All channels';
+
+  @override
+  String get fTitleAr => 'Title (Arabic, optional)';
+
+  @override
+  String get fTitleEn => 'Title (English, optional)';
+
+  @override
+  String get fCount => 'Channels in row';
+
+  @override
+  String get fFrom => 'Show from';
+
+  @override
+  String get fTo => 'Show until';
+
+  @override
+  String get addChannels => 'Add channels';
+
+  @override
+  String get pickChannel => 'Pick a channel';
+
+  @override
+  String netChannels(int n) {
+    return '$n channels';
+  }
+
+  @override
+  String get netRename => 'Rename';
+
+  @override
+  String get netNewName => 'New name (empty = remove the network)';
+
+  @override
+  String get logoLibraryLater =>
+      'The logo library (upload to storage, WebP sizes) arrives with the storage setup in phase 6.';
+
+  @override
+  String dupGroups(int n) {
+    return '$n groups of duplicates';
+  }
+
+  @override
+  String get noDuplicates => 'No duplicates found.';
+
+  @override
+  String get aCompare => 'Compare';
+
+  @override
+  String get aHideOthers => 'Hide the others';
+
+  @override
+  String get aMergeHere => 'Merge into this one';
+
+  @override
+  String mergeTitle(String name) {
+    return 'Merge into: $name';
+  }
+
+  @override
+  String mergePreview(int s, int c) {
+    return '$s streams move to it · $c channels are hidden (not deleted)';
+  }
+
+  @override
+  String get mergeFieldsHint => 'Fields that differ: choose the value to keep.';
+
+  @override
+  String get mergeUndoHint =>
+      'Merged channels stay hidden with a link to this one, and the merge can be undone from its page.';
+
+  @override
+  String get mergedHere => 'Merged into this channel';
+
+  @override
+  String get aUnmerge => 'Undo merge';
+
+  @override
+  String get compareHint =>
+      'Pick 2–4 channels from Duplicates or Channels to compare them here.';
+
+  @override
+  String get playSideBySide => 'Play side by side';
+
+  @override
+  String get diffOnly => 'Differences only';
+
+  @override
+  String get compareMoreLater =>
+      'Comparing sources and snapshots arrives with import (phase 5).';
+
+  @override
+  String get lgBroken => 'Broken';
+
+  @override
+  String get lgMissing => 'No logo';
+
+  @override
+  String get lgUnchecked => 'Not checked';
+
+  @override
+  String get lgOk => 'Working';
+
+  @override
+  String get checkLogos => 'Check logos';
+
+  @override
+  String logoChecking(int done, int total) {
+    return 'Checking logos $done/$total…';
+  }
+
+  @override
+  String get logoMoreLater =>
+      'Logo suggestions from iptv-org and copying logos to storage arrive with phases 5 and 6.';
+
+  @override
+  String get setLogo => 'Set logo';
 }

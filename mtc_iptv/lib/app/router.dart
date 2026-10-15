@@ -8,7 +8,12 @@ import 'package:flutter/material.dart';
 import '../features/admin/channels/channel_detail_screen.dart';
 import '../features/admin/channels/channels_admin_screen.dart';
 import '../features/admin/dashboard_screen.dart';
+import '../features/admin/compare_screen.dart';
+import '../features/admin/duplicates_screen.dart';
 import '../features/admin/health_screen.dart';
+import '../features/admin/home_layout_screen.dart';
+import '../features/admin/logos_screen.dart';
+import '../features/admin/networks_screen.dart';
 import '../features/admin/jobs_screen.dart';
 import '../features/admin/numbering_screen.dart';
 import '../features/admin/review_screen.dart';
@@ -88,8 +93,18 @@ Widget _screenFor(ScreenDef s, GoRouterState state) {
     'ADM-A1' => const DashboardScreen(),
     'ADM-A2' => const JobsScreen(),
     'ADM-B1' => ChannelsAdminScreen(
-        key: ValueKey(state.uri.toString()), initialState: q['state'], initialCountry: q['country'], initialCategory: q['category'], openAdd: q['add'] == '1'),
+        key: ValueKey(state.uri.toString()),
+        initialState: q['state'],
+        initialCountry: q['country'],
+        initialCategory: q['category'],
+        initialSearch: q['q'],
+        openAdd: q['add'] == '1'),
     'ADM-B3' => const StreamsScreen(),
+    'ADM-B4' => const HomeLayoutScreen(),
+    'ADM-B6' => const NetworksScreen(),
+    'ADM-D2' => const DuplicatesScreen(),
+    'ADM-D3' => CompareScreen(key: ValueKey(state.uri.toString()), ids: (q['ids'] ?? '').split(',').where((x) => x.isNotEmpty).toList()),
+    'ADM-D5' => const LogosScreen(),
     'ADM-B5' => const TaxonomyScreen(),
     'ADM-B7' => const NumberingScreen(),
     'ADM-D1' => const ReviewScreen(),
