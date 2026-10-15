@@ -5,7 +5,12 @@ import 'package:go_router/go_router.dart';
 
 import 'package:flutter/material.dart';
 
+import '../features/admin/channels/channel_detail_screen.dart';
+import '../features/admin/channels/channels_admin_screen.dart';
+import '../features/admin/dashboard_screen.dart';
+import '../features/admin/health_screen.dart';
 import '../features/admin/login/admin_login_screen.dart';
+import '../features/admin/reports_screen.dart';
 import '../features/placeholder/placeholder_screen.dart';
 import '../features/viewer/about_screen.dart';
 import '../features/viewer/channels_screen.dart';
@@ -50,6 +55,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: s.path,
                 pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: _screenFor(s, state)),
               ),
+          GoRoute(
+            path: '/admin/channel/:id',
+            pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: ChannelDetailScreen(key: ValueKey(state.pathParameters['id']), id: state.pathParameters['id']!)),
+          ),
         ],
       ),
       // المشاهدة خارج الهيكل: الفيديو يأخذ المساحة كاملة (§8.1)
@@ -71,6 +80,10 @@ Widget _screenFor(ScreenDef s, GoRouterState state) {
     'V-10' => const SettingsScreen(),
     'V-11' => const AboutScreen(),
     'V-12' => ReportScreen(key: ValueKey(state.uri.toString()), channelId: q['channel']),
+    'ADM-A1' => const DashboardScreen(),
+    'ADM-B1' => ChannelsAdminScreen(key: ValueKey(state.uri.toString()), initialState: q['state'], openAdd: q['add'] == '1'),
+    'ADM-D4' => HealthScreen(key: ValueKey(state.uri.toString()), initialState: q['state']),
+    'ADM-D6' => const ReportsAdminScreen(),
     _ => PlaceholderScreen(def: s),
   };
 }

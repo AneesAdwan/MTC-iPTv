@@ -21,8 +21,8 @@ class SupabaseEpgApi implements EpgApi {
       .from('epg_programmes')
       .select('channel_uid,start_at,end_at,title,description,category')
       .gte('end_at', since.toUtc().toIso8601String())
-      .order('channel_uid')
-      .order('start_at')
+      .order('channel_uid', ascending: true) // postgrest-dart: الافتراضي تنازلي
+      .order('start_at', ascending: true)
       .range(from, to);
 }
 

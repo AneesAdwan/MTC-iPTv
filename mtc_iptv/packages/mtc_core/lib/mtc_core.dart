@@ -4,3 +4,4 @@ library;
 export 'src/normalize.dart';
 export 'src/playlist/m3u_parser.dart';
 export 'src/net/safe_fetch.dart';
+export 'src/net/stream_probe.dart';

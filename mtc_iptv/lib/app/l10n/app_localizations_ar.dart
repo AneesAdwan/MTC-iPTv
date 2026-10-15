@@ -697,4 +697,350 @@ class L10nAr extends L10n {
 
   @override
   String get closePlayer => 'إغلاق المشغّل';
+
+  @override
+  String get psPublished => 'منشورة';
+
+  @override
+  String get psPending => 'قيد المراجعة';
+
+  @override
+  String get psHidden => 'مخفية';
+
+  @override
+  String get psDraft => 'مسودة';
+
+  @override
+  String get psRejected => 'مرفوضة';
+
+  @override
+  String get hsPlayable => 'قابل للتشغيل';
+
+  @override
+  String get hsReachable => 'قابل للوصول';
+
+  @override
+  String get hsDegraded => 'متدهور';
+
+  @override
+  String get hsAuthFailed => 'مصادقة مرفوضة';
+
+  @override
+  String get hsUnsupported => 'صيغة غير مدعومة';
+
+  @override
+  String get hsNetworkError => 'خطأ شبكة';
+
+  @override
+  String get hsUnavailable => 'غير متاح';
+
+  @override
+  String get hsGeoRestricted => 'قيود وصول محتملة';
+
+  @override
+  String get hsInconclusive => 'غير حاسم';
+
+  @override
+  String get hsDisabled => 'معطّل';
+
+  @override
+  String get kpiChannels => 'القنوات';
+
+  @override
+  String get kpiStreams => 'الروابط';
+
+  @override
+  String get kpiWorking => 'تعمل';
+
+  @override
+  String get kpiFailing => 'فاشلة';
+
+  @override
+  String get kpiUncertain => 'غير مثبتة';
+
+  @override
+  String get kpiOpenReports => 'بلاغات مفتوحة';
+
+  @override
+  String get kpiEpgCoverage => 'تغطية الدليل';
+
+  @override
+  String kpiEpgHint(int n, int total) {
+    return '$n من $total منشورة لها برامج خلال 24 ساعة';
+  }
+
+  @override
+  String get streamHealth => 'صحة الروابط';
+
+  @override
+  String get recentChanges => 'آخر التغييرات';
+
+  @override
+  String get noChanges => 'لا تغييرات مسجّلة بعد.';
+
+  @override
+  String get quickActions => 'إجراءات سريعة';
+
+  @override
+  String get qaReviewPending => 'مراجعة المعلّق';
+
+  @override
+  String get qaCheckFailing => 'فحص الروابط الفاشلة';
+
+  @override
+  String get qaReports => 'بلاغات المشاهدين';
+
+  @override
+  String get refresh => 'تحديث';
+
+  @override
+  String get addChannel => 'إضافة قناة';
+
+  @override
+  String get searchAdminHint => 'الاسم أو الرقم أو المعرّف أو الشبكة…';
+
+  @override
+  String get allStates => 'كل الحالات';
+
+  @override
+  String get allCountries => 'كل الدول';
+
+  @override
+  String get allCategories => 'كل الفئات';
+
+  @override
+  String get fFeatured => 'مميزة';
+
+  @override
+  String get fNoLogo => 'بلا شعار';
+
+  @override
+  String get fManual => 'يدوية';
+
+  @override
+  String get colNumber => '#';
+
+  @override
+  String get colName => 'الاسم';
+
+  @override
+  String get colCountry => 'الدولة';
+
+  @override
+  String get colCategory => 'الفئة';
+
+  @override
+  String get colStreams => 'الروابط';
+
+  @override
+  String get colState => 'الحالة';
+
+  @override
+  String get colUpdated => 'آخر تعديل';
+
+  @override
+  String pageOf(int from, int to, int total) {
+    return '$from–$to من $total';
+  }
+
+  @override
+  String selected(int n) {
+    return 'تم تحديد $n';
+  }
+
+  @override
+  String get aPublish => 'نشر';
+
+  @override
+  String get aHide => 'إخفاء';
+
+  @override
+  String get aFeature => 'تمييز';
+
+  @override
+  String get aUnfeature => 'إلغاء التمييز';
+
+  @override
+  String get aSetCategory => 'تغيير الفئة';
+
+  @override
+  String get aSetCountry => 'تغيير الدولة';
+
+  @override
+  String get aCheckStreams => 'فحص الروابط';
+
+  @override
+  String get aDelete => 'حذف';
+
+  @override
+  String get aDisable => 'تعطيل';
+
+  @override
+  String get aEnable => 'تفعيل';
+
+  @override
+  String get aTry => 'جرّب الآن';
+
+  @override
+  String get aCheck => 'فحص';
+
+  @override
+  String get aEdit => 'تعديل';
+
+  @override
+  String get aResolve => 'تمّ الحل';
+
+  @override
+  String get aOpenChannel => 'فتح القناة';
+
+  @override
+  String get aHideChannel => 'إخفاء القناة';
+
+  @override
+  String confirmDelete(int n) {
+    return 'حذف $n عنصر نهائيًا؟ لا يمكن التراجع من هنا (سجل التغييرات يحتفظ بنسخة).';
+  }
+
+  @override
+  String get saved => 'تم الحفظ.';
+
+  @override
+  String saveFailed(String e) {
+    return 'تعذّر الحفظ: $e';
+  }
+
+  @override
+  String get tabInfo => 'المعلومات';
+
+  @override
+  String get tabStreams => 'الروابط';
+
+  @override
+  String get tabGuide => 'دليل البرامج';
+
+  @override
+  String get tabHistory => 'السجل';
+
+  @override
+  String get fNameAr => 'الاسم بالعربية';
+
+  @override
+  String get fNameEn => 'الاسم بالإنجليزية';
+
+  @override
+  String get fAltNames => 'أسماء بديلة (مفصولة بفواصل)';
+
+  @override
+  String get fNumber => 'الرقم';
+
+  @override
+  String get fNetwork => 'الشبكة';
+
+  @override
+  String get fLogoUrl => 'رابط الشعار';
+
+  @override
+  String get fLanguage => 'رمز اللغة';
+
+  @override
+  String get fQuality => 'الجودة';
+
+  @override
+  String get fDescription => 'الوصف';
+
+  @override
+  String get fWebsite => 'الموقع';
+
+  @override
+  String get fEpgId => 'معرّف EPG (فارغ = uid)';
+
+  @override
+  String get fEpgOffset => 'إزاحة الدليل (دقائق)';
+
+  @override
+  String get fParental => 'للكبار (قفل أبوي)';
+
+  @override
+  String get fPublishState => 'حالة النشر';
+
+  @override
+  String get addStream => 'إضافة رابط';
+
+  @override
+  String get fUrl => 'رابط البث';
+
+  @override
+  String get fLabel => 'اسم السيرفر (اختياري)';
+
+  @override
+  String get fUserAgent => 'User-Agent (اختياري)';
+
+  @override
+  String get fReferrer => 'Referer (اختياري)';
+
+  @override
+  String get dragToReorder =>
+      'اسحب لترتيب الأولوية: المشغّل يجرّب السيرفر الأعلى أولًا.';
+
+  @override
+  String get noStreamsAdmin => 'لا روابط لهذه القناة.';
+
+  @override
+  String lastChecked(String t) {
+    return 'فُحص $t';
+  }
+
+  @override
+  String get neverChecked => 'لم يُفحص بعد';
+
+  @override
+  String checkRunning(int done, int total) {
+    return 'جارٍ فحص $done من $total…';
+  }
+
+  @override
+  String checkDone(int done) {
+    return 'انتهى الفحص: $done رابط.';
+  }
+
+  @override
+  String get checkOffline =>
+      'توقف الفحص: لا إنترنت على هذا الجهاز، ولم يُسجَّل شيء.';
+
+  @override
+  String get stop => 'إيقاف';
+
+  @override
+  String get playCheck => 'فحص التشغيل (mpv)';
+
+  @override
+  String get playCheckHint =>
+      'الطبقة 1 تثبت أن الخادم يستجيب؛ الطبقة 2 تثبت وصول إطار فيديو فعلي.';
+
+  @override
+  String get noStreamsInState => 'لا روابط بهذه الحالة.';
+
+  @override
+  String get noOpenReports => 'لا بلاغات مفتوحة.';
+
+  @override
+  String reportsCount(int n) {
+    return '$n بلاغ';
+  }
+
+  @override
+  String get epgPreviewHint => 'البرامج المحفوظة على هذا الجهاز لهذه القناة.';
+
+  @override
+  String get noEpgForChannel => 'لا برامج لهذه القناة.';
+
+  @override
+  String notAvailableYet(int p) {
+    return 'تأتي مع المرحلة $p.';
+  }
+
+  @override
+  String reasonLabel(String r) {
+    return 'السبب: $r';
+  }
 }

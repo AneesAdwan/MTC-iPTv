@@ -30,12 +30,21 @@ class SafeFetchPolicy {
   final int maxBytes;
   final Duration timeout;
 
+  /// أي منفذ مسموح (فحص الروابط في برنامج المدير: روابط البث تستخدم منافذ كثيرة).
+  /// حظر العناوين الداخلية يبقى كما هو.
+  final bool anyPort;
+
+  /// عند تجاوز [maxBytes]: أعد ما وصل بدل الخطأ (عيّنة من مقطع للفحص).
+  final bool truncate;
+
   const SafeFetchPolicy({
     this.allowedPorts = const {80, 443, 8080, 8000, 25461},
     this.allowedLocal = const [],
     this.maxRedirects = 3,
     this.maxBytes = 50 * 1024 * 1024,
     this.timeout = const Duration(seconds: 20),
+    this.anyPort = false,
+    this.truncate = false,
   });
 }
 
@@ -100,7 +109,7 @@ class SafeFetcher {
   /// يتحقق من الرابط ويُرجع العنوان المثبّت الذي سيُتصل به.
   Future<InternetAddress> check(Uri u) async {
     if (u.scheme != 'http' && u.scheme != 'https') throw SafeFetchException('scheme', 'scheme ${u.scheme} not allowed');
-    if (!policy.allowedPorts.contains(_port(u))) throw SafeFetchException('port', 'port ${_port(u)} not allowed');
+    if (!policy.anyPort && !policy.allowedPorts.contains(_port(u))) throw SafeFetchException('port', 'port ${_port(u)} not allowed');
     final literal = InternetAddress.tryParse(u.host);
     final List<InternetAddress> addrs;
     try {
@@ -152,9 +161,14 @@ class SafeFetcher {
         final bytes = BytesBuilder(copy: false);
         await for (final chunk in res.timeout(deadline.difference(DateTime.now()))) {
           bytes.add(chunk);
-          if (bytes.length > policy.maxBytes) throw SafeFetchException('too_large', 'response exceeds ${policy.maxBytes} bytes');
+          if (bytes.length > policy.maxBytes) {
+            if (policy.truncate) break;
+            throw SafeFetchException('too_large', 'response exceeds ${policy.maxBytes} bytes');
+          }
         }
-        return SafeFetchResult(uri, res.statusCode, res.headers.contentType?.mimeType, bytes.takeBytes());
+        final body = bytes.takeBytes();
+        return SafeFetchResult(
+            uri, res.statusCode, res.headers.contentType?.mimeType, body.length > policy.maxBytes ? Uint8List.sublistView(body, 0, policy.maxBytes) : body);
       } on TimeoutException {
         throw SafeFetchException('timeout', 'timeout');
       } finally {

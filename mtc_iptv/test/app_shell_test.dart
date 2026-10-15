@@ -119,10 +119,10 @@ void main() {
     appTest('tapping a sidebar item opens its placeholder with the screen id', (tester) async {
       await pumpApp(tester, const LocalSettings());
       // القائمة كسولة: نمرّرها حتى يظهر العنصر
-      await tester.scrollUntilVisible(find.text('صحة البث'), 200, scrollable: find.byType(Scrollable).first);
-      await tester.tap(find.text('صحة البث'));
+      await tester.scrollUntilVisible(find.text('المقارنة'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(find.text('المقارنة'));
       await tester.pumpAndSettle();
-      expect(find.text('ADM-D4'), findsOneWidget);
+      expect(find.text('ADM-D3'), findsOneWidget);
     });
   });
 

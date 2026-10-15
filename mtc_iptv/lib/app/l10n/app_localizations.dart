@@ -1410,6 +1410,648 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'إغلاق المشغّل'**
   String get closePlayer;
+
+  /// No description provided for @psPublished.
+  ///
+  /// In ar, this message translates to:
+  /// **'منشورة'**
+  String get psPublished;
+
+  /// No description provided for @psPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيد المراجعة'**
+  String get psPending;
+
+  /// No description provided for @psHidden.
+  ///
+  /// In ar, this message translates to:
+  /// **'مخفية'**
+  String get psHidden;
+
+  /// No description provided for @psDraft.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسودة'**
+  String get psDraft;
+
+  /// No description provided for @psRejected.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرفوضة'**
+  String get psRejected;
+
+  /// No description provided for @hsPlayable.
+  ///
+  /// In ar, this message translates to:
+  /// **'قابل للتشغيل'**
+  String get hsPlayable;
+
+  /// No description provided for @hsReachable.
+  ///
+  /// In ar, this message translates to:
+  /// **'قابل للوصول'**
+  String get hsReachable;
+
+  /// No description provided for @hsDegraded.
+  ///
+  /// In ar, this message translates to:
+  /// **'متدهور'**
+  String get hsDegraded;
+
+  /// No description provided for @hsAuthFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'مصادقة مرفوضة'**
+  String get hsAuthFailed;
+
+  /// No description provided for @hsUnsupported.
+  ///
+  /// In ar, this message translates to:
+  /// **'صيغة غير مدعومة'**
+  String get hsUnsupported;
+
+  /// No description provided for @hsNetworkError.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطأ شبكة'**
+  String get hsNetworkError;
+
+  /// No description provided for @hsUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير متاح'**
+  String get hsUnavailable;
+
+  /// No description provided for @hsGeoRestricted.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيود وصول محتملة'**
+  String get hsGeoRestricted;
+
+  /// No description provided for @hsInconclusive.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير حاسم'**
+  String get hsInconclusive;
+
+  /// No description provided for @hsDisabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'معطّل'**
+  String get hsDisabled;
+
+  /// No description provided for @kpiChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'القنوات'**
+  String get kpiChannels;
+
+  /// No description provided for @kpiStreams.
+  ///
+  /// In ar, this message translates to:
+  /// **'الروابط'**
+  String get kpiStreams;
+
+  /// No description provided for @kpiWorking.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعمل'**
+  String get kpiWorking;
+
+  /// No description provided for @kpiFailing.
+  ///
+  /// In ar, this message translates to:
+  /// **'فاشلة'**
+  String get kpiFailing;
+
+  /// No description provided for @kpiUncertain.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير مثبتة'**
+  String get kpiUncertain;
+
+  /// No description provided for @kpiOpenReports.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلاغات مفتوحة'**
+  String get kpiOpenReports;
+
+  /// No description provided for @kpiEpgCoverage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغطية الدليل'**
+  String get kpiEpgCoverage;
+
+  /// No description provided for @kpiEpgHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} من {total} منشورة لها برامج خلال 24 ساعة'**
+  String kpiEpgHint(int n, int total);
+
+  /// No description provided for @streamHealth.
+  ///
+  /// In ar, this message translates to:
+  /// **'صحة الروابط'**
+  String get streamHealth;
+
+  /// No description provided for @recentChanges.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر التغييرات'**
+  String get recentChanges;
+
+  /// No description provided for @noChanges.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تغييرات مسجّلة بعد.'**
+  String get noChanges;
+
+  /// No description provided for @quickActions.
+  ///
+  /// In ar, this message translates to:
+  /// **'إجراءات سريعة'**
+  String get quickActions;
+
+  /// No description provided for @qaReviewPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'مراجعة المعلّق'**
+  String get qaReviewPending;
+
+  /// No description provided for @qaCheckFailing.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص الروابط الفاشلة'**
+  String get qaCheckFailing;
+
+  /// No description provided for @qaReports.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلاغات المشاهدين'**
+  String get qaReports;
+
+  /// No description provided for @refresh.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديث'**
+  String get refresh;
+
+  /// No description provided for @addChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة قناة'**
+  String get addChannel;
+
+  /// No description provided for @searchAdminHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم أو الرقم أو المعرّف أو الشبكة…'**
+  String get searchAdminHint;
+
+  /// No description provided for @allStates.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل الحالات'**
+  String get allStates;
+
+  /// No description provided for @allCountries.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل الدول'**
+  String get allCountries;
+
+  /// No description provided for @allCategories.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل الفئات'**
+  String get allCategories;
+
+  /// No description provided for @fFeatured.
+  ///
+  /// In ar, this message translates to:
+  /// **'مميزة'**
+  String get fFeatured;
+
+  /// No description provided for @fNoLogo.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا شعار'**
+  String get fNoLogo;
+
+  /// No description provided for @fManual.
+  ///
+  /// In ar, this message translates to:
+  /// **'يدوية'**
+  String get fManual;
+
+  /// No description provided for @colNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'#'**
+  String get colNumber;
+
+  /// No description provided for @colName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم'**
+  String get colName;
+
+  /// No description provided for @colCountry.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدولة'**
+  String get colCountry;
+
+  /// No description provided for @colCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئة'**
+  String get colCategory;
+
+  /// No description provided for @colStreams.
+  ///
+  /// In ar, this message translates to:
+  /// **'الروابط'**
+  String get colStreams;
+
+  /// No description provided for @colState.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحالة'**
+  String get colState;
+
+  /// No description provided for @colUpdated.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر تعديل'**
+  String get colUpdated;
+
+  /// No description provided for @pageOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'{from}–{to} من {total}'**
+  String pageOf(int from, int to, int total);
+
+  /// No description provided for @selected.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تحديد {n}'**
+  String selected(int n);
+
+  /// No description provided for @aPublish.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشر'**
+  String get aPublish;
+
+  /// No description provided for @aHide.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء'**
+  String get aHide;
+
+  /// No description provided for @aFeature.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمييز'**
+  String get aFeature;
+
+  /// No description provided for @aUnfeature.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء التمييز'**
+  String get aUnfeature;
+
+  /// No description provided for @aSetCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير الفئة'**
+  String get aSetCategory;
+
+  /// No description provided for @aSetCountry.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير الدولة'**
+  String get aSetCountry;
+
+  /// No description provided for @aCheckStreams.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص الروابط'**
+  String get aCheckStreams;
+
+  /// No description provided for @aDelete.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف'**
+  String get aDelete;
+
+  /// No description provided for @aDisable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعطيل'**
+  String get aDisable;
+
+  /// No description provided for @aEnable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل'**
+  String get aEnable;
+
+  /// No description provided for @aTry.
+  ///
+  /// In ar, this message translates to:
+  /// **'جرّب الآن'**
+  String get aTry;
+
+  /// No description provided for @aCheck.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص'**
+  String get aCheck;
+
+  /// No description provided for @aEdit.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل'**
+  String get aEdit;
+
+  /// No description provided for @aResolve.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمّ الحل'**
+  String get aResolve;
+
+  /// No description provided for @aOpenChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح القناة'**
+  String get aOpenChannel;
+
+  /// No description provided for @aHideChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء القناة'**
+  String get aHideChannel;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف {n} عنصر نهائيًا؟ لا يمكن التراجع من هنا (سجل التغييرات يحتفظ بنسخة).'**
+  String confirmDelete(int n);
+
+  /// No description provided for @saved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الحفظ.'**
+  String get saved;
+
+  /// No description provided for @saveFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر الحفظ: {e}'**
+  String saveFailed(String e);
+
+  /// No description provided for @tabInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'المعلومات'**
+  String get tabInfo;
+
+  /// No description provided for @tabStreams.
+  ///
+  /// In ar, this message translates to:
+  /// **'الروابط'**
+  String get tabStreams;
+
+  /// No description provided for @tabGuide.
+  ///
+  /// In ar, this message translates to:
+  /// **'دليل البرامج'**
+  String get tabGuide;
+
+  /// No description provided for @tabHistory.
+  ///
+  /// In ar, this message translates to:
+  /// **'السجل'**
+  String get tabHistory;
+
+  /// No description provided for @fNameAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم بالعربية'**
+  String get fNameAr;
+
+  /// No description provided for @fNameEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم بالإنجليزية'**
+  String get fNameEn;
+
+  /// No description provided for @fAltNames.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسماء بديلة (مفصولة بفواصل)'**
+  String get fAltNames;
+
+  /// No description provided for @fNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرقم'**
+  String get fNumber;
+
+  /// No description provided for @fNetwork.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشبكة'**
+  String get fNetwork;
+
+  /// No description provided for @fLogoUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط الشعار'**
+  String get fLogoUrl;
+
+  /// No description provided for @fLanguage.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز اللغة'**
+  String get fLanguage;
+
+  /// No description provided for @fQuality.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجودة'**
+  String get fQuality;
+
+  /// No description provided for @fDescription.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوصف'**
+  String get fDescription;
+
+  /// No description provided for @fWebsite.
+  ///
+  /// In ar, this message translates to:
+  /// **'الموقع'**
+  String get fWebsite;
+
+  /// No description provided for @fEpgId.
+  ///
+  /// In ar, this message translates to:
+  /// **'معرّف EPG (فارغ = uid)'**
+  String get fEpgId;
+
+  /// No description provided for @fEpgOffset.
+  ///
+  /// In ar, this message translates to:
+  /// **'إزاحة الدليل (دقائق)'**
+  String get fEpgOffset;
+
+  /// No description provided for @fParental.
+  ///
+  /// In ar, this message translates to:
+  /// **'للكبار (قفل أبوي)'**
+  String get fParental;
+
+  /// No description provided for @fPublishState.
+  ///
+  /// In ar, this message translates to:
+  /// **'حالة النشر'**
+  String get fPublishState;
+
+  /// No description provided for @addStream.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة رابط'**
+  String get addStream;
+
+  /// No description provided for @fUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط البث'**
+  String get fUrl;
+
+  /// No description provided for @fLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم السيرفر (اختياري)'**
+  String get fLabel;
+
+  /// No description provided for @fUserAgent.
+  ///
+  /// In ar, this message translates to:
+  /// **'User-Agent (اختياري)'**
+  String get fUserAgent;
+
+  /// No description provided for @fReferrer.
+  ///
+  /// In ar, this message translates to:
+  /// **'Referer (اختياري)'**
+  String get fReferrer;
+
+  /// No description provided for @dragToReorder.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسحب لترتيب الأولوية: المشغّل يجرّب السيرفر الأعلى أولًا.'**
+  String get dragToReorder;
+
+  /// No description provided for @noStreamsAdmin.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا روابط لهذه القناة.'**
+  String get noStreamsAdmin;
+
+  /// No description provided for @lastChecked.
+  ///
+  /// In ar, this message translates to:
+  /// **'فُحص {t}'**
+  String lastChecked(String t);
+
+  /// No description provided for @neverChecked.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يُفحص بعد'**
+  String get neverChecked;
+
+  /// No description provided for @checkRunning.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ فحص {done} من {total}…'**
+  String checkRunning(int done, int total);
+
+  /// No description provided for @checkDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهى الفحص: {done} رابط.'**
+  String checkDone(int done);
+
+  /// No description provided for @checkOffline.
+  ///
+  /// In ar, this message translates to:
+  /// **'توقف الفحص: لا إنترنت على هذا الجهاز، ولم يُسجَّل شيء.'**
+  String get checkOffline;
+
+  /// No description provided for @stop.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف'**
+  String get stop;
+
+  /// No description provided for @playCheck.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص التشغيل (mpv)'**
+  String get playCheck;
+
+  /// No description provided for @playCheckHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الطبقة 1 تثبت أن الخادم يستجيب؛ الطبقة 2 تثبت وصول إطار فيديو فعلي.'**
+  String get playCheckHint;
+
+  /// No description provided for @noStreamsInState.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا روابط بهذه الحالة.'**
+  String get noStreamsInState;
+
+  /// No description provided for @noOpenReports.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا بلاغات مفتوحة.'**
+  String get noOpenReports;
+
+  /// No description provided for @reportsCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} بلاغ'**
+  String reportsCount(int n);
+
+  /// No description provided for @epgPreviewHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'البرامج المحفوظة على هذا الجهاز لهذه القناة.'**
+  String get epgPreviewHint;
+
+  /// No description provided for @noEpgForChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا برامج لهذه القناة.'**
+  String get noEpgForChannel;
+
+  /// No description provided for @notAvailableYet.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأتي مع المرحلة {p}.'**
+  String notAvailableYet(int p);
+
+  /// No description provided for @reasonLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'السبب: {r}'**
+  String reasonLabel(String r);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

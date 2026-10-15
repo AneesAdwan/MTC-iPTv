@@ -1,7 +1,7 @@
 // اختبار شامل ضد Supabase المحلي (Docker): الدخول بخطوتين + is_admin على الخادم + المزامنة.
 // يتطلب:  supabase start   ثم:
 //   $env:MTC_LOCAL_SERVICE_KEY = (supabase status -o env | sls '^SERVICE_ROLE_KEY').Line.Split('"')[1]
-//   flutter test --tags local
+//   flutter test --tags local -j 1     (-j 1: الملفات تتشارك القاعدة نفسها)
 // مفتاح service_role هنا للقاعدة المحلية التجريبية فقط، يُقرأ من البيئة ولا يُكتب في أي ملف.
 @Tags(['local'])
 library;
@@ -90,9 +90,22 @@ void main() {
   }, skip: skip);
 
   test('viewer: catalog sync pulls only published channels into the local DB', () async {
-    // publish 3 channels on the local DB through the legacy columns (review-gate path the old panel uses)
-    final ids = ((jsonDecode((await admin('GET', '/rest/v1/channels?select=id&order=number&limit=3')).body) as List)).map((e) => e['id']).toList();
-    final hide = ((jsonDecode((await admin('GET', '/rest/v1/channels?select=id&order=number&offset=3&limit=1')).body) as List)).map((e) => e['id']).toList();
+    // own fixtures (the local DB may be freshly reset): 4 channels with one stream each
+    final created = <String>[];
+    for (var i = 0; i < 4; i++) {
+      final r = await admin('POST', '/rest/v1/channels', {'uid': 'test:$stamp:$i', 'name': 'Sync $stamp $i', 'number': 80000 + stamp % 9000 * 4 % 9000 + i});
+      expect(r.statusCode, anyOf(200, 201), reason: r.body);
+      final id = ((jsonDecode(r.body) as List).single as Map)['id'] as String;
+      created.add(id);
+      await admin('POST', '/rest/v1/streams', {'channel_id': id, 'url': 'https://example.com/$stamp/$i.m3u8'});
+    }
+    addTearDown(() async {
+      for (final id in created) {
+        await admin('DELETE', '/rest/v1/channels?id=eq.$id');
+      }
+    });
+    final ids = created.take(3).toList();
+    final hide = [created.last];
     for (final id in ids) {
       await admin('PATCH', '/rest/v1/channels?id=eq.$id', {'publish_state': 'published'});
     }

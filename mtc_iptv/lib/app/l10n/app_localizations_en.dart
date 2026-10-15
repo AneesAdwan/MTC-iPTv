@@ -703,4 +703,351 @@ class L10nEn extends L10n {
 
   @override
   String get closePlayer => 'Close player';
+
+  @override
+  String get psPublished => 'Published';
+
+  @override
+  String get psPending => 'Pending review';
+
+  @override
+  String get psHidden => 'Hidden';
+
+  @override
+  String get psDraft => 'Draft';
+
+  @override
+  String get psRejected => 'Rejected';
+
+  @override
+  String get hsPlayable => 'Playable';
+
+  @override
+  String get hsReachable => 'Reachable';
+
+  @override
+  String get hsDegraded => 'Degraded';
+
+  @override
+  String get hsAuthFailed => 'Auth refused';
+
+  @override
+  String get hsUnsupported => 'Unsupported';
+
+  @override
+  String get hsNetworkError => 'Network error';
+
+  @override
+  String get hsUnavailable => 'Unavailable';
+
+  @override
+  String get hsGeoRestricted => 'Possibly restricted';
+
+  @override
+  String get hsInconclusive => 'Inconclusive';
+
+  @override
+  String get hsDisabled => 'Disabled';
+
+  @override
+  String get kpiChannels => 'Channels';
+
+  @override
+  String get kpiStreams => 'Streams';
+
+  @override
+  String get kpiWorking => 'Working';
+
+  @override
+  String get kpiFailing => 'Failing';
+
+  @override
+  String get kpiUncertain => 'Not proven';
+
+  @override
+  String get kpiOpenReports => 'Open reports';
+
+  @override
+  String get kpiEpgCoverage => 'Guide coverage';
+
+  @override
+  String kpiEpgHint(int n, int total) {
+    return '$n of $total published have programmes in the next 24h';
+  }
+
+  @override
+  String get streamHealth => 'Stream health';
+
+  @override
+  String get recentChanges => 'Recent changes';
+
+  @override
+  String get noChanges => 'No changes recorded yet.';
+
+  @override
+  String get quickActions => 'Quick actions';
+
+  @override
+  String get qaReviewPending => 'Review pending';
+
+  @override
+  String get qaCheckFailing => 'Check failing streams';
+
+  @override
+  String get qaReports => 'Viewer reports';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get addChannel => 'Add channel';
+
+  @override
+  String get searchAdminHint => 'Name, number, uid or network…';
+
+  @override
+  String get allStates => 'All states';
+
+  @override
+  String get allCountries => 'All countries';
+
+  @override
+  String get allCategories => 'All categories';
+
+  @override
+  String get fFeatured => 'Featured';
+
+  @override
+  String get fNoLogo => 'No logo';
+
+  @override
+  String get fManual => 'Manual';
+
+  @override
+  String get colNumber => '#';
+
+  @override
+  String get colName => 'Name';
+
+  @override
+  String get colCountry => 'Country';
+
+  @override
+  String get colCategory => 'Category';
+
+  @override
+  String get colStreams => 'Streams';
+
+  @override
+  String get colState => 'State';
+
+  @override
+  String get colUpdated => 'Updated';
+
+  @override
+  String pageOf(int from, int to, int total) {
+    return '$from–$to of $total';
+  }
+
+  @override
+  String selected(int n) {
+    return '$n selected';
+  }
+
+  @override
+  String get aPublish => 'Publish';
+
+  @override
+  String get aHide => 'Hide';
+
+  @override
+  String get aFeature => 'Feature';
+
+  @override
+  String get aUnfeature => 'Unfeature';
+
+  @override
+  String get aSetCategory => 'Set category';
+
+  @override
+  String get aSetCountry => 'Set country';
+
+  @override
+  String get aCheckStreams => 'Check streams';
+
+  @override
+  String get aDelete => 'Delete';
+
+  @override
+  String get aDisable => 'Disable';
+
+  @override
+  String get aEnable => 'Enable';
+
+  @override
+  String get aTry => 'Try now';
+
+  @override
+  String get aCheck => 'Check';
+
+  @override
+  String get aEdit => 'Edit';
+
+  @override
+  String get aResolve => 'Resolve';
+
+  @override
+  String get aOpenChannel => 'Open channel';
+
+  @override
+  String get aHideChannel => 'Hide channel';
+
+  @override
+  String confirmDelete(int n) {
+    return 'Delete $n item(s) permanently? This cannot be undone from here (the change log keeps a copy).';
+  }
+
+  @override
+  String get saved => 'Saved.';
+
+  @override
+  String saveFailed(String e) {
+    return 'Saving failed: $e';
+  }
+
+  @override
+  String get tabInfo => 'Info';
+
+  @override
+  String get tabStreams => 'Streams';
+
+  @override
+  String get tabGuide => 'Guide';
+
+  @override
+  String get tabHistory => 'History';
+
+  @override
+  String get fNameAr => 'Arabic name';
+
+  @override
+  String get fNameEn => 'English name';
+
+  @override
+  String get fAltNames => 'Alternative names (comma separated)';
+
+  @override
+  String get fNumber => 'Number';
+
+  @override
+  String get fNetwork => 'Network';
+
+  @override
+  String get fLogoUrl => 'Logo URL';
+
+  @override
+  String get fLanguage => 'Language code';
+
+  @override
+  String get fQuality => 'Quality';
+
+  @override
+  String get fDescription => 'Description';
+
+  @override
+  String get fWebsite => 'Website';
+
+  @override
+  String get fEpgId => 'EPG id (empty = uid)';
+
+  @override
+  String get fEpgOffset => 'EPG offset (minutes)';
+
+  @override
+  String get fParental => 'Adults only (parental lock)';
+
+  @override
+  String get fPublishState => 'Publish state';
+
+  @override
+  String get addStream => 'Add stream';
+
+  @override
+  String get fUrl => 'Stream URL';
+
+  @override
+  String get fLabel => 'Server name (optional)';
+
+  @override
+  String get fUserAgent => 'User-Agent (optional)';
+
+  @override
+  String get fReferrer => 'Referer (optional)';
+
+  @override
+  String get dragToReorder =>
+      'Drag to set the order: the player tries the top server first.';
+
+  @override
+  String get noStreamsAdmin => 'No streams for this channel.';
+
+  @override
+  String lastChecked(String t) {
+    return 'Checked $t';
+  }
+
+  @override
+  String get neverChecked => 'Not checked yet';
+
+  @override
+  String checkRunning(int done, int total) {
+    return 'Checking $done of $total…';
+  }
+
+  @override
+  String checkDone(int done) {
+    return 'Check finished: $done streams.';
+  }
+
+  @override
+  String get checkOffline =>
+      'Check stopped: no internet on this computer, nothing was recorded.';
+
+  @override
+  String get stop => 'Stop';
+
+  @override
+  String get playCheck => 'Playback check (mpv)';
+
+  @override
+  String get playCheckHint =>
+      'Layer 1 proves the server answers; layer 2 proves a real video frame arrives.';
+
+  @override
+  String get noStreamsInState => 'No streams in this state.';
+
+  @override
+  String get noOpenReports => 'No open reports.';
+
+  @override
+  String reportsCount(int n) {
+    return '$n reports';
+  }
+
+  @override
+  String get epgPreviewHint =>
+      'Programmes stored on this device for this channel.';
+
+  @override
+  String get noEpgForChannel => 'No programmes for this channel.';
+
+  @override
+  String notAvailableYet(int p) {
+    return 'Arrives with phase $p.';
+  }
+
+  @override
+  String reasonLabel(String r) {
+    return 'Reason: $r';
+  }
 }
