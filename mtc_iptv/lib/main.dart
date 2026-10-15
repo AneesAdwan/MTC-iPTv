@@ -16,11 +16,13 @@ import 'core/logging/log.dart';
 import 'core/settings/local_settings.dart';
 import 'player/tls_bundle.dart';
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized(); // libmpv (ADR-02)
   await initLogging();
-  log.info('start v${Env.version} env=${Env.name} ${Platform.operatingSystem}');
+  // --hidden: البدء مع ويندوز في الخلفية (المُجدوِل يعمل والنافذة مخفية، §9.10 H2)
+  final hidden = args.contains('--hidden');
+  log.info('start v${Env.version} env=${Env.name} ${Platform.operatingSystem}${hidden ? ' hidden' : ''}');
 
   // أي خطأ غير معالَج يُسجَّل (دون أسرار) بدل أن يضيع
   FlutterError.onError = (d) {
@@ -52,6 +54,7 @@ Future<void> main() async {
         backgroundColor: Color(0xFF08080C),
       ),
       () async {
+        if (hidden) return; // يظهر من أيقونة منطقة الإشعارات
         await windowManager.show();
         await windowManager.focus();
       },

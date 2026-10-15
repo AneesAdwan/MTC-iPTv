@@ -726,6 +726,107 @@ class AdminRepository {
   Future<String?> xtreamPassword(String id) async => (await db.rpc('admin_xtream_password', params: {'p_id': id})) as String?;
   Future<void> deleteXtream(String id) => db.rpc('admin_xtream_delete', params: {'p_id': id});
 
+  // ── سجل التدقيق (ADM-H3) ─────────────────────────────────────────────────
+  Future<(List<AuditEntry>, List<Map<String, dynamic>>, int)> auditSearch({String? table, String? action, String? rowId, int page = 0, int size = 100}) async {
+    var f = db.from('audit_logs').select('id,at,action,table_name,row_id,reason,before,after');
+    if (table != null) f = f.eq('table_name', table);
+    if (action != null) f = f.eq('action', action);
+    if (rowId != null && rowId.trim().isNotEmpty) f = f.eq('row_id', rowId.trim());
+    final res = await f.order('at', ascending: false).range(page * size, page * size + size - 1).count(CountOption.exact);
+    return (
+      [
+        for (final r in res.data)
+          AuditEntry(DateTime.parse(r['at'] as String).toLocal(), r['action'] as String, r['table_name'] as String, r['reason'] as String?,
+              (r['before'] as Map?)?.cast<String, dynamic>(), (r['after'] as Map?)?.cast<String, dynamic>()),
+      ],
+      res.data,
+      res.count,
+    );
+  }
+
+  // ── قوائم المُجدوِل (ADM-H2) ─────────────────────────────────────────────
+  /// روابط القنوات المنشورة (غير المعطّلة) — فحص الوصول كل 6 ساعات.
+  Future<List<AdminStream>> publishedStreams() async => [
+        for (final r in await _all((a, b) => db
+            .from('streams')
+            .select('$_streamCols,channels!inner(publish_state)')
+            .eq('channels.publish_state', 'published')
+            .neq('health_state', 'disabled')
+            .order('id', ascending: true)
+            .range(a, b)))
+          AdminStream.fromJson(r),
+      ];
+
+  Future<List<AdminStream>> allStreams() async => [
+        for (final r in await _all((a, b) => db.from('streams').select(_streamCols).neq('health_state', 'disabled').order('id', ascending: true).range(a, b))) AdminStream.fromJson(r),
+      ];
+
+  /// عيّنة دوّارة للتشغيل الحقيقي: الأقدم فحصًا أولًا (§17: 200 يوميًا).
+  Future<List<AdminStream>> playbackSample({int size = 200}) async => [
+        for (final r in await db.from('streams').select(_streamCols).neq('health_state', 'disabled').order('last_checked_at', ascending: true, nullsFirst: true).limit(size))
+          AdminStream.fromJson(r),
+      ];
+
+  Future<List<Map<String, dynamic>>> channelsWithLogos() =>
+      _all((a, b) => db.from('channels').select('id,logo_url').not('logo_url', 'is', null).order('id', ascending: true).range(a, b));
+
+  Future<bool> acquireTask(String key, String device) async => (await db.rpc('admin_task_acquire', params: {'p_key': key, 'p_device': device})) == true;
+  Future<void> finishTask(String key, String device, String status) => db.rpc('admin_task_finish', params: {'p_key': key, 'p_device': device, 'p_status': status});
+  Future<void> updateTask(String key, Map<String, dynamic> fields) => db.from('scheduled_tasks').update(fields).eq('key', key);
+
+  // ── النسخ الاحتياطي والاستعادة (ADM-H4، §21) ─────────────────────────────
+  /// الجداول المشمولة ومفتاح ترتيب ثابت لكل منها (§21.1). كلمات مرور Xtream في Vault لا تُصدَّر (§21.1).
+  static const backupTables = {
+    'languages': 'code',
+    'countries': 'code',
+    'categories': 'slug',
+    'channels': 'id',
+    'streams': 'id',
+    'channel_field_provenance': 'channel_id',
+    'playlist_sources': 'id',
+    'site_settings': 'key',
+    'scheduled_tasks': 'key',
+    'epg_sources': 'id',
+    'transform_rules': 'id',
+    'xtream_accounts': 'id',
+    'reports': 'id',
+    'admin_users': 'user_id',
+    'audit_logs': 'id',
+  };
+
+  /// ما تمكن استعادته بالإضافة/التحديث (الجداول ذات المعرّف المولّد دائمًا لا تُستعاد: audit_logs، reports).
+  static const restorableTables = ['languages', 'countries', 'categories', 'channels', 'streams', 'playlist_sources', 'site_settings', 'epg_sources', 'transform_rules'];
+
+  /// أعمدة يولّدها الخادم ولا تُكتب.
+  static const _generated = {
+    'streams': {'host', 'protocol', 'has_credentials', 'catalog_rev'},
+    'countries': {'flag_url'},
+    'channels': {'catalog_rev'},
+  };
+
+  Future<List<Map<String, dynamic>>> dumpTable(String table) async {
+    final key = backupTables[table]!;
+    if (table == 'audit_logs') {
+      // الاحتفاظ 365 يومًا (§9.10)
+      final since = DateTime.now().toUtc().subtract(const Duration(days: 365)).toIso8601String();
+      return _all((a, b) => db.from(table).select().gte('at', since).order(key, ascending: true).range(a, b));
+    }
+    if (table == 'xtream_accounts') return _all((a, b) => db.from(table).select('id,name,server,username,enabled,last_import_at,created_at').order(key, ascending: true).range(a, b));
+    return _all((a, b) => db.from(table).select().order(key, ascending: true).range(a, b));
+  }
+
+  Future<int> tableCount(String table) => db.from(table).count();
+
+  /// استعادة بالإضافة/التحديث فقط (upsert) — لا تحذف أي صف أحدث من النسخة.
+  Future<int> restoreUpsert(String table, List<Map<String, dynamic>> rows) async {
+    final skip = _generated[table] ?? const <String>{};
+    final clean = [for (final r in rows) {for (final e in r.entries) if (!skip.contains(e.key)) e.key: e.value}];
+    for (var i = 0; i < clean.length; i += 500) {
+      await db.from(table).upsert(clean.sublist(i, (i + 500).clamp(0, clean.length)), onConflict: backupTables[table]);
+    }
+    return clean.length;
+  }
+
   // ── المهام (ADM-A2) ──────────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> taskRuns({int limit = 100}) =>
       db.from('task_runs').select('id,task_key,device,started_at,finished_at,status,summary,error').order('started_at', ascending: false).limit(limit);

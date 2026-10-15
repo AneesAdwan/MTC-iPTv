@@ -6,6 +6,7 @@ import '../core/backend/backend.dart';
 import '../core/settings/local_settings.dart';
 import '../data/epg/epg_repository.dart';
 import '../features/splash/splash_gate.dart';
+import 'desktop/desktop_host.dart';
 import 'l10n/app_localizations.dart';
 import 'router.dart';
 import 'theme/theme.dart';
@@ -34,7 +35,7 @@ class MtcApp extends ConsumerWidget {
       themeMode: s.themeMode,
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
-      builder: (context, child) => SplashGate(child: child ?? const SizedBox.shrink()),
+      builder: (context, child) => DesktopHost(child: SplashGate(child: child ?? const SizedBox.shrink())),
     );
   }
 }

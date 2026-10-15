@@ -1776,4 +1776,185 @@ class L10nAr extends L10n {
   @override
   String get ioLicense =>
       'بيانات iptv-org (ملكية عامة). وجود رابط هناك ليس دليلًا على حق إعادة توزيعه؛ والقنوات الجديدة تمرّ بالمراجعة دائمًا.';
+
+  @override
+  String get acEmail => 'البريد';
+
+  @override
+  String get acMfa => 'التحقق بخطوتين';
+
+  @override
+  String get acAddFactor => 'إضافة تطبيق مصادقة احتياطي';
+
+  @override
+  String get acAddFactorHint =>
+      'مستحسن: تطبيق مصادقة ثانٍ (هاتف آخر أو مدير كلمات مرور). إن فقدت أحدهما يعمل الآخر.';
+
+  @override
+  String get acChangePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get acNewPassword => 'كلمة المرور الجديدة (10 أحرف على الأقل)';
+
+  @override
+  String get acSignOutAll => 'الخروج من كل الأجهزة';
+
+  @override
+  String get acSignOutAllConfirm => 'الخروج من كل مكان، ومنه هذا الجهاز؟';
+
+  @override
+  String get acRecovery =>
+      'فقدت كل تطبيقات المصادقة؟ اتبع docs/runbooks/admin-recovery.md لاستعادة الوصول من لوحة Supabase.';
+
+  @override
+  String get shEnabled => 'تشغيل المهام المجدولة على هذا الجهاز';
+
+  @override
+  String get shTray => 'البقاء في منطقة الإشعارات عند إغلاق النافذة';
+
+  @override
+  String get shStartup => 'البدء مع ويندوز (مخفيًا)';
+
+  @override
+  String get shRunNow => 'شغّل الآن';
+
+  @override
+  String get shAnyTime => 'أي وقت';
+
+  @override
+  String get shAllowed => 'الساعات المسموحة';
+
+  @override
+  String shNext(String t) {
+    return 'التالي $t';
+  }
+
+  @override
+  String shMissed(String list) {
+    return 'فاتت أثناء إطفاء الجهاز: $list';
+  }
+
+  @override
+  String shRunning(String task) {
+    return 'يعمل: $task';
+  }
+
+  @override
+  String get shInterval => 'كل (دقائق)';
+
+  @override
+  String get shNote =>
+      'الفحص الثقيل ينتظر أثناء مشاهدتك لقناة. كل مهمة تعمل على جهاز واحد فقط (قفل على الخادم). المهام الفائتة تُشغَّل عند فتح البرنامج.';
+
+  @override
+  String get auSearch => 'معرّف الصف…';
+
+  @override
+  String get auAllTables => 'كل الجداول';
+
+  @override
+  String get auAllActions => 'كل العمليات';
+
+  @override
+  String get auExport => 'تصدير CSV';
+
+  @override
+  String get bkFolder => 'مجلد النسخ';
+
+  @override
+  String get bkChooseFolder => 'اختر مجلدًا…';
+
+  @override
+  String get bkPassphrase => 'عبارة المرور (8 أحرف على الأقل)';
+
+  @override
+  String get bkPassphraseHint =>
+      'لا تُرسل للخادم أبدًا. إن فقدتها لا يمكن فتح النسخ — احفظها في مدير كلمات مرور. نصيحة: اختر مجلدًا متزامنًا مع OneDrive أو Google Drive.';
+
+  @override
+  String get bkNow => 'نسخة الآن';
+
+  @override
+  String bkDone(String name) {
+    return 'حُفظت النسخة: $name';
+  }
+
+  @override
+  String get bkList => 'النسخ في المجلد';
+
+  @override
+  String get bkOpen => 'فتح ومعاينة';
+
+  @override
+  String get bkRestoreTables => 'استعادة الجداول المحددة';
+
+  @override
+  String get bkRestoreChannel => 'استعادة قناة واحدة';
+
+  @override
+  String bkCounts(int b, int c) {
+    return 'النسخة $b · الآن $c';
+  }
+
+  @override
+  String bkRestored(String s) {
+    return 'استُعيد: $s';
+  }
+
+  @override
+  String get bkNotConfigured => 'اختر المجلد وعبارة المرور أولًا.';
+
+  @override
+  String get bkRestoreNote =>
+      'الاستعادة تضيف الصفوف أو تحدّثها فقط ولا تحذف أي بيانات أحدث. الاستبدال الكامل يُختبر على نسخة منفصلة، لا على الكتالوج الحي.';
+
+  @override
+  String get bkChannelId => 'معرّف القناة';
+
+  @override
+  String get mtStatus => 'حالة النظام';
+
+  @override
+  String mtDbLatency(int ms) {
+    return 'زمن استجابة قاعدة البيانات: $ms ms';
+  }
+
+  @override
+  String get mtEpgStale => 'لم يُزامَن الدليل منذ أكثر من 48 ساعة';
+
+  @override
+  String get mtBackupStale => 'لا نسخة احتياطية خلال 48 ساعة';
+
+  @override
+  String get mtCleanup => 'التنظيف';
+
+  @override
+  String get mtDanger => 'منطقة الخطر';
+
+  @override
+  String get mtDangerHint =>
+      'كل عملية تأخذ نسخة احتياطية إلزامية أولًا، ثم تطلب كتابة كلمة التأكيد.';
+
+  @override
+  String mtTypeWord(String w) {
+    return 'اكتب $w للتأكيد';
+  }
+
+  @override
+  String get mtRefreshCounts => 'إعادة عدّ المصادر';
+
+  @override
+  String get mtClearReports => 'حذف البلاغات المحلولة';
+
+  @override
+  String get mtClearBrokenLogos => 'إزالة الشعارات المعطّلة';
+
+  @override
+  String get mtDeleteOffline => 'حذف الروابط غير المتاحة';
+
+  @override
+  String get mtDeleteHidden => 'حذف القنوات المخفية';
+
+  @override
+  String get mtDeletePending => 'حذف القنوات قيد المراجعة';
 }

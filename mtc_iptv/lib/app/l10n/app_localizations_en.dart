@@ -1785,4 +1785,187 @@ class L10nEn extends L10n {
   @override
   String get ioLicense =>
       'Data from iptv-org (public domain). A link listed there is not proof of the right to redistribute it; new channels always go to review.';
+
+  @override
+  String get acEmail => 'Email';
+
+  @override
+  String get acMfa => 'Two-step verification';
+
+  @override
+  String get acAddFactor => 'Add a backup authenticator';
+
+  @override
+  String get acAddFactorHint =>
+      'Recommended: a second authenticator (another phone or a password manager). If you lose one, the other still works.';
+
+  @override
+  String get acChangePassword => 'Change password';
+
+  @override
+  String get acNewPassword => 'New password (at least 10 characters)';
+
+  @override
+  String get acSignOutAll => 'Sign out of all devices';
+
+  @override
+  String get acSignOutAllConfirm =>
+      'Sign out everywhere, including this device?';
+
+  @override
+  String get acRecovery =>
+      'Lost every authenticator? Follow docs/runbooks/admin-recovery.md to restore access from the Supabase dashboard.';
+
+  @override
+  String get shEnabled => 'Run scheduled tasks on this device';
+
+  @override
+  String get shTray =>
+      'Keep running in the notification area when the window is closed';
+
+  @override
+  String get shStartup => 'Start with Windows (hidden)';
+
+  @override
+  String get shRunNow => 'Run now';
+
+  @override
+  String get shAnyTime => 'any time';
+
+  @override
+  String get shAllowed => 'Allowed hours';
+
+  @override
+  String shNext(String t) {
+    return 'next $t';
+  }
+
+  @override
+  String shMissed(String list) {
+    return 'Missed while this computer was off: $list';
+  }
+
+  @override
+  String shRunning(String task) {
+    return 'Running: $task';
+  }
+
+  @override
+  String get shInterval => 'Every (minutes)';
+
+  @override
+  String get shNote =>
+      'Heavy checks wait while you are watching a channel. Only one device runs each task (server lock). Missed tasks run when the program opens.';
+
+  @override
+  String get auSearch => 'Row id…';
+
+  @override
+  String get auAllTables => 'All tables';
+
+  @override
+  String get auAllActions => 'All actions';
+
+  @override
+  String get auExport => 'Export CSV';
+
+  @override
+  String get bkFolder => 'Backup folder';
+
+  @override
+  String get bkChooseFolder => 'Choose folder…';
+
+  @override
+  String get bkPassphrase => 'Passphrase (at least 8 characters)';
+
+  @override
+  String get bkPassphraseHint =>
+      'It is never sent to the server. If you lose it, the backups cannot be opened — keep it in a password manager. Tip: choose a folder synced to OneDrive or Google Drive.';
+
+  @override
+  String get bkNow => 'Back up now';
+
+  @override
+  String bkDone(String name) {
+    return 'Backup saved: $name';
+  }
+
+  @override
+  String get bkList => 'Backups in the folder';
+
+  @override
+  String get bkOpen => 'Open & preview';
+
+  @override
+  String get bkRestoreTables => 'Restore selected tables';
+
+  @override
+  String get bkRestoreChannel => 'Restore one channel';
+
+  @override
+  String bkCounts(int b, int c) {
+    return 'backup $b · now $c';
+  }
+
+  @override
+  String bkRestored(String s) {
+    return 'Restored: $s';
+  }
+
+  @override
+  String get bkNotConfigured => 'Choose a folder and a passphrase first.';
+
+  @override
+  String get bkRestoreNote =>
+      'Restore only adds or updates rows; it never deletes newer data. A full replacement is tested on a separate copy, never on the live catalog.';
+
+  @override
+  String get bkChannelId => 'Channel id';
+
+  @override
+  String get mtStatus => 'System status';
+
+  @override
+  String mtDbLatency(int ms) {
+    return 'Database response: $ms ms';
+  }
+
+  @override
+  String get mtEpgStale => 'The guide has not synced for more than 48 hours';
+
+  @override
+  String get mtBackupStale => 'No backup in the last 48 hours';
+
+  @override
+  String get mtCleanup => 'Clean-up';
+
+  @override
+  String get mtDanger => 'Danger zone';
+
+  @override
+  String get mtDangerHint =>
+      'Each action first takes a mandatory backup, then asks you to type the confirmation word.';
+
+  @override
+  String mtTypeWord(String w) {
+    return 'Type $w to confirm';
+  }
+
+  @override
+  String get mtRefreshCounts => 'Recount sources';
+
+  @override
+  String get mtClearReports => 'Delete resolved reports';
+
+  @override
+  String get mtClearBrokenLogos => 'Remove broken logos';
+
+  @override
+  String get mtDeleteOffline => 'Delete unavailable streams';
+
+  @override
+  String get mtDeleteHidden => 'Delete hidden channels';
+
+  @override
+  String get mtDeletePending => 'Delete channels pending review';
 }

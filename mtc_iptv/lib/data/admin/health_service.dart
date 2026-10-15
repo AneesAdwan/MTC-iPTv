@@ -43,7 +43,7 @@ class HealthService extends Notifier<HealthJob> {
 
   void cancel() => _cancel = true;
 
-  Future<void> run(List<AdminStream> streams, {bool playCheck = true}) async {
+  Future<void> run(List<AdminStream> streams, {bool playCheck = true, String taskKey = 'health_all'}) async {
     final repo = ref.read(adminRepoProvider);
     if (repo == null || state.running) return;
     final todo = streams.where((s) => s.healthState != 'disabled').toList();
@@ -62,7 +62,7 @@ class HealthService extends Notifier<HealthJob> {
     // سجل التشغيل في ADM-A2 (اختياري: يفشل بصمت دون جلسة تحقق بخطوتين)
     int? runId;
     try {
-      runId = await repo.startRun('health_all', Platform.localHostname);
+      runId = await repo.startRun(taskKey, Platform.localHostname);
     } catch (e) {
       log.fine('task_runs unavailable: $e');
     }

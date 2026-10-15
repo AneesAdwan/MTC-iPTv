@@ -28,7 +28,11 @@ bool FlutterWindow::OnCreate() {
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
-    this->Show();
+    // --hidden: started with Windows for the admin scheduler; the window stays hidden
+    // until opened from the tray icon (spec 9.10 H2).
+    if (wcsstr(GetCommandLineW(), L"--hidden") == nullptr) {
+      this->Show();
+    }
   });
 
   // Flutter can complete the first frame before the "show window" callback is

@@ -4,6 +4,7 @@ library;
 export 'src/normalize.dart';
 export 'src/playlist/m3u_parser.dart';
 export 'src/net/safe_fetch.dart';
+export 'src/backup/backup_format.dart';
 export 'src/connectors/iptv_org.dart';
 export 'src/epg/xmltv.dart';
 export 'src/import/decode.dart';

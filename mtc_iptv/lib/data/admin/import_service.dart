@@ -272,3 +272,44 @@ class ImportService extends Notifier<ImportState> {
 }
 
 final importProvider = NotifierProvider<ImportService, ImportState>(ImportService.new);
+
+/// مزامنة مصدر من المُجدوِل (ADM-H2، §10.4): نفس التحليل والمطابقة، ثم يُرسل الجديد والإضافات فقط —
+/// القنوات الجديدة تذهب لقيد المراجعة كالعادة، و**لا تعطيل تلقائي** للروابط التي اختفت (يقرره المدير من «جلب ومراجعة»).
+Future<Map<String, int>> syncSourceHeadless(AdminRepository repo, Map<String, dynamic> source) async {
+  final runId = await repo.startRun('sources', Platform.localHostname);
+  try {
+    final r = await SafeFetcher(policy: const SafeFetchPolicy(anyPort: true, maxBytes: maxImportBytes, timeout: Duration(seconds: 120)))
+        .get(Uri.parse('${source['url']}'), headers: const {'User-Agent': 'MTC-iPTv-Import/3'});
+    if (r.statusCode >= 400) throw StateError('HTTP ${r.statusCode}');
+    final (channels, streams) = await repo.matchingCatalog();
+    var rules = const <Map<String, dynamic>>[];
+    try {
+      rules = [for (final x in await repo.transformRules()) if (x['enabled'] == true) x];
+    } catch (_) {}
+    final a = await analyzeInIsolate(r.body, channels, {for (final s in streams) s['url'] as String: s['channel_id'] as String}, rules: rules);
+    final cats = await repo.categories();
+    final res = a.report.results;
+    final items = [
+      for (var i = 0; i < res.length; i++)
+        if (res[i].kind == 'new' || res[i].kind == 'update')
+          {
+            'uid': res[i].uid,
+            'name': res[i].item.name,
+            'logo': res[i].item.logo,
+            'country': res[i].item.country,
+            'category': (i < a.ruleCategories.length ? a.ruleCategories[i] : null) ?? mapCategory(res[i].item.group, cats),
+            'language': res[i].item.language,
+            'quality': res[i].item.quality,
+            'url': res[i].item.url,
+          },
+    ];
+    final (ch, st) = items.isEmpty ? (0, 0) : await repo.importItems('${source['id']}', items);
+    await repo.markSourceImported('${source['id']}');
+    final summary = {'source': '${source['name']}', 'channels': ch, 'streams': st, 'existing': a.report.counts['existing'] ?? 0, 'failed': a.report.counts['failed'] ?? 0};
+    await repo.finishRun(runId!, status: 'ok', summary: summary);
+    return {'channels': ch, 'streams': st};
+  } catch (e) {
+    await repo.finishRun(runId!, status: 'failed', error: '$e');
+    rethrow;
+  }
+}

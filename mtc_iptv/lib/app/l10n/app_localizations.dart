@@ -3330,6 +3330,324 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'بيانات iptv-org (ملكية عامة). وجود رابط هناك ليس دليلًا على حق إعادة توزيعه؛ والقنوات الجديدة تمرّ بالمراجعة دائمًا.'**
   String get ioLicense;
+
+  /// No description provided for @acEmail.
+  ///
+  /// In ar, this message translates to:
+  /// **'البريد'**
+  String get acEmail;
+
+  /// No description provided for @acMfa.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحقق بخطوتين'**
+  String get acMfa;
+
+  /// No description provided for @acAddFactor.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة تطبيق مصادقة احتياطي'**
+  String get acAddFactor;
+
+  /// No description provided for @acAddFactorHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'مستحسن: تطبيق مصادقة ثانٍ (هاتف آخر أو مدير كلمات مرور). إن فقدت أحدهما يعمل الآخر.'**
+  String get acAddFactorHint;
+
+  /// No description provided for @acChangePassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير كلمة المرور'**
+  String get acChangePassword;
+
+  /// No description provided for @acNewPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور الجديدة (10 أحرف على الأقل)'**
+  String get acNewPassword;
+
+  /// No description provided for @acSignOutAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخروج من كل الأجهزة'**
+  String get acSignOutAll;
+
+  /// No description provided for @acSignOutAllConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخروج من كل مكان، ومنه هذا الجهاز؟'**
+  String get acSignOutAllConfirm;
+
+  /// No description provided for @acRecovery.
+  ///
+  /// In ar, this message translates to:
+  /// **'فقدت كل تطبيقات المصادقة؟ اتبع docs/runbooks/admin-recovery.md لاستعادة الوصول من لوحة Supabase.'**
+  String get acRecovery;
+
+  /// No description provided for @shEnabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'تشغيل المهام المجدولة على هذا الجهاز'**
+  String get shEnabled;
+
+  /// No description provided for @shTray.
+  ///
+  /// In ar, this message translates to:
+  /// **'البقاء في منطقة الإشعارات عند إغلاق النافذة'**
+  String get shTray;
+
+  /// No description provided for @shStartup.
+  ///
+  /// In ar, this message translates to:
+  /// **'البدء مع ويندوز (مخفيًا)'**
+  String get shStartup;
+
+  /// No description provided for @shRunNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'شغّل الآن'**
+  String get shRunNow;
+
+  /// No description provided for @shAnyTime.
+  ///
+  /// In ar, this message translates to:
+  /// **'أي وقت'**
+  String get shAnyTime;
+
+  /// No description provided for @shAllowed.
+  ///
+  /// In ar, this message translates to:
+  /// **'الساعات المسموحة'**
+  String get shAllowed;
+
+  /// No description provided for @shNext.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي {t}'**
+  String shNext(String t);
+
+  /// No description provided for @shMissed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فاتت أثناء إطفاء الجهاز: {list}'**
+  String shMissed(String list);
+
+  /// No description provided for @shRunning.
+  ///
+  /// In ar, this message translates to:
+  /// **'يعمل: {task}'**
+  String shRunning(String task);
+
+  /// No description provided for @shInterval.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل (دقائق)'**
+  String get shInterval;
+
+  /// No description provided for @shNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفحص الثقيل ينتظر أثناء مشاهدتك لقناة. كل مهمة تعمل على جهاز واحد فقط (قفل على الخادم). المهام الفائتة تُشغَّل عند فتح البرنامج.'**
+  String get shNote;
+
+  /// No description provided for @auSearch.
+  ///
+  /// In ar, this message translates to:
+  /// **'معرّف الصف…'**
+  String get auSearch;
+
+  /// No description provided for @auAllTables.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل الجداول'**
+  String get auAllTables;
+
+  /// No description provided for @auAllActions.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل العمليات'**
+  String get auAllActions;
+
+  /// No description provided for @auExport.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصدير CSV'**
+  String get auExport;
+
+  /// No description provided for @bkFolder.
+  ///
+  /// In ar, this message translates to:
+  /// **'مجلد النسخ'**
+  String get bkFolder;
+
+  /// No description provided for @bkChooseFolder.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر مجلدًا…'**
+  String get bkChooseFolder;
+
+  /// No description provided for @bkPassphrase.
+  ///
+  /// In ar, this message translates to:
+  /// **'عبارة المرور (8 أحرف على الأقل)'**
+  String get bkPassphrase;
+
+  /// No description provided for @bkPassphraseHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تُرسل للخادم أبدًا. إن فقدتها لا يمكن فتح النسخ — احفظها في مدير كلمات مرور. نصيحة: اختر مجلدًا متزامنًا مع OneDrive أو Google Drive.'**
+  String get bkPassphraseHint;
+
+  /// No description provided for @bkNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخة الآن'**
+  String get bkNow;
+
+  /// No description provided for @bkDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'حُفظت النسخة: {name}'**
+  String bkDone(String name);
+
+  /// No description provided for @bkList.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسخ في المجلد'**
+  String get bkList;
+
+  /// No description provided for @bkOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح ومعاينة'**
+  String get bkOpen;
+
+  /// No description provided for @bkRestoreTables.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعادة الجداول المحددة'**
+  String get bkRestoreTables;
+
+  /// No description provided for @bkRestoreChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعادة قناة واحدة'**
+  String get bkRestoreChannel;
+
+  /// No description provided for @bkCounts.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسخة {b} · الآن {c}'**
+  String bkCounts(int b, int c);
+
+  /// No description provided for @bkRestored.
+  ///
+  /// In ar, this message translates to:
+  /// **'استُعيد: {s}'**
+  String bkRestored(String s);
+
+  /// No description provided for @bkNotConfigured.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر المجلد وعبارة المرور أولًا.'**
+  String get bkNotConfigured;
+
+  /// No description provided for @bkRestoreNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستعادة تضيف الصفوف أو تحدّثها فقط ولا تحذف أي بيانات أحدث. الاستبدال الكامل يُختبر على نسخة منفصلة، لا على الكتالوج الحي.'**
+  String get bkRestoreNote;
+
+  /// No description provided for @bkChannelId.
+  ///
+  /// In ar, this message translates to:
+  /// **'معرّف القناة'**
+  String get bkChannelId;
+
+  /// No description provided for @mtStatus.
+  ///
+  /// In ar, this message translates to:
+  /// **'حالة النظام'**
+  String get mtStatus;
+
+  /// No description provided for @mtDbLatency.
+  ///
+  /// In ar, this message translates to:
+  /// **'زمن استجابة قاعدة البيانات: {ms} ms'**
+  String mtDbLatency(int ms);
+
+  /// No description provided for @mtEpgStale.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يُزامَن الدليل منذ أكثر من 48 ساعة'**
+  String get mtEpgStale;
+
+  /// No description provided for @mtBackupStale.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا نسخة احتياطية خلال 48 ساعة'**
+  String get mtBackupStale;
+
+  /// No description provided for @mtCleanup.
+  ///
+  /// In ar, this message translates to:
+  /// **'التنظيف'**
+  String get mtCleanup;
+
+  /// No description provided for @mtDanger.
+  ///
+  /// In ar, this message translates to:
+  /// **'منطقة الخطر'**
+  String get mtDanger;
+
+  /// No description provided for @mtDangerHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل عملية تأخذ نسخة احتياطية إلزامية أولًا، ثم تطلب كتابة كلمة التأكيد.'**
+  String get mtDangerHint;
+
+  /// No description provided for @mtTypeWord.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب {w} للتأكيد'**
+  String mtTypeWord(String w);
+
+  /// No description provided for @mtRefreshCounts.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة عدّ المصادر'**
+  String get mtRefreshCounts;
+
+  /// No description provided for @mtClearReports.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف البلاغات المحلولة'**
+  String get mtClearReports;
+
+  /// No description provided for @mtClearBrokenLogos.
+  ///
+  /// In ar, this message translates to:
+  /// **'إزالة الشعارات المعطّلة'**
+  String get mtClearBrokenLogos;
+
+  /// No description provided for @mtDeleteOffline.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف الروابط غير المتاحة'**
+  String get mtDeleteOffline;
+
+  /// No description provided for @mtDeleteHidden.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف القنوات المخفية'**
+  String get mtDeleteHidden;
+
+  /// No description provided for @mtDeletePending.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف القنوات قيد المراجعة'**
+  String get mtDeletePending;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

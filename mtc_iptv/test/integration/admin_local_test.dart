@@ -4,10 +4,12 @@
 library;
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mtc_core/mtc_core.dart';
 import 'package:mtc_iptv/data/admin/admin_repository.dart';
+import 'package:mtc_iptv/data/admin/backup_service.dart';
 import 'package:mtc_iptv/data/admin/import_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -242,6 +244,59 @@ void main() {
     expect(await repo.xtreamPassword(id), 'p-$stamp');
     await repo.deleteXtream(id);
     expect((await repo.xtreamAccounts()).where((a) => a['id'] == id), isEmpty);
+  }, skip: skip);
+
+  test('phase 6a: backup -> verify -> loss -> restore drill (local only), scheduler lease', () async {
+    expect(url, startsWith('http://127.0.0.1'), reason: 'the restore drill must never run against production');
+    final dir = await Directory.systemTemp.createTemp('mtc-bak-');
+    addTearDown(() => dir.delete(recursive: true));
+    final svc = BackupService(repo);
+
+    // بيانات معروفة
+    final r = await admin('POST', '/rest/v1/channels', {'uid': 'bak:$stamp', 'name': 'Backup $stamp'});
+    final id = ((jsonDecode(r.body) as List).single as Map)['id'] as String;
+    await admin('POST', '/rest/v1/streams', {'channel_id': id, 'url': 'https://example.com/bak/$stamp.m3u8'});
+    addTearDown(() => admin('DELETE', '/rest/v1/channels?id=eq.$id'));
+
+    // النسخة: ملف + بصمة، والصيغة الصحيحة
+    final res = await svc.create(dir: dir.path, passphrase: 'drill-pass-$stamp', kind: 'manual');
+    expect(File(res.path).existsSync(), isTrue);
+    expect(File('${res.path}.sha256').existsSync(), isTrue);
+    final before = {'channels': await repo.tableCount('channels'), 'streams': await repo.tableCount('streams')};
+    expect(res.counts['channels'], before['channels']);
+
+    // رفض: عبارة مرور خاطئة، وبصمة لا تطابق
+    await expectLater(BackupService.open(res.path, 'wrong-pass'), throwsA(isA<BackupError>()));
+    final doc = await BackupService.open(res.path, 'drill-pass-$stamp');
+    final sha = File('${res.path}.sha256');
+    final good = await sha.readAsString();
+    await sha.writeAsString('0' * 64);
+    await expectLater(BackupService.open(res.path, 'drill-pass-$stamp'), throwsA(isA<BackupError>()));
+    await sha.writeAsString(good);
+
+    // استعادة قناة واحدة بعد حذفها
+    await admin('DELETE', '/rest/v1/channels?id=eq.$id');
+    expect(await repo.channel(id), isNull);
+    final one = await svc.restore(doc, channelId: id);
+    expect(one, {'channels': 1, 'streams': 1});
+    expect((await repo.streamsOf(id)).single.url, 'https://example.com/bak/$stamp.m3u8');
+
+    // التمرين الكامل (Gate C): فقدان كل القنوات والروابط ثم استعادتها والتحقق بالأعداد
+    await admin('DELETE', '/rest/v1/channels?id=not.is.null');
+    expect(await repo.tableCount('channels'), 0);
+    final all = await svc.restore(doc, tables: ['languages', 'countries', 'categories', 'channels', 'streams']);
+    expect(all['channels'], before['channels']);
+    expect(await repo.tableCount('channels'), before['channels']);
+    expect(await repo.tableCount('streams'), before['streams']);
+
+    // المُجدوِل: قفل المهمة على جهاز واحد
+    await repo.updateTask('logos', {'next_run_at': null, 'locked_by': null, 'locked_until': null, 'enabled': true});
+    expect(await repo.acquireTask('logos', 'dev-A-$stamp'), isTrue);
+    expect(await repo.acquireTask('logos', 'dev-B-$stamp'), isFalse);
+    await repo.finishTask('logos', 'dev-A-$stamp', 'ok');
+    final t = (await repo.scheduledTasks()).firstWhere((x) => x['key'] == 'logos');
+    expect([t['last_status'], t['locked_by']], ['ok', null]);
+    expect(DateTime.parse('${t['next_run_at']}').isAfter(DateTime.now().toUtc()), isTrue);
   }, skip: skip);
 
   test('batch 4c: reversible merge, duplicates, logos, networks, home layout', () async {

@@ -14,6 +14,7 @@ import '../features/admin/connectors_screen.dart';
 import '../features/admin/epg_screens.dart';
 import '../features/admin/export_screen.dart';
 import '../features/admin/rules_screen.dart';
+import '../features/admin/system_screens.dart';
 import '../features/admin/health_screen.dart';
 import '../features/admin/import_screen.dart';
 import '../features/admin/sources_screen.dart';
@@ -119,6 +120,11 @@ Widget _screenFor(ScreenDef s, GoRouterState state) {
     'ADM-C4' => const ConnectorsScreen(),
     'ADM-C5' => const ExportScreen(),
     'ADM-C6' => const RulesScreen(),
+    'ADM-H1' => const AccountScreen(),
+    'ADM-H2' => const SchedulerScreen(),
+    'ADM-H3' => const AuditScreen(),
+    'ADM-H4' => const BackupsScreen(),
+    'ADM-H5' => const MaintenanceScreen(),
     'ADM-E1' => const EpgSourcesScreen(),
     'ADM-E2' => const EpgMappingScreen(),
     'ADM-E3' => const EpgPreviewScreen(),
