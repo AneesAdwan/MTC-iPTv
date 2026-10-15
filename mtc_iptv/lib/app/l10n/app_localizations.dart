@@ -3084,6 +3084,252 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'{n} قناة مطابقة'**
   String exChannels(int n);
+
+  /// No description provided for @needsMigration.
+  ///
+  /// In ar, this message translates to:
+  /// **'يحتاج هذا الترحيل 0004 على الخادم، ولم يُطبَّق بعد.'**
+  String get needsMigration;
+
+  /// No description provided for @epgAddSource.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة مصدر'**
+  String get epgAddSource;
+
+  /// No description provided for @epgSyncNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'زامن الآن'**
+  String get epgSyncNow;
+
+  /// No description provided for @epgSyncing.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ المزامنة {done}/{total}: {name}'**
+  String epgSyncing(int done, int total, String name);
+
+  /// No description provided for @epgSummary.
+  ///
+  /// In ar, this message translates to:
+  /// **'{c} قناة · {p} برنامج'**
+  String epgSummary(int c, int p);
+
+  /// No description provided for @epgEvery.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل {h} ساعة'**
+  String epgEvery(int h);
+
+  /// No description provided for @epgGithubNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'grabber مشروع iptv-org ما زال يعمل على GitHub (يحتاج Node). مصادر XMLTV هذه تعمل من البرنامج؛ كل مصدر يُكمّل القنوات التي فاتت ما قبله.'**
+  String get epgGithubNote;
+
+  /// No description provided for @epgSourceUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط XMLTV (‎.xml أو ‎.xml.gz)'**
+  String get epgSourceUrl;
+
+  /// No description provided for @epgPriority.
+  ///
+  /// In ar, this message translates to:
+  /// **'الترتيب (الأصغر أولًا)'**
+  String get epgPriority;
+
+  /// No description provided for @epgIntervalHours.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل (ساعات)'**
+  String get epgIntervalHours;
+
+  /// No description provided for @mapMissing.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} قناة منشورة بلا برامج خلال 24 ساعة القادمة'**
+  String mapMissing(int n);
+
+  /// No description provided for @mapLoad.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل الاقتراحات من المصادر'**
+  String get mapLoad;
+
+  /// No description provided for @mapLink.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربط'**
+  String get mapLink;
+
+  /// No description provided for @mapLinkAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربط كل المطابقات التامة ({n})'**
+  String mapLinkAll(int n);
+
+  /// No description provided for @mapNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا اقتراح'**
+  String get mapNone;
+
+  /// No description provided for @mapHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الربط يضبط معرّف EPG للقناة (بالمعرّف لا بالاسم). تصل البرامج في المزامنة التالية.'**
+  String get mapHint;
+
+  /// No description provided for @e3Issues.
+  ///
+  /// In ar, this message translates to:
+  /// **'{g} فجوة · {o} تداخل'**
+  String e3Issues(int g, int o);
+
+  /// No description provided for @e3Offset.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإزاحة (دقائق)'**
+  String get e3Offset;
+
+  /// No description provided for @e3OffsetHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُطبّق على البرامج التي يكتبها البرنامج من المزامنة التالية.'**
+  String get e3OffsetHint;
+
+  /// No description provided for @e3Gap.
+  ///
+  /// In ar, this message translates to:
+  /// **'فجوة {m} دقيقة'**
+  String e3Gap(int m);
+
+  /// No description provided for @e3Overlap.
+  ///
+  /// In ar, this message translates to:
+  /// **'تداخل {m} دقيقة'**
+  String e3Overlap(int m);
+
+  /// No description provided for @rkGroupCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'group-title ← الفئة'**
+  String get rkGroupCategory;
+
+  /// No description provided for @rkNameCountry.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم ← الدولة'**
+  String get rkNameCountry;
+
+  /// No description provided for @rkNameLanguage.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم ← اللغة'**
+  String get rkNameLanguage;
+
+  /// No description provided for @rkNameCleanup.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنظيف الاسم'**
+  String get rkNameCleanup;
+
+  /// No description provided for @rkIdMap.
+  ///
+  /// In ar, this message translates to:
+  /// **'tvg-id ← قناتنا'**
+  String get rkIdMap;
+
+  /// No description provided for @rPattern.
+  ///
+  /// In ar, this message translates to:
+  /// **'يحتوي'**
+  String get rPattern;
+
+  /// No description provided for @rTarget.
+  ///
+  /// In ar, this message translates to:
+  /// **'النتيجة'**
+  String get rTarget;
+
+  /// No description provided for @rRegex.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعبير نمطي'**
+  String get rRegex;
+
+  /// No description provided for @rNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظة'**
+  String get rNote;
+
+  /// No description provided for @rulesHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'القواعد تُطبّق على كل استيراد قبل المطابقة. القاعدة تملأ المجهول فقط ولا تستبدل تعديلاتك.'**
+  String get rulesHint;
+
+  /// No description provided for @xtSave.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ هذا الحساب (كلمة المرور مشفّرة في Supabase Vault)'**
+  String get xtSave;
+
+  /// No description provided for @xtSaved.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحسابات المحفوظة'**
+  String get xtSaved;
+
+  /// No description provided for @xtFetch.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلب ومراجعة'**
+  String get xtFetch;
+
+  /// No description provided for @ioLoad.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل بيانات iptv-org'**
+  String get ioLoad;
+
+  /// No description provided for @ioSearch.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في قنوات iptv-org…'**
+  String get ioSearch;
+
+  /// No description provided for @ioInCatalog.
+  ///
+  /// In ar, this message translates to:
+  /// **'في الكتالوج'**
+  String get ioInCatalog;
+
+  /// No description provided for @ioNotInCatalog.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليست في الكتالوج'**
+  String get ioNotInCatalog;
+
+  /// No description provided for @ioStreams.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} رابط'**
+  String ioStreams(int n);
+
+  /// No description provided for @ioReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'مراجعة المحدد في الاستيراد ({n})'**
+  String ioReview(int n);
+
+  /// No description provided for @ioLicense.
+  ///
+  /// In ar, this message translates to:
+  /// **'بيانات iptv-org (ملكية عامة). وجود رابط هناك ليس دليلًا على حق إعادة توزيعه؛ والقنوات الجديدة تمرّ بالمراجعة دائمًا.'**
+  String get ioLicense;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

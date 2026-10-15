@@ -677,6 +677,55 @@ class AdminRepository {
         return f.order('number', ascending: true, nullsFirst: false).order('id', ascending: true).range(a, b);
       });
 
+  // ── دليل البرامج (ADM-E1/E2/E3) — يتطلب الترحيل 0004 ─────────────────────
+  Future<List<Map<String, dynamic>>> epgSources() => db.from('epg_sources').select().order('priority', ascending: true).order('name', ascending: true);
+  Future<void> upsertEpgSource(Map<String, dynamic> row) => db.from('epg_sources').upsert(row);
+  Future<void> deleteEpgSource(String id) => db.from('epg_sources').delete().eq('id', id);
+
+  /// القنوات المنشورة مع حقول المطابقة.
+  Future<List<Map<String, dynamic>>> epgTargets() => _all((a, b) =>
+      db.from('channels').select('id,uid,epg_id,name,name_ar,name_en,alt_names,number,logo_url,epg_offset_minutes').eq('publish_state', 'published').order('id', ascending: true).range(a, b));
+
+  /// المعرّفات (uid) التي لها برامج خلال 24 ساعة.
+  Future<Set<String>> uidsWithProgrammes() async {
+    final now = DateTime.now().toUtc();
+    final rows = await _all((a, b) => db
+        .from('epg_programmes')
+        .select('channel_uid,start_at')
+        .gte('end_at', now.toIso8601String())
+        .lte('start_at', now.add(const Duration(hours: 24)).toIso8601String())
+        .order('channel_uid', ascending: true)
+        .order('start_at', ascending: true)
+        .range(a, b));
+    return {for (final r in rows) r['channel_uid'] as String};
+  }
+
+  Future<int> epgUpsert(List<Map<String, dynamic>> rows) async {
+    var n = 0;
+    for (var i = 0; i < rows.length; i += 500) {
+      n += ((await db.rpc('admin_epg_upsert', params: {'p_rows': rows.sublist(i, (i + 500).clamp(0, rows.length))})) as num).toInt();
+    }
+    return n;
+  }
+
+  Future<void> epgFinish(String sourceId, {required String status, required int channels, required int programmes, String? error}) =>
+      db.rpc('admin_epg_finish', params: {'p_source': sourceId, 'p_status': status, 'p_channels': channels, 'p_programmes': programmes, 'p_error': error});
+
+  Future<List<Map<String, dynamic>>> epgDay(String uid, DateTime day) async =>
+      [for (final r in await db.rpc('epg_day', params: {'p_uid': uid, 'p_day': day.toIso8601String().substring(0, 10)}) as List) Map<String, dynamic>.from(r as Map)];
+
+  // ── قواعد التحويل (ADM-C6) ───────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> transformRules() => db.from('transform_rules').select().order('kind', ascending: true).order('priority', ascending: true);
+  Future<void> upsertRule(Map<String, dynamic> row) => db.from('transform_rules').upsert(row);
+  Future<void> deleteRule(String id) => db.from('transform_rules').delete().eq('id', id);
+
+  // ── حسابات Xtream (Vault) ────────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> xtreamAccounts() => db.from('xtream_accounts').select('id,name,server,username,enabled,last_import_at').order('name', ascending: true);
+  Future<String> saveXtream(String name, String server, String user, String pass) async =>
+      (await db.rpc('admin_xtream_save', params: {'p_name': name, 'p_server': server, 'p_username': user, 'p_password': pass})) as String;
+  Future<String?> xtreamPassword(String id) async => (await db.rpc('admin_xtream_password', params: {'p_id': id})) as String?;
+  Future<void> deleteXtream(String id) => db.rpc('admin_xtream_delete', params: {'p_id': id});
+
   // ── المهام (ADM-A2) ──────────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> taskRuns({int limit = 100}) =>
       db.from('task_runs').select('id,task_key,device,started_at,finished_at,status,summary,error').order('started_at', ascending: false).limit(limit);

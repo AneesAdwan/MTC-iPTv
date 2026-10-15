@@ -8,6 +8,7 @@ import 'package:mtc_core/mtc_core.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/theme/tokens.dart';
+import '../../data/admin/admin_repository.dart';
 import '../../data/admin/import_service.dart';
 import 'widgets/admin_widgets.dart';
 
@@ -67,6 +68,7 @@ class _SourceStep extends ConsumerStatefulWidget {
 
 class _SourceStepState extends ConsumerState<_SourceStep> {
   final url = TextEditingController(), paste = TextEditingController(), server = TextEditingController(), user = TextEditingController(), pass = TextEditingController();
+  bool saveXtream = false;
 
   @override
   void dispose() {
@@ -125,14 +127,27 @@ class _SourceStepState extends ConsumerState<_SourceStep> {
                   const SizedBox(height: Space.md),
                   Align(alignment: AlignmentDirectional.centerStart, child: FilledButton(onPressed: () => svc.fromText(paste.text), child: Text(t.imAnalyze))),
                 ])),
-                pad(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                pad(ListView(children: [
                   TextField(controller: server, textDirection: TextDirection.ltr, decoration: InputDecoration(labelText: t.imXServer)),
                   TextField(controller: user, textDirection: TextDirection.ltr, decoration: InputDecoration(labelText: t.imXUser)),
                   TextField(controller: pass, obscureText: true, textDirection: TextDirection.ltr, decoration: InputDecoration(labelText: t.imXPass)),
-                  const SizedBox(height: Space.sm),
-                  Text(t.imXtreamNote, style: TextStyle(color: c.textMuted, fontSize: 12.5)),
-                  const SizedBox(height: Space.md),
-                  Align(alignment: AlignmentDirectional.centerStart, child: FilledButton(onPressed: () => svc.fromXtream(server.text, user.text, pass.text), child: Text(t.imAnalyze))),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    value: saveXtream,
+                    onChanged: (v) => setState(() => saveXtream = v ?? false),
+                    title: Text(t.xtSave, style: const TextStyle(fontSize: 13.5)),
+                    subtitle: saveXtream ? null : Text(t.imXtreamNote, style: TextStyle(color: c.textMuted, fontSize: 12)),
+                  ),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: FilledButton(
+                      onPressed: () => svc.fromXtream(server.text, user.text, pass.text, saveAs: saveXtream ? (Uri.tryParse(server.text.trim())?.host ?? server.text) : null),
+                      child: Text(t.imAnalyze),
+                    ),
+                  ),
+                  const SizedBox(height: Space.lg),
+                  const _SavedXtream(),
                 ])),
               ]),
             ),
@@ -140,6 +155,40 @@ class _SourceStepState extends ConsumerState<_SourceStep> {
         ),
       ),
     );
+  }
+}
+
+final _xtreamProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async => await ref.watch(adminRepoProvider)?.xtreamAccounts() ?? const []);
+
+/// الحسابات المحفوظة (تختفي بهدوء إن لم يُطبَّق الترحيل 0004 بعد).
+class _SavedXtream extends ConsumerWidget {
+  const _SavedXtream();
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = L10n.of(context), c = context.colors;
+    final list = ref.watch(_xtreamProvider).value ?? const <Map<String, dynamic>>[];
+    if (list.isEmpty) return const SizedBox.shrink();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(t.xtSaved, style: TextStyle(color: c.text, fontWeight: FontWeight.w700)),
+      for (final a in list)
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.vpn_key_rounded),
+          title: Text('${a['name']}'),
+          subtitle: Text('${a['username']} @ ${a['server']}', textDirection: TextDirection.ltr, style: TextStyle(color: c.textMuted, fontSize: 12)),
+          trailing: Wrap(children: [
+            FilledButton.tonal(onPressed: () => ref.read(importProvider.notifier).fromSavedXtream(a), child: Text(t.xtFetch)),
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded),
+              onPressed: () async {
+                if (!await confirm(context, t.confirmDelete(1))) return;
+                await ref.read(adminRepoProvider)?.deleteXtream(a['id'] as String);
+                ref.invalidate(_xtreamProvider);
+              },
+            ),
+          ]),
+        ),
+    ]);
   }
 }
 
@@ -255,7 +304,12 @@ class _PreviewStepState extends ConsumerState<_PreviewStep> {
                 if (r.possibleDuplicateOf != null) Padding(padding: const EdgeInsetsDirectional.only(start: Space.sm), child: Pill(t.imPossibleDup, healthColor('degraded'))),
               ]),
               subtitle: Text(
-                '${r.why} · ${r.item.group ?? ''} · ${maskCredentials(r.item.url)}',
+                [
+                  r.why,
+                  if (i < a.ruleNotes.length && a.ruleNotes[i].isNotEmpty) '⚙ ${a.ruleNotes[i].join(', ')}',
+                  ?r.item.group,
+                  maskCredentials(r.item.url),
+                ].join(' · '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textDirection: TextDirection.ltr,

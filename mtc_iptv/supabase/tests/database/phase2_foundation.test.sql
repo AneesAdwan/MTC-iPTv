@@ -110,6 +110,9 @@ select ok((public.catalog_changes(current_setting('test.since')::bigint) -> 'rem
 select ok((public.catalog_changes(0, 1) ->> 'more')::boolean, 'sync pages large catalogs (more=true when the page is full)');
 
 -- ── 6) scheduler lease ──────────────────────────────────────────────────────
+-- يبدأ من مهمة حرّة ومستحقة (قاعدة محلية مستعملة قد تحمل عقدًا من اختبار تكامل سابق)
+select pg_temp.as_owner();
+update public.scheduled_tasks set locked_by = null, locked_until = null, next_run_at = null where key = 'epg';
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1', 'aal2');
 select is(public.admin_task_acquire('epg', 'device-A'), true, 'device A takes the lease');
 select is(public.admin_task_acquire('epg', 'device-B'), false, 'device B cannot run the same task meanwhile');

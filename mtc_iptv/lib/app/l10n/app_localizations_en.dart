@@ -1635,4 +1635,154 @@ class L10nEn extends L10n {
   String exChannels(int n) {
     return '$n channels match';
   }
+
+  @override
+  String get needsMigration =>
+      'This needs migration 0004 on the server, which is not applied yet.';
+
+  @override
+  String get epgAddSource => 'Add source';
+
+  @override
+  String get epgSyncNow => 'Sync now';
+
+  @override
+  String epgSyncing(int done, int total, String name) {
+    return 'Syncing $done/$total: $name';
+  }
+
+  @override
+  String epgSummary(int c, int p) {
+    return '$c channels · $p programmes';
+  }
+
+  @override
+  String epgEvery(int h) {
+    return 'every $h h';
+  }
+
+  @override
+  String get epgGithubNote =>
+      'The iptv-org grabber still runs on GitHub (it needs Node). These XMLTV sources run from this program; each one fills the channels the previous ones missed.';
+
+  @override
+  String get epgSourceUrl => 'XMLTV link (.xml or .xml.gz)';
+
+  @override
+  String get epgPriority => 'Order (smaller first)';
+
+  @override
+  String get epgIntervalHours => 'Every (hours)';
+
+  @override
+  String mapMissing(int n) {
+    return '$n published channels have no programmes in the next 24 hours';
+  }
+
+  @override
+  String get mapLoad => 'Load suggestions from the sources';
+
+  @override
+  String get mapLink => 'Link';
+
+  @override
+  String mapLinkAll(int n) {
+    return 'Link all exact matches ($n)';
+  }
+
+  @override
+  String get mapNone => 'No suggestion';
+
+  @override
+  String get mapHint =>
+      'Linking sets the channel\'s EPG id (by id, not by name). Programmes arrive at the next sync.';
+
+  @override
+  String e3Issues(int g, int o) {
+    return '$g gaps · $o overlaps';
+  }
+
+  @override
+  String get e3Offset => 'Offset (minutes)';
+
+  @override
+  String get e3OffsetHint =>
+      'Applied to programmes written from the next sync by this program.';
+
+  @override
+  String e3Gap(int m) {
+    return 'Gap of $m min';
+  }
+
+  @override
+  String e3Overlap(int m) {
+    return 'Overlap of $m min';
+  }
+
+  @override
+  String get rkGroupCategory => 'group-title → category';
+
+  @override
+  String get rkNameCountry => 'Name → country';
+
+  @override
+  String get rkNameLanguage => 'Name → language';
+
+  @override
+  String get rkNameCleanup => 'Clean the name';
+
+  @override
+  String get rkIdMap => 'tvg-id → our channel';
+
+  @override
+  String get rPattern => 'Contains';
+
+  @override
+  String get rTarget => 'Result';
+
+  @override
+  String get rRegex => 'Regular expression';
+
+  @override
+  String get rNote => 'Note';
+
+  @override
+  String get rulesHint =>
+      'Rules apply to every import before matching. A rule only fills what is unknown; it never overwrites your edits.';
+
+  @override
+  String get xtSave =>
+      'Save this account (the password is encrypted in Supabase Vault)';
+
+  @override
+  String get xtSaved => 'Saved accounts';
+
+  @override
+  String get xtFetch => 'Fetch & review';
+
+  @override
+  String get ioLoad => 'Load iptv-org data';
+
+  @override
+  String get ioSearch => 'Search iptv-org channels…';
+
+  @override
+  String get ioInCatalog => 'In catalog';
+
+  @override
+  String get ioNotInCatalog => 'Not in catalog';
+
+  @override
+  String ioStreams(int n) {
+    return '$n streams';
+  }
+
+  @override
+  String ioReview(int n) {
+    return 'Review selected in import ($n)';
+  }
+
+  @override
+  String get ioLicense =>
+      'Data from iptv-org (public domain). A link listed there is not proof of the right to redistribute it; new channels always go to review.';
 }

@@ -22,7 +22,10 @@ class ImportAnalysis {
   final Set<String> attributes;
   final MatchReport report;
   final List<String> vanishedStreamIds; // للمصدر المتكرر: روابطه التي لم تعد في القائمة
-  const ImportAnalysis(this.format, this.encoding, this.gzipped, this.issues, this.attributes, this.report, {this.vanishedStreamIds = const []});
+  final List<String?> ruleCategories; // فئة من قاعدة تحويل لكل نتيجة (بنفس الترتيب)
+  final List<List<String>> ruleNotes; // القواعد المطبّقة لكل نتيجة (الشفافية)
+  const ImportAnalysis(this.format, this.encoding, this.gzipped, this.issues, this.attributes, this.report,
+      {this.vanishedStreamIds = const [], this.ruleCategories = const [], this.ruleNotes = const []});
 }
 
 class ImportState {
@@ -37,7 +40,8 @@ class ImportState {
 }
 
 /// تحليل + مطابقة خارج خيط الواجهة (§10.3: «في Isolate منفصل فلا تتجمد الواجهة»).
-Future<ImportAnalysis> analyzeInIsolate(List<int> bytes, List<Map<String, dynamic>> channels, Map<String, String> urls) => Isolate.run(() {
+Future<ImportAnalysis> analyzeInIsolate(List<int> bytes, List<Map<String, dynamic>> channels, Map<String, String> urls, {List<Map<String, dynamic>> rules = const []}) =>
+    Isolate.run(() {
       final d = decodeImport(bytes);
       final p = parseImport(d.text);
       final index = CatalogIndex([
@@ -54,7 +58,11 @@ Future<ImportAnalysis> analyzeInIsolate(List<int> bytes, List<Map<String, dynami
             altNames: [for (final x in (c['alt_names'] as List?) ?? const []) '$x'],
           ),
       ], urls);
-      return ImportAnalysis(p.format, d.encoding, d.gzipped, p.issues, p.attributes, matchImport(p.items, index));
+      // قواعد التحويل قبل المطابقة (§10.3 الخطوة 2)
+      final rs = [for (final r in rules) TransformRule.fromJson(r)];
+      final outcomes = [for (final it in p.items) applyRules(it, rs)];
+      return ImportAnalysis(p.format, d.encoding, d.gzipped, p.issues, p.attributes, matchImport([for (final o in outcomes) o.item], index),
+          ruleCategories: [for (final o in outcomes) o.category], ruleNotes: [for (final o in outcomes) o.applied]);
     });
 
 /// ربط group-title بفئة موجودة (§10.3 الاستنتاج): بالمعرّف أو الاسمين أو مرادفات شائعة.
@@ -104,8 +112,32 @@ class ImportService extends Notifier<ImportState> {
     }
   }
 
-  /// حساب Xtream Codes (§10.1): player_api.php ← قائمة القنوات الحية. لا يُحفظ الحساب.
-  Future<void> fromXtream(String server, String user, String pass) async {
+  /// حساب محفوظ: كلمة المرور تُقرأ من Vault عند الجلب فقط (is_admin + تحقق بخطوتين).
+  Future<void> fromSavedXtream(Map<String, dynamic> account) async {
+    final repo = _repo;
+    if (repo == null) return;
+    state = ImportState(phase: ImportPhase.analyzing, label: 'Xtream: ${account['name']}');
+    try {
+      final pass = await repo.xtreamPassword(account['id'] as String);
+      if (pass == null) throw StateError('no password');
+      await fromXtream('${account['server']}', '${account['username']}', pass);
+      await repo.db.from('xtream_accounts').update({'last_import_at': DateTime.now().toUtc().toIso8601String()}).eq('id', account['id']);
+    } catch (e) {
+      state = ImportState(phase: ImportPhase.error, label: state.label, error: '$e');
+    }
+  }
+
+  /// حساب Xtream Codes (§10.1): player_api.php ← قائمة القنوات الحية.
+  /// [saveAs]: يُحفظ الحساب (كلمة المرور في Vault فقط) قبل الجلب.
+  Future<void> fromXtream(String server, String user, String pass, {String? saveAs}) async {
+    if (saveAs != null) {
+      try {
+        await _repo?.saveXtream(saveAs, server, user, pass);
+      } catch (e) {
+        state = ImportState(phase: ImportPhase.error, label: 'Xtream', error: '$e');
+        return;
+      }
+    }
     final base = server.trim().replaceAll(RegExp(r'/+$'), '');
     state = ImportState(phase: ImportPhase.analyzing, label: 'Xtream: ${Uri.tryParse(base)?.host ?? base}');
     try {
@@ -141,12 +173,19 @@ class ImportService extends Notifier<ImportState> {
     try {
       final (channels, streams) = await repo.matchingCatalog();
       final urls = {for (final s in streams) s['url'] as String: s['channel_id'] as String};
-      var a = await analyzeInIsolate(bytes, channels, urls);
+      var rules = const <Map<String, dynamic>>[];
+      try {
+        rules = [for (final r in await repo.transformRules()) if (r['enabled'] == true) r];
+      } catch (e) {
+        log.fine('transform rules unavailable (migration 0004?): $e');
+      }
+      var a = await analyzeInIsolate(bytes, channels, urls, rules: rules);
       if (sourceId != null) {
         // الفرق منذ آخر جلب (§10.4): روابط المصدر التي اختفت من القائمة الآن
         final now = {for (final r in a.report.results) normalizeUrl(r.item.url)};
         final vanished = [for (final s in streams) if (s['source_id'] == sourceId && !now.contains(normalizeUrl(s['url'] as String))) s['id'] as String];
-        a = ImportAnalysis(a.format, a.encoding, a.gzipped, a.issues, a.attributes, a.report, vanishedStreamIds: vanished);
+        a = ImportAnalysis(a.format, a.encoding, a.gzipped, a.issues, a.attributes, a.report,
+            vanishedStreamIds: vanished, ruleCategories: a.ruleCategories, ruleNotes: a.ruleNotes);
       }
       final sel = {for (var i = 0; i < a.report.results.length; i++) if (const {'new', 'update'}.contains(a.report.results[i].kind)) i};
       state = ImportState(phase: ImportPhase.preview, label: label, sourceId: sourceId, analysis: a, selected: sel);
@@ -179,15 +218,17 @@ class ImportService extends Notifier<ImportState> {
     } catch (_) {}
     try {
       final cats = await repo.categories();
-      final chosen = [for (final i in state.selected) a.report.results[i]];
+      final chosenIdx = state.selected.toList()..sort();
+      final chosen = [for (final i in chosenIdx) a.report.results[i]];
       final items = [
-        for (final r in chosen)
+        for (final i in chosenIdx)
+          if (a.report.results[i] case final r)
           {
             'uid': r.uid,
             'name': r.item.name,
             'logo': r.item.logo,
             'country': r.item.country,
-            'category': mapCategory(r.item.group, cats),
+            'category': (i < a.ruleCategories.length ? a.ruleCategories[i] : null) ?? mapCategory(r.item.group, cats),
             'language': r.item.language,
             'quality': r.item.quality,
             'url': r.item.url,

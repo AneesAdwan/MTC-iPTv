@@ -1627,4 +1627,153 @@ class L10nAr extends L10n {
   String exChannels(int n) {
     return '$n قناة مطابقة';
   }
+
+  @override
+  String get needsMigration =>
+      'يحتاج هذا الترحيل 0004 على الخادم، ولم يُطبَّق بعد.';
+
+  @override
+  String get epgAddSource => 'إضافة مصدر';
+
+  @override
+  String get epgSyncNow => 'زامن الآن';
+
+  @override
+  String epgSyncing(int done, int total, String name) {
+    return 'جارٍ المزامنة $done/$total: $name';
+  }
+
+  @override
+  String epgSummary(int c, int p) {
+    return '$c قناة · $p برنامج';
+  }
+
+  @override
+  String epgEvery(int h) {
+    return 'كل $h ساعة';
+  }
+
+  @override
+  String get epgGithubNote =>
+      'grabber مشروع iptv-org ما زال يعمل على GitHub (يحتاج Node). مصادر XMLTV هذه تعمل من البرنامج؛ كل مصدر يُكمّل القنوات التي فاتت ما قبله.';
+
+  @override
+  String get epgSourceUrl => 'رابط XMLTV (‎.xml أو ‎.xml.gz)';
+
+  @override
+  String get epgPriority => 'الترتيب (الأصغر أولًا)';
+
+  @override
+  String get epgIntervalHours => 'كل (ساعات)';
+
+  @override
+  String mapMissing(int n) {
+    return '$n قناة منشورة بلا برامج خلال 24 ساعة القادمة';
+  }
+
+  @override
+  String get mapLoad => 'تحميل الاقتراحات من المصادر';
+
+  @override
+  String get mapLink => 'ربط';
+
+  @override
+  String mapLinkAll(int n) {
+    return 'ربط كل المطابقات التامة ($n)';
+  }
+
+  @override
+  String get mapNone => 'لا اقتراح';
+
+  @override
+  String get mapHint =>
+      'الربط يضبط معرّف EPG للقناة (بالمعرّف لا بالاسم). تصل البرامج في المزامنة التالية.';
+
+  @override
+  String e3Issues(int g, int o) {
+    return '$g فجوة · $o تداخل';
+  }
+
+  @override
+  String get e3Offset => 'الإزاحة (دقائق)';
+
+  @override
+  String get e3OffsetHint =>
+      'تُطبّق على البرامج التي يكتبها البرنامج من المزامنة التالية.';
+
+  @override
+  String e3Gap(int m) {
+    return 'فجوة $m دقيقة';
+  }
+
+  @override
+  String e3Overlap(int m) {
+    return 'تداخل $m دقيقة';
+  }
+
+  @override
+  String get rkGroupCategory => 'group-title ← الفئة';
+
+  @override
+  String get rkNameCountry => 'الاسم ← الدولة';
+
+  @override
+  String get rkNameLanguage => 'الاسم ← اللغة';
+
+  @override
+  String get rkNameCleanup => 'تنظيف الاسم';
+
+  @override
+  String get rkIdMap => 'tvg-id ← قناتنا';
+
+  @override
+  String get rPattern => 'يحتوي';
+
+  @override
+  String get rTarget => 'النتيجة';
+
+  @override
+  String get rRegex => 'تعبير نمطي';
+
+  @override
+  String get rNote => 'ملاحظة';
+
+  @override
+  String get rulesHint =>
+      'القواعد تُطبّق على كل استيراد قبل المطابقة. القاعدة تملأ المجهول فقط ولا تستبدل تعديلاتك.';
+
+  @override
+  String get xtSave => 'حفظ هذا الحساب (كلمة المرور مشفّرة في Supabase Vault)';
+
+  @override
+  String get xtSaved => 'الحسابات المحفوظة';
+
+  @override
+  String get xtFetch => 'جلب ومراجعة';
+
+  @override
+  String get ioLoad => 'تحميل بيانات iptv-org';
+
+  @override
+  String get ioSearch => 'ابحث في قنوات iptv-org…';
+
+  @override
+  String get ioInCatalog => 'في الكتالوج';
+
+  @override
+  String get ioNotInCatalog => 'ليست في الكتالوج';
+
+  @override
+  String ioStreams(int n) {
+    return '$n رابط';
+  }
+
+  @override
+  String ioReview(int n) {
+    return 'مراجعة المحدد في الاستيراد ($n)';
+  }
+
+  @override
+  String get ioLicense =>
+      'بيانات iptv-org (ملكية عامة). وجود رابط هناك ليس دليلًا على حق إعادة توزيعه؛ والقنوات الجديدة تمرّ بالمراجعة دائمًا.';
 }

@@ -29,12 +29,12 @@ class ImportItem {
     this.headers = const {},
   }) : rawName = rawName ?? name;
 
-  ImportItem copyWith({String? name, String? country, String? group, String? language, String? quality}) => ImportItem(
+  ImportItem copyWith({String? name, String? country, String? group, String? language, String? quality, String? tvgId}) => ImportItem(
         line: line,
         name: name ?? this.name,
         rawName: rawName,
         url: url,
-        tvgId: tvgId,
+        tvgId: tvgId ?? this.tvgId,
         logo: logo,
         group: group ?? this.group,
         country: country ?? this.country,

@@ -211,6 +211,39 @@ void main() {
     expect(rows.map((r) => r['uid']), contains('Brand$stamp.eg'));
   }, skip: skip);
 
+  test('phase 5b (migration 0004): epg sources/upsert/finish, rules, xtream in vault', () async {
+    // مصادر الدليل المزروعة + كتابة برامج بالمفتاح نفسه دون تكرار
+    final sources = await repo.epgSources();
+    expect(sources.length, greaterThanOrEqualTo(4));
+    final now = DateTime.now().toUtc();
+    final uid = 'EpgTest$stamp.sa';
+    addTearDown(() => admin('DELETE', '/rest/v1/epg_programmes?channel_uid=eq.$uid'));
+    final rows = [
+      for (var h = 0; h < 3; h++)
+        {'channel_uid': uid, 'start_at': now.add(Duration(hours: h)).toIso8601String(), 'end_at': now.add(Duration(hours: h + 1)).toIso8601String(), 'title': 'P$h', 'source': 'test'},
+    ];
+    expect(await repo.epgUpsert([...rows, rows.first]), 3);
+    expect(await repo.uidsWithProgrammes(), contains(uid));
+    final day = await repo.epgDay(uid, DateTime(now.year, now.month, now.day));
+    expect(day.map((r) => r['title']), contains('P0'));
+    await repo.epgFinish(sources.first['id'] as String, status: 'ok', channels: 1, programmes: 3);
+    expect((await repo.epgSources()).firstWhere((s) => s['id'] == sources.first['id'])['last_status'], 'ok');
+
+    // قواعد التحويل: حفظ وقراءة وحذف
+    await repo.upsertRule({'kind': 'group_category', 'pattern': 'Sport$stamp', 'target': 'sports'});
+    final rule = (await repo.transformRules()).firstWhere((r) => r['pattern'] == 'Sport$stamp');
+    await repo.deleteRule(rule['id'] as String);
+    expect((await repo.transformRules()).where((r) => r['pattern'] == 'Sport$stamp'), isEmpty);
+
+    // Xtream: كلمة المرور في Vault فقط، وتُقرأ بجلسة التحقق بخطوتين
+    final id = await repo.saveXtream('T$stamp', 'http://xt.example:8080', 'u$stamp', 'p-$stamp');
+    final listed = (await repo.xtreamAccounts()).firstWhere((a) => a['id'] == id);
+    expect(listed.containsKey('secret_id'), isFalse, reason: 'the app never selects the secret id');
+    expect(await repo.xtreamPassword(id), 'p-$stamp');
+    await repo.deleteXtream(id);
+    expect((await repo.xtreamAccounts()).where((a) => a['id'] == id), isEmpty);
+  }, skip: skip);
+
   test('batch 4c: reversible merge, duplicates, logos, networks, home layout', () async {
     // مجموعة مكررة: نفس الاسم والدولة
     final ids = <String>[];
