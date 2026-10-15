@@ -158,6 +158,13 @@ class SchedulerService extends Notifier<SchedulerState> {
           await repo.finishRun(runId!, status: 'failed', error: '$e');
           rethrow;
         }
+      case 'telemetry_rollup':
+        // آخر 3 أيام دائمًا: يعوّض أيامًا فاتت والجهاز مطفأ (الخام يبقى 30 يومًا)
+        final runId = await repo.startRun(key, _device);
+        final r = await repo.telemetryRollup(DateTime.now().toUtc().subtract(const Duration(days: 3)));
+        await repo.finishRun(runId!, status: 'ok', summary: r);
+      case 'alerts':
+        await repo.alertsScan();
     }
     return 'ok';
   }

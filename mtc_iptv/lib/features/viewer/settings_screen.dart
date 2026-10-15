@@ -11,6 +11,7 @@ import '../../core/text/bidi.dart';
 import '../../data/catalog/catalog_repository.dart';
 import '../../data/epg/epg_repository.dart';
 import '../../data/settings/remote_config.dart';
+import '../../data/telemetry/telemetry.dart';
 import 'guide_screen.dart' show fmtTime;
 import 'home_screen.dart';
 
@@ -160,6 +161,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           subtitle: Text(t.telemetryHint, style: TextStyle(color: c.textMuted)),
           value: s.telemetry,
           onChanged: ctrl.setTelemetry,
+        ),
+        // §20.2: معرّف جديد يقطع الصلة بالسابق، ويُحذف السابق وأحداثه من الخادم
+        ListTile(
+          leading: const Icon(Icons.restart_alt_rounded),
+          title: Text(t.resetInstallId),
+          subtitle: Text(t.resetInstallIdHint, style: TextStyle(color: c.textMuted)),
+          trailing: OutlinedButton(
+            onPressed: () async {
+              await ref.read(telemetryProvider).resetId();
+              if (context.mounted) _toast(t.resetInstallIdDone);
+            },
+            child: Text(t.reset),
+          ),
         ),
       ]),
     ]);

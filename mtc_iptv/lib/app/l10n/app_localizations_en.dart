@@ -655,7 +655,7 @@ class L10nEn extends L10n {
 
   @override
   String get privacyText =>
-      'MTC-iPTv does not require an account and does not collect personal data. Favorites, history, reminders and settings stay on your device. If enabled, anonymous playback statistics (success or failure, start time, error type) are sent without links or identifiers to help improve the channels. Problem reports contain only what you write, plus technical details if you choose to attach them.';
+      'MTC-iPTv does not require an account and does not collect your name, email, IP address, precise location or any advertising ID. Favorites, history, reminders and settings stay on your device.\n\nIf statistics are enabled, the app sends for each playback attempt: the server used (not its link), success or failure and the error type, start time, watch time (rounded) and resolution — with a random device ID, platform, app version, app language and an approximate country. Raw events are kept for 30 days, then only daily totals without device IDs; the device record is deleted 90 days after it was last seen. You can turn statistics off or reset the device ID (which deletes the previous one) in Settings.\n\nProblem reports contain only what you write, plus technical details if you choose to attach them.';
 
   @override
   String get reportTitle => 'Report a problem';
@@ -1638,7 +1638,267 @@ class L10nEn extends L10n {
 
   @override
   String get needsMigration =>
-      'This needs migration 0004 on the server, which is not applied yet.';
+      'This needs a server migration that is not applied yet.';
+
+  @override
+  String get resetInstallId => 'Reset device ID';
+
+  @override
+  String get resetInstallIdHint =>
+      'Creates a new random ID and deletes the previous one and its statistics from the server.';
+
+  @override
+  String get resetInstallIdDone => 'A new device ID was created';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get kpiSuccess24h => 'Playback success (24h)';
+
+  @override
+  String kpiSampleLow(int n) {
+    return 'Sample too small ($n attempts)';
+  }
+
+  @override
+  String kpiAttempts(int n) {
+    return '$n attempts';
+  }
+
+  @override
+  String get kpiDevices7 => 'Active devices (7 days)';
+
+  @override
+  String get tkTelemetryRollup => 'Playback statistics rollup';
+
+  @override
+  String get tkAlerts => 'Alerts check';
+
+  @override
+  String get alEpgFailed => 'Guide update failed';
+
+  @override
+  String get alEpgStale => 'Guide not updated for 48 hours';
+
+  @override
+  String get alSourceFailed => 'Source failing';
+
+  @override
+  String get alImportFailed => 'Import failed';
+
+  @override
+  String get alSuccessDrop => 'Playback success dropped';
+
+  @override
+  String get alBackupFailed => 'Backup failed';
+
+  @override
+  String get alBackupStale => 'No backup for 48 hours';
+
+  @override
+  String get alRepeatedReports => 'Repeated reports';
+
+  @override
+  String get alConnectorStopped => 'Connector stopped automatically';
+
+  @override
+  String get alTaskFailed => 'Scheduled task failed';
+
+  @override
+  String alSuccessDetail(String rate, String prev, String attempts) {
+    return 'Yesterday $rate (previous week $prev) from $attempts attempts';
+  }
+
+  @override
+  String alReportsDetail(String name, String count) {
+    return '$name: $count open reports in 24 hours';
+  }
+
+  @override
+  String get alAlreadyOpen =>
+      'An open alert for the same condition already exists.';
+
+  @override
+  String get alOpen => 'Open';
+
+  @override
+  String get alNew => 'New';
+
+  @override
+  String get alSeen => 'Seen';
+
+  @override
+  String get alResolved => 'Resolved';
+
+  @override
+  String get alAll => 'All';
+
+  @override
+  String get alScanNow => 'Check now';
+
+  @override
+  String get alMarkAllSeen => 'Mark all seen';
+
+  @override
+  String get alHint =>
+      'The scheduler checks the conditions every hour. A problem stays one alert whose count grows, and is resolved only by you.';
+
+  @override
+  String get alNone => 'No alerts.';
+
+  @override
+  String alTimes(int n) {
+    return '$n times';
+  }
+
+  @override
+  String alFirst(String t) {
+    return 'First $t';
+  }
+
+  @override
+  String alLast(String t) {
+    return 'Last $t';
+  }
+
+  @override
+  String get alOpenItem => 'Open';
+
+  @override
+  String get alReopen => 'Reopen';
+
+  @override
+  String anDays(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n days',
+      one: 'Today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get anAttempts => 'Attempts';
+
+  @override
+  String get anSuccesses => 'Succeeded';
+
+  @override
+  String get anRate => 'Success rate';
+
+  @override
+  String get anViews => 'Views (≥ 30s)';
+
+  @override
+  String get anHours => 'Watch hours';
+
+  @override
+  String get anTtff50 => 'Start time (median)';
+
+  @override
+  String get anTtff90 => 'Start time (P90)';
+
+  @override
+  String get anExport => 'Export CSV (opens in Excel)';
+
+  @override
+  String get anNoData => 'No data yet.';
+
+  @override
+  String get anHint =>
+      'From real playback only (not checks). Rates show only with enough samples; start time across days is approximate.';
+
+  @override
+  String anDevices30(int n) {
+    return '$n in 30 days';
+  }
+
+  @override
+  String get anTopChannels => 'Most watched';
+
+  @override
+  String get anChannel => 'Channel';
+
+  @override
+  String get anWorstChannels => 'Lowest success';
+
+  @override
+  String anMinSample(int n) {
+    return 'Channels with at least $n attempts.';
+  }
+
+  @override
+  String get anByHost => 'By server (host)';
+
+  @override
+  String get anHost => 'Host';
+
+  @override
+  String get anByPlatform => 'By platform';
+
+  @override
+  String get anPlatform => 'Platform';
+
+  @override
+  String get anByCountry => 'By country';
+
+  @override
+  String get anCountry => 'Country';
+
+  @override
+  String get anByDay => 'By day';
+
+  @override
+  String get anDay => 'Day';
+
+  @override
+  String get anDevices => 'Devices and versions';
+
+  @override
+  String get anGroup => 'Group';
+
+  @override
+  String get anValue => 'Value';
+
+  @override
+  String get anCount => 'Count';
+
+  @override
+  String get anVersion => 'Version';
+
+  @override
+  String get anLanguage => 'Language';
+
+  @override
+  String anDevicesLine(int a7, int a30) {
+    return 'Active: $a7 in 7 days, $a30 in 30 days';
+  }
+
+  @override
+  String anReportsLine(int total, int open) {
+    return '$total reports in the period, $open still open';
+  }
+
+  @override
+  String get anReason => 'Reason';
+
+  @override
+  String get anActivity => 'Task activity (import, checks, guide, backups…)';
+
+  @override
+  String get anTask => 'Task';
+
+  @override
+  String get anOk => 'Succeeded';
+
+  @override
+  String get anFailed => 'Failed';
+
+  @override
+  String get anEmpty =>
+      'No playback statistics yet. They appear once users watch with the new version and the day is rolled up.';
 
   @override
   String get epgAddSource => 'Add source';

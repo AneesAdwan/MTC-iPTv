@@ -14,6 +14,7 @@ import '../core/settings/local_settings.dart';
 import '../core/storage/catalog_db.dart';
 import '../data/catalog/catalog_repository.dart';
 import '../data/settings/remote_config.dart';
+import '../data/telemetry/telemetry.dart';
 import 'hls_resolver.dart';
 import 'tls_bundle.dart';
 
@@ -105,6 +106,7 @@ class PlaybackController extends Notifier<PlaybackState> {
 
   static const maxRounds = 1; // جولات إعادة إضافية بعد فشل كل السيرفرات
   int _rounds = 0;
+  _Attempt? _att; // محاولة التشغيل الحالية (لقياس المشاهدين §12.4)
   final _subs = <StreamSubscription>[];
   Timer? _watchdog;
   int _token = 0; // يُبطل الأحداث القادمة من محاولة سابقة
@@ -179,6 +181,7 @@ class PlaybackController extends Notifier<PlaybackState> {
   }
 
   Future<void> stop() async {
+    _closeAttempt(null);
     _token++;
     _watchdog?.cancel();
     if (_subs.isNotEmpty) await _p.stop();
@@ -205,6 +208,8 @@ class PlaybackController extends Notifier<PlaybackState> {
     if (token != _token) return; // أُلغيت بمحاولة أحدث
     state = state.copyWith(source: src, phase: state.phase == PlayPhase.switching ? PlayPhase.switching : PlayPhase.loading);
     log.info('play ch=${state.channel?.number} server=${state.index + 1}/${state.streams.length} local=${src.viaLocalServer} variants=${src.variants.length}');
+    _closeAttempt(null);
+    _att = _Attempt(s.id, state.index);
     await _p.open(Media(src.playUrl, httpHeaders: headers));
     _arm(Duration(seconds: _rc.playerSeconds('first_frame_s', firstFrameTimeout.inSeconds)), token, 'no first frame');
   }
@@ -219,6 +224,11 @@ class PlaybackController extends Notifier<PlaybackState> {
   void _onFirstFrame() {
     if (state.phase == PlayPhase.playing) return;
     _watchdog?.cancel();
+    final a = _att;
+    if (a != null && a.frameAt == null) {
+      a.frameAt = DateTime.now();
+      a.height = _p.state.height;
+    }
     state = state.copyWith(phase: PlayPhase.playing, clearError: true);
   }
 
@@ -234,6 +244,7 @@ class PlaybackController extends Notifier<PlaybackState> {
   Future<void> _onFailure(String code, String? detail) async {
     if (state.channel == null || state.phase == PlayPhase.failed) return;
     log.warning('play failed ch=${state.channel?.number} server=${state.index + 1}: $code ${detail ?? ''}');
+    _closeAttempt(code);
     // آخر رابط فشل: جولة إعادة واحدة على كل السيرفرات (تجمّد مؤقت في البث المباشر شائع)،
     // ثم نتوقف ونعرض رسالة مفهومة بدل الدوران بلا نهاية
     if (state.index + 1 >= state.streams.length && _rounds < _rc.playerSeconds('retry_rounds', maxRounds)) {
@@ -252,4 +263,42 @@ class PlaybackController extends Notifier<PlaybackState> {
     state = state.copyWith(index: state.index + 1, phase: PlayPhase.switching, errorCode: code, clearPrefer: true);
     await _openCurrent();
   }
+
+  /// تُغلق المحاولة الحالية بحدث واحد: نجاح (مع زمن أول إطار ومدة المشاهدة)، أو فشل برمزه، أو تُركت قبل أول إطار.
+  void _closeAttempt(String? failCode) {
+    final a = _att;
+    if (a == null) return;
+    _att = null;
+    final now = DateTime.now();
+    final PlayEvent e;
+    if (a.frameAt != null) {
+      e = PlayEvent(
+        streamId: a.streamId,
+        outcome: 'success',
+        firstFrameMs: a.frameAt!.difference(a.opened).inMilliseconds,
+        watchSeconds: now.difference(a.frameAt!).inSeconds,
+        serverIndex: a.index,
+        height: a.height,
+        at: a.opened,
+      );
+    } else if (failCode != null) {
+      e = PlayEvent(streamId: a.streamId, outcome: 'failure', errorCode: failCode, serverIndex: a.index, at: a.opened);
+    } else {
+      e = PlayEvent(streamId: a.streamId, outcome: 'abandoned', serverIndex: a.index, at: a.opened);
+    }
+    try {
+      ref.read(telemetryProvider).record(e);
+    } catch (err) {
+      log.fine('telemetry record failed: $err');
+    }
+  }
+}
+
+class _Attempt {
+  final String streamId;
+  final int index;
+  final DateTime opened = DateTime.now();
+  DateTime? frameAt;
+  int? height;
+  _Attempt(this.streamId, this.index);
 }

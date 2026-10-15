@@ -14,6 +14,8 @@ import 'package:window_manager/window_manager.dart';
 import '../../core/logging/log.dart';
 import '../../data/admin/admin_device.dart';
 import '../../data/admin/scheduler.dart';
+import '../../data/telemetry/telemetry.dart';
+import '../../player/playback_controller.dart';
 import '../shell/sidebar.dart' show isAdminProvider;
 
 bool get isDesktop => Platform.isWindows || Platform.isMacOS || Platform.isLinux;
@@ -67,6 +69,11 @@ class _DesktopHostState extends ConsumerState<DesktopHost> with WindowListener, 
   }
 
   Future<void> _quit() async {
+    // آخر أحداث القياس (§12.4): تُغلق جلسة المشاهدة وتُرسل الدفعة، بمهلة قصيرة كي لا يتأخر الإغلاق
+    try {
+      await ref.read(playbackProvider.notifier).stop();
+      await ref.read(telemetryProvider).flush().timeout(const Duration(seconds: 3));
+    } catch (_) {}
     await trayManager.destroy();
     await windowManager.setPreventClose(false);
     await windowManager.destroy();

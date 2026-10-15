@@ -650,7 +650,7 @@ class L10nAr extends L10n {
 
   @override
   String get privacyText =>
-      'لا يحتاج MTC-iPTv إلى حساب ولا يجمع بيانات شخصية. المفضلة والسجل والتذكيرات والإعدادات تبقى على جهازك. عند تفعيلها، تُرسل إحصاءات تشغيل مجهولة (نجاح أو فشل، زمن البدء، نوع الخطأ) دون روابط أو معرّفات لتحسين القنوات. بلاغات المشاكل تحتوي ما تكتبه فقط، مع التفاصيل التقنية إن اخترت إرفاقها.';
+      'لا يحتاج MTC-iPTv إلى حساب، ولا يجمع اسمك أو بريدك أو عنوان IP أو موقعك الدقيق أو أي معرّف إعلاني. المفضلة والسجل والتذكيرات والإعدادات تبقى على جهازك.\n\nعند تفعيل الإحصاءات يُرسل التطبيق لكل محاولة تشغيل: السيرفر المستخدم (لا رابطه)، النجاح أو الفشل ونوع الخطأ، زمن البدء، مدة المشاهدة (مقرّبة) والدقة — مع معرّف عشوائي للجهاز والمنصّة والإصدار ولغة التطبيق والدولة التقريبية. تُحفظ الأحداث 30 يومًا ثم تبقى مجاميع يومية فقط بلا معرّفات أجهزة، ويُحذف سجل الجهاز بعد 90 يومًا من آخر ظهور. يمكنك إيقاف الإحصاءات أو إعادة تعيين معرّف الجهاز (فيُحذف السابق) من الإعدادات.\n\nبلاغات المشاكل تحتوي ما تكتبه فقط، مع التفاصيل التقنية إن اخترت إرفاقها.';
 
   @override
   String get reportTitle => 'الإبلاغ عن مشكلة';
@@ -1629,8 +1629,266 @@ class L10nAr extends L10n {
   }
 
   @override
-  String get needsMigration =>
-      'يحتاج هذا الترحيل 0004 على الخادم، ولم يُطبَّق بعد.';
+  String get needsMigration => 'يحتاج هذا ترحيلًا على الخادم لم يُطبَّق بعد.';
+
+  @override
+  String get resetInstallId => 'إعادة تعيين معرّف الجهاز';
+
+  @override
+  String get resetInstallIdHint =>
+      'يولّد معرّفًا عشوائيًا جديدًا ويحذف السابق وإحصاءاته من الخادم.';
+
+  @override
+  String get resetInstallIdDone => 'تم إنشاء معرّف جديد للجهاز';
+
+  @override
+  String get reset => 'إعادة تعيين';
+
+  @override
+  String get kpiSuccess24h => 'نجاح التشغيل (24 ساعة)';
+
+  @override
+  String kpiSampleLow(int n) {
+    return 'العيّنة غير كافية ($n محاولة)';
+  }
+
+  @override
+  String kpiAttempts(int n) {
+    return '$n محاولة';
+  }
+
+  @override
+  String get kpiDevices7 => 'الأجهزة النشطة (7 أيام)';
+
+  @override
+  String get tkTelemetryRollup => 'تجميع إحصاءات التشغيل';
+
+  @override
+  String get tkAlerts => 'فحص التنبيهات';
+
+  @override
+  String get alEpgFailed => 'فشل تحديث الدليل';
+
+  @override
+  String get alEpgStale => 'الدليل لم يتحدّث منذ 48 ساعة';
+
+  @override
+  String get alSourceFailed => 'تعطّل مصدر';
+
+  @override
+  String get alImportFailed => 'فشل الاستيراد';
+
+  @override
+  String get alSuccessDrop => 'انخفاض نسبة نجاح التشغيل';
+
+  @override
+  String get alBackupFailed => 'فشلت النسخة الاحتياطية';
+
+  @override
+  String get alBackupStale => 'لا نسخة احتياطية منذ 48 ساعة';
+
+  @override
+  String get alRepeatedReports => 'بلاغات متكررة';
+
+  @override
+  String get alConnectorStopped => 'توقف موصل تلقائيًا';
+
+  @override
+  String get alTaskFailed => 'فشلت مهمة مجدولة';
+
+  @override
+  String alSuccessDetail(String rate, String prev, String attempts) {
+    return 'نسبة الأمس $rate (الأسبوع السابق $prev) من $attempts محاولة';
+  }
+
+  @override
+  String alReportsDetail(String name, String count) {
+    return '$name: $count بلاغات مفتوحة خلال 24 ساعة';
+  }
+
+  @override
+  String get alAlreadyOpen => 'يوجد تنبيه مفتوح للحالة نفسها.';
+
+  @override
+  String get alOpen => 'المفتوحة';
+
+  @override
+  String get alNew => 'جديد';
+
+  @override
+  String get alSeen => 'تمّت رؤيته';
+
+  @override
+  String get alResolved => 'تمّ الحل';
+
+  @override
+  String get alAll => 'الكل';
+
+  @override
+  String get alScanNow => 'افحص الآن';
+
+  @override
+  String get alMarkAllSeen => 'تمّت رؤية الكل';
+
+  @override
+  String get alHint =>
+      'يفحص المُجدوِل الشروط كل ساعة. تبقى المشكلة تنبيهًا واحدًا يزداد عدد تكراره، ولا يُحل إلا بقرارك.';
+
+  @override
+  String get alNone => 'لا تنبيهات.';
+
+  @override
+  String alTimes(int n) {
+    return '$n مرات';
+  }
+
+  @override
+  String alFirst(String t) {
+    return 'أول مرة $t';
+  }
+
+  @override
+  String alLast(String t) {
+    return 'آخر مرة $t';
+  }
+
+  @override
+  String get alOpenItem => 'فتح';
+
+  @override
+  String get alReopen => 'إعادة فتح';
+
+  @override
+  String anDays(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n يومًا',
+      one: 'اليوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get anAttempts => 'المحاولات';
+
+  @override
+  String get anSuccesses => 'الناجحة';
+
+  @override
+  String get anRate => 'نسبة النجاح';
+
+  @override
+  String get anViews => 'المشاهدات (≥ 30 ث)';
+
+  @override
+  String get anHours => 'ساعات المشاهدة';
+
+  @override
+  String get anTtff50 => 'زمن البدء (الوسيط)';
+
+  @override
+  String get anTtff90 => 'زمن البدء (P90)';
+
+  @override
+  String get anExport => 'تصدير CSV (يفتحه Excel)';
+
+  @override
+  String get anNoData => 'لا بيانات بعد.';
+
+  @override
+  String get anHint =>
+      'من أحداث تشغيل حقيقية فقط (لا من الفحص). النسبة تُعرض بعيّنة كافية، وزمن البدء عبر عدة أيام تقريبي.';
+
+  @override
+  String anDevices30(int n) {
+    return '$n خلال 30 يومًا';
+  }
+
+  @override
+  String get anTopChannels => 'الأكثر مشاهدة';
+
+  @override
+  String get anChannel => 'القناة';
+
+  @override
+  String get anWorstChannels => 'الأقل نجاحًا';
+
+  @override
+  String anMinSample(int n) {
+    return 'القنوات التي لها $n محاولة على الأقل.';
+  }
+
+  @override
+  String get anByHost => 'حسب الخادم (النطاق)';
+
+  @override
+  String get anHost => 'النطاق';
+
+  @override
+  String get anByPlatform => 'حسب المنصّة';
+
+  @override
+  String get anPlatform => 'المنصّة';
+
+  @override
+  String get anByCountry => 'حسب الدولة';
+
+  @override
+  String get anCountry => 'الدولة';
+
+  @override
+  String get anByDay => 'حسب اليوم';
+
+  @override
+  String get anDay => 'اليوم';
+
+  @override
+  String get anDevices => 'الأجهزة والإصدارات';
+
+  @override
+  String get anGroup => 'المجموعة';
+
+  @override
+  String get anValue => 'القيمة';
+
+  @override
+  String get anCount => 'العدد';
+
+  @override
+  String get anVersion => 'الإصدار';
+
+  @override
+  String get anLanguage => 'اللغة';
+
+  @override
+  String anDevicesLine(int a7, int a30) {
+    return 'نشطة: $a7 خلال 7 أيام، $a30 خلال 30 يومًا';
+  }
+
+  @override
+  String anReportsLine(int total, int open) {
+    return '$total بلاغًا في الفترة، $open منها مفتوحة';
+  }
+
+  @override
+  String get anReason => 'السبب';
+
+  @override
+  String get anActivity => 'نشاط المهام (استيراد، فحص، دليل، نسخ…)';
+
+  @override
+  String get anTask => 'المهمة';
+
+  @override
+  String get anOk => 'نجحت';
+
+  @override
+  String get anFailed => 'فشلت';
+
+  @override
+  String get anEmpty =>
+      'لم تصل إحصاءات تشغيل بعد. تظهر بعد أن يشاهد المستخدمون بالإصدار الجديد ويُجمَّع اليوم.';
 
   @override
   String get epgAddSource => 'إضافة مصدر';

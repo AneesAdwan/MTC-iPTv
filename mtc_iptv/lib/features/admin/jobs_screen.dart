@@ -25,6 +25,8 @@ String taskLabel(L10n t, String k) => switch (k) {
       'epg' => t.tkEpg,
       'sources' => t.tkSources,
       'backup' => t.tkBackup,
+      'telemetry_rollup' => t.tkTelemetryRollup,
+      'alerts' => t.tkAlerts,
       _ => k,
     };
 

@@ -218,7 +218,12 @@ class Dashboard {
   final Map<String, int> channelsByState, streamsByHealth;
   final int openReports, epgChannels;
   final List<AuditEntry> recent;
-  const Dashboard(this.channelsByState, this.streamsByHealth, this.openReports, this.epgChannels, this.recent);
+
+  /// من قياس المشاهدين (0005): null = الترحيل غير مطبّق أو العيّنة غير كافية.
+  final int? attempts24h, activeDevices7, openAlerts;
+  final double? successRate24h;
+  const Dashboard(this.channelsByState, this.streamsByHealth, this.openReports, this.epgChannels, this.recent,
+      {this.attempts24h, this.successRate24h, this.activeDevices7, this.openAlerts});
   int get channels => channelsByState.values.fold(0, (a, b) => a + b);
   int get streams => streamsByHealth.values.fold(0, (a, b) => a + b);
 }
@@ -266,7 +271,23 @@ class AdminRepository {
     final uids = {for (final r in epgRows) r['channel_uid'] as String};
     final published = await _all((a, b) => db.from('channels').select('uid').eq('publish_state', 'published').order('id', ascending: true).range(a, b));
     final covered = published.where((r) => uids.contains(r['uid'])).length;
-    return Dashboard(ch, st, reports, covered, await recentAudit(limit: 10));
+    // §9.3: نسبة النجاح من أحداث آخر 24 ساعة (تُعرض فقط بعيّنة ≥ 100)، والأجهزة النشطة 7 أيام، والتنبيهات الجديدة
+    int? attempts, ok, devices, alerts;
+    try {
+      final since = now.subtract(const Duration(hours: 24)).toIso8601String();
+      attempts = await db.from('playback_events').count().gte('at', since).neq('outcome', 'abandoned');
+      ok = await db.from('playback_events').count().gte('at', since).eq('outcome', 'success');
+      // عمود صريح: المدير لا يملك قراءة push_token، و count() يطلب كل الأعمدة
+      devices = (await db.from('installations').select('id').gte('last_seen_at', now.subtract(const Duration(days: 7)).toIso8601String()).limit(1).count(CountOption.exact)).count;
+      alerts = await openAlerts();
+    } catch (_) {
+      // الترحيل 0005 غير مطبّق بعد
+    }
+    return Dashboard(ch, st, reports, covered, await recentAudit(limit: 10),
+        attempts24h: attempts,
+        successRate24h: attempts != null && attempts >= 100 && ok != null ? ok / attempts : null,
+        activeDevices7: devices,
+        openAlerts: alerts);
   }
 
   Future<List<AuditEntry>> recentAudit({int limit = 10, String? rowId}) async {
@@ -843,6 +864,88 @@ class AdminRepository {
       .from('task_runs')
       .update({'status': status, 'finished_at': DateTime.now().toUtc().toIso8601String(), 'summary': summary, 'error': error})
       .eq('id', id);
+
+  // ── القياس والتجميع (0005) ────────────────────────────────────────────────
+  static String _day(DateTime d) => d.toUtc().toIso8601String().substring(0, 10);
+
+  Future<Map<String, dynamic>> telemetryRollup(DateTime from) async =>
+      ((await db.rpc('admin_telemetry_rollup', params: {'p_from': _day(from)})) as Map).cast<String, dynamic>();
+
+  /// التجميعات اليومية منذ [from] (صف لكل يوم × رابط × منصّة × دولة).
+  Future<List<Map<String, dynamic>>> playbackStats(DateTime from) => _all((a, b) => db
+      .from('playback_stats_daily')
+      .select()
+      .gte('day', _day(from))
+      .order('day', ascending: true)
+      .order('stream_id', ascending: true)
+      .order('platform', ascending: true)
+      .order('country', ascending: true)
+      .range(a, b));
+
+  /// الأجهزة التي ظهرت منذ [since] (بلا رمز Push: لا يقرؤه المدير).
+  Future<List<Map<String, dynamic>>> installations(DateTime since) => _all((a, b) => db
+      .from('installations')
+      .select('id,platform,app_version,locale,country,first_seen_at,last_seen_at')
+      .gte('last_seen_at', since.toUtc().toIso8601String())
+      .order('id', ascending: true)
+      .range(a, b));
+
+  /// النطاق (host) لكل رابط — لتجميع النجاح حسب الخادم دون نقل الروابط.
+  Future<Map<String, String>> streamHosts(Iterable<String> ids) async {
+    final out = <String, String>{};
+    final list = ids.toList();
+    for (var i = 0; i < list.length; i += 200) {
+      final rows = await db.from('streams').select('id,host').inFilter('id', list.sublist(i, (i + 200).clamp(0, list.length)));
+      for (final r in rows) {
+        out['${r['id']}'] = '${r['host'] ?? ''}';
+      }
+    }
+    return out;
+  }
+
+  /// للتحليلات: الاسمان والرقم، على دفعات (قد تكون مئات القنوات).
+  Future<List<Map<String, dynamic>>> channelRows(Iterable<String> ids) async {
+    final list = ids.toList();
+    final out = <Map<String, dynamic>>[];
+    for (var i = 0; i < list.length; i += 200) {
+      out.addAll(await db.from('channels').select('id,number,name,name_ar,name_en').inFilter('id', list.sublist(i, (i + 200).clamp(0, list.length))));
+    }
+    return out;
+  }
+
+  Future<List<Map<String, dynamic>>> reportsSince(DateTime since) => _all((a, b) =>
+      db.from('reports').select('id,channel_id,reason,status,created_at').gte('created_at', since.toUtc().toIso8601String()).order('id', ascending: true).range(a, b));
+
+  Future<List<Map<String, dynamic>>> runsSince(DateTime since) => _all((a, b) =>
+      db.from('task_runs').select('id,task_key,status,started_at').gte('started_at', since.toUtc().toIso8601String()).order('id', ascending: true).range(a, b));
+
+  // ── التنبيهات (ADM-A3) ───────────────────────────────────────────────────
+  Future<int> alertsScan() async => ((await db.rpc('admin_alerts_scan')) as num).toInt();
+
+  Future<List<Map<String, dynamic>>> alerts({String? status, int limit = 300}) {
+    var q = db.from('admin_alerts').select();
+    if (status != null) q = q.eq('status', status);
+    return q.order('last_at', ascending: false).limit(limit);
+  }
+
+  Future<int> openAlerts() => db.from('admin_alerts').count().eq('status', 'new');
+
+  Future<void> setAlertStatus(List<int> ids, String status) => db
+      .from('admin_alerts')
+      .update({'status': status, 'resolved_at': status == 'resolved' ? DateTime.now().toUtc().toIso8601String() : null})
+      .inFilter('id', ids);
+
+  /// يرفعه البرنامج نفسه (مثل توقف موصل iptv-org تلقائيًا).
+  Future<void> raiseAlert(String kind, String key, String title, {String severity = 'warning', Map<String, dynamic> detail = const {}, String? refType, String? refId}) =>
+      db.rpc('admin_alert_raise', params: {
+        'p_kind': kind,
+        'p_severity': severity,
+        'p_key': key,
+        'p_title': title,
+        'p_detail': detail,
+        'p_ref_type': refType,
+        'p_ref_id': refId,
+      });
 }
 
 final adminRepoProvider = Provider<AdminRepository?>((ref) {

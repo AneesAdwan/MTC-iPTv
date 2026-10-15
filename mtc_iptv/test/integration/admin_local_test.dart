@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mtc_core/mtc_core.dart';
 import 'package:mtc_iptv/data/admin/admin_repository.dart';
+import 'package:mtc_iptv/data/admin/analytics.dart';
 import 'package:mtc_iptv/data/admin/backup_service.dart';
 import 'package:mtc_iptv/data/admin/import_service.dart';
 import 'package:mtc_iptv/data/admin/settings_repository.dart';
@@ -387,6 +388,61 @@ void main() {
       }
       if (before['features'] == null) await c.from('site_settings').delete().eq('key', 'features');
       if (before['social'] == null) await c.from('site_settings').delete().eq('key', 'social');
+    }
+  }, skip: skip);
+
+  test('phase 6c: viewer telemetry -> rollup -> analytics, alerts, and forget', () async {
+    final id = await repo.createChannel(nameAr: 'قياس $stamp', nameEn: 'Telemetry $stamp', number: 70000 + stamp % 9000);
+    await repo.addStream(id, url: 'https://example.com/$stamp/t.m3u8', label: 'T');
+    final sid = (await repo.streamsOf(id)).single.id;
+    final inst = '00000000-0000-4000-8000-${(stamp % 1000000000000).toString().padLeft(12, '0')}';
+    final anon = SupabaseClient(url, anonKey);
+    try {
+      final n = await anon.rpc('telemetry_ingest', params: {
+        'p_installation': inst,
+        'p_platform': 'windows',
+        'p_version': '3.0.0-alpha.17',
+        'p_locale': 'ar',
+        'p_events': [
+          {'stream_id': sid, 'outcome': 'success', 'first_frame_ms': 800, 'watch_seconds': 95},
+          {'stream_id': sid, 'outcome': 'failure', 'error_code': 'network_error'},
+          {'stream_id': sid, 'outcome': 'abandoned'},
+        ],
+      });
+      expect(n, 3);
+      // الزائر لا يقرأ ما كتبه
+      await expectLater(anon.from('playback_events').select(), throwsA(anything));
+
+      final r = await repo.telemetryRollup(DateTime.now().toUtc());
+      expect(r['rows'], greaterThanOrEqualTo(1));
+      final rows = (await repo.playbackStats(DateTime.now().toUtc())).where((x) => x['stream_id'] == sid).toList();
+      final a = PlaybackAnalytics.from(rows);
+      expect(a.total.attempts, 2);
+      expect(a.total.successes, 1);
+      expect(a.total.abandoned, 1);
+      expect(a.total.sessions30, 1);
+      expect(a.total.failures['network_error'], 1);
+      expect((await repo.installations(DateTime.now().subtract(const Duration(days: 1)))).any((x) => x['id'] == inst), isTrue);
+      expect((await repo.dashboard()).activeDevices7, greaterThanOrEqualTo(1));
+
+      // التنبيهات: الفحص يعمل، وتغيير الحالة
+      await repo.alertsScan();
+      await repo.raiseAlert('connector_stopped', 'test:$stamp', 'iptv-org', refType: 'connector');
+      await repo.raiseAlert('connector_stopped', 'test:$stamp', 'iptv-org', refType: 'connector');
+      final al = (await repo.alerts()).firstWhere((x) => x['dedupe_key'] == 'test:$stamp');
+      expect(al['occurrences'], 2);
+      await repo.setAlertStatus([(al['id'] as num).toInt()], 'resolved');
+      expect((await repo.alerts(status: 'resolved')).any((x) => x['id'] == al['id']), isTrue);
+
+      // «أعد تعيين المعرّف»: الجهاز وأحداثه تُحذف، والتجميعات تبقى
+      await anon.rpc('telemetry_forget', params: {'p_installation': inst});
+      expect((await repo.installations(DateTime.now().subtract(const Duration(days: 1)))).any((x) => x['id'] == inst), isFalse);
+      expect((await c.from('playback_events').select('id').eq('installation_id', inst)), isEmpty);
+      expect((await repo.playbackStats(DateTime.now().toUtc())).where((x) => x['stream_id'] == sid), isNotEmpty);
+    } finally {
+      await admin('DELETE', '/rest/v1/admin_alerts?dedupe_key=eq.test:$stamp');
+      await admin('DELETE', '/rest/v1/playback_stats_daily?stream_id=eq.$sid');
+      await repo.deleteChannels([id]);
     }
   }, skip: skip);
 }

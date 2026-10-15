@@ -1,5 +1,5 @@
 // ADM-A1 لوحة المعلومات (§9.3): مؤشرات حقيقية فقط من قاعدة البيانات، كل بطاقة تأخذك للقائمة المفلترة.
-// (نسبة نجاح التشغيل والأجهزة النشطة تحتاج قياس المشاهدين — المرحلة 6.)
+// نسبة نجاح التشغيل والأجهزة النشطة والتنبيهات من قياس المشاهدين (0005)، وتختفي إن لم يُطبَّق الترحيل.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -58,6 +58,25 @@ class DashboardScreen extends ConsumerWidget {
           StatCard(label: t.kpiUncertain, value: '$uncertain', icon: Icons.help_rounded, color: healthColor('inconclusive'), onTap: () => context.go('/admin/health?state=inconclusive')),
           StatCard(label: t.kpiOpenReports, value: '${d.openReports}', icon: Icons.flag_rounded, color: d.openReports > 0 ? healthColor('degraded') : null, onTap: () => context.go('/admin/reports')),
           StatCard(label: t.kpiEpgCoverage, value: '$pct%', icon: Icons.view_timeline_rounded, hint: t.kpiEpgHint(d.epgChannels, published)),
+          if (d.attempts24h != null)
+            StatCard(
+              label: t.kpiSuccess24h,
+              value: d.successRate24h == null ? '—' : '${(d.successRate24h! * 100).round()}%',
+              icon: Icons.play_circle_rounded,
+              color: d.successRate24h == null ? null : healthColor(d.successRate24h! >= 0.8 ? 'playable' : d.successRate24h! >= 0.6 ? 'degraded' : 'unavailable'),
+              hint: d.successRate24h == null ? t.kpiSampleLow(d.attempts24h!) : t.kpiAttempts(d.attempts24h!),
+              onTap: () => context.go('/admin/analytics'),
+            ),
+          if (d.activeDevices7 != null)
+            StatCard(label: t.kpiDevices7, value: '${d.activeDevices7}', icon: Icons.devices_rounded, onTap: () => context.go('/admin/analytics')),
+          if (d.openAlerts != null)
+            StatCard(
+              label: t.sA3,
+              value: '${d.openAlerts}',
+              icon: Icons.notification_important_rounded,
+              color: d.openAlerts! > 0 ? healthColor('unavailable') : null,
+              onTap: () => context.go('/admin/alerts'),
+            ),
         ]),
         const SizedBox(height: Space.lg),
         SectionCard(

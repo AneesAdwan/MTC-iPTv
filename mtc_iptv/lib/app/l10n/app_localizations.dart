@@ -1324,7 +1324,7 @@ abstract class L10n {
   /// No description provided for @privacyText.
   ///
   /// In ar, this message translates to:
-  /// **'لا يحتاج MTC-iPTv إلى حساب ولا يجمع بيانات شخصية. المفضلة والسجل والتذكيرات والإعدادات تبقى على جهازك. عند تفعيلها، تُرسل إحصاءات تشغيل مجهولة (نجاح أو فشل، زمن البدء، نوع الخطأ) دون روابط أو معرّفات لتحسين القنوات. بلاغات المشاكل تحتوي ما تكتبه فقط، مع التفاصيل التقنية إن اخترت إرفاقها.'**
+  /// **'لا يحتاج MTC-iPTv إلى حساب، ولا يجمع اسمك أو بريدك أو عنوان IP أو موقعك الدقيق أو أي معرّف إعلاني. المفضلة والسجل والتذكيرات والإعدادات تبقى على جهازك.\n\nعند تفعيل الإحصاءات يُرسل التطبيق لكل محاولة تشغيل: السيرفر المستخدم (لا رابطه)، النجاح أو الفشل ونوع الخطأ، زمن البدء، مدة المشاهدة (مقرّبة) والدقة — مع معرّف عشوائي للجهاز والمنصّة والإصدار ولغة التطبيق والدولة التقريبية. تُحفظ الأحداث 30 يومًا ثم تبقى مجاميع يومية فقط بلا معرّفات أجهزة، ويُحذف سجل الجهاز بعد 90 يومًا من آخر ظهور. يمكنك إيقاف الإحصاءات أو إعادة تعيين معرّف الجهاز (فيُحذف السابق) من الإعدادات.\n\nبلاغات المشاكل تحتوي ما تكتبه فقط، مع التفاصيل التقنية إن اخترت إرفاقها.'**
   String get privacyText;
 
   /// No description provided for @reportTitle.
@@ -3088,8 +3088,458 @@ abstract class L10n {
   /// No description provided for @needsMigration.
   ///
   /// In ar, this message translates to:
-  /// **'يحتاج هذا الترحيل 0004 على الخادم، ولم يُطبَّق بعد.'**
+  /// **'يحتاج هذا ترحيلًا على الخادم لم يُطبَّق بعد.'**
   String get needsMigration;
+
+  /// No description provided for @resetInstallId.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة تعيين معرّف الجهاز'**
+  String get resetInstallId;
+
+  /// No description provided for @resetInstallIdHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يولّد معرّفًا عشوائيًا جديدًا ويحذف السابق وإحصاءاته من الخادم.'**
+  String get resetInstallIdHint;
+
+  /// No description provided for @resetInstallIdDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إنشاء معرّف جديد للجهاز'**
+  String get resetInstallIdDone;
+
+  /// No description provided for @reset.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة تعيين'**
+  String get reset;
+
+  /// No description provided for @kpiSuccess24h.
+  ///
+  /// In ar, this message translates to:
+  /// **'نجاح التشغيل (24 ساعة)'**
+  String get kpiSuccess24h;
+
+  /// No description provided for @kpiSampleLow.
+  ///
+  /// In ar, this message translates to:
+  /// **'العيّنة غير كافية ({n} محاولة)'**
+  String kpiSampleLow(int n);
+
+  /// No description provided for @kpiAttempts.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} محاولة'**
+  String kpiAttempts(int n);
+
+  /// No description provided for @kpiDevices7.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأجهزة النشطة (7 أيام)'**
+  String get kpiDevices7;
+
+  /// No description provided for @tkTelemetryRollup.
+  ///
+  /// In ar, this message translates to:
+  /// **'تجميع إحصاءات التشغيل'**
+  String get tkTelemetryRollup;
+
+  /// No description provided for @tkAlerts.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص التنبيهات'**
+  String get tkAlerts;
+
+  /// No description provided for @alEpgFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل تحديث الدليل'**
+  String get alEpgFailed;
+
+  /// No description provided for @alEpgStale.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدليل لم يتحدّث منذ 48 ساعة'**
+  String get alEpgStale;
+
+  /// No description provided for @alSourceFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعطّل مصدر'**
+  String get alSourceFailed;
+
+  /// No description provided for @alImportFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشل الاستيراد'**
+  String get alImportFailed;
+
+  /// No description provided for @alSuccessDrop.
+  ///
+  /// In ar, this message translates to:
+  /// **'انخفاض نسبة نجاح التشغيل'**
+  String get alSuccessDrop;
+
+  /// No description provided for @alBackupFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشلت النسخة الاحتياطية'**
+  String get alBackupFailed;
+
+  /// No description provided for @alBackupStale.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا نسخة احتياطية منذ 48 ساعة'**
+  String get alBackupStale;
+
+  /// No description provided for @alRepeatedReports.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلاغات متكررة'**
+  String get alRepeatedReports;
+
+  /// No description provided for @alConnectorStopped.
+  ///
+  /// In ar, this message translates to:
+  /// **'توقف موصل تلقائيًا'**
+  String get alConnectorStopped;
+
+  /// No description provided for @alTaskFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشلت مهمة مجدولة'**
+  String get alTaskFailed;
+
+  /// No description provided for @alSuccessDetail.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسبة الأمس {rate} (الأسبوع السابق {prev}) من {attempts} محاولة'**
+  String alSuccessDetail(String rate, String prev, String attempts);
+
+  /// No description provided for @alReportsDetail.
+  ///
+  /// In ar, this message translates to:
+  /// **'{name}: {count} بلاغات مفتوحة خلال 24 ساعة'**
+  String alReportsDetail(String name, String count);
+
+  /// No description provided for @alAlreadyOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'يوجد تنبيه مفتوح للحالة نفسها.'**
+  String get alAlreadyOpen;
+
+  /// No description provided for @alOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'المفتوحة'**
+  String get alOpen;
+
+  /// No description provided for @alNew.
+  ///
+  /// In ar, this message translates to:
+  /// **'جديد'**
+  String get alNew;
+
+  /// No description provided for @alSeen.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمّت رؤيته'**
+  String get alSeen;
+
+  /// No description provided for @alResolved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمّ الحل'**
+  String get alResolved;
+
+  /// No description provided for @alAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكل'**
+  String get alAll;
+
+  /// No description provided for @alScanNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'افحص الآن'**
+  String get alScanNow;
+
+  /// No description provided for @alMarkAllSeen.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمّت رؤية الكل'**
+  String get alMarkAllSeen;
+
+  /// No description provided for @alHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يفحص المُجدوِل الشروط كل ساعة. تبقى المشكلة تنبيهًا واحدًا يزداد عدد تكراره، ولا يُحل إلا بقرارك.'**
+  String get alHint;
+
+  /// No description provided for @alNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تنبيهات.'**
+  String get alNone;
+
+  /// No description provided for @alTimes.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} مرات'**
+  String alTimes(int n);
+
+  /// No description provided for @alFirst.
+  ///
+  /// In ar, this message translates to:
+  /// **'أول مرة {t}'**
+  String alFirst(String t);
+
+  /// No description provided for @alLast.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر مرة {t}'**
+  String alLast(String t);
+
+  /// No description provided for @alOpenItem.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح'**
+  String get alOpenItem;
+
+  /// No description provided for @alReopen.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة فتح'**
+  String get alReopen;
+
+  /// No description provided for @anDays.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n, plural, =1{اليوم} other{{n} يومًا}}'**
+  String anDays(int n);
+
+  /// No description provided for @anAttempts.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحاولات'**
+  String get anAttempts;
+
+  /// No description provided for @anSuccesses.
+  ///
+  /// In ar, this message translates to:
+  /// **'الناجحة'**
+  String get anSuccesses;
+
+  /// No description provided for @anRate.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسبة النجاح'**
+  String get anRate;
+
+  /// No description provided for @anViews.
+  ///
+  /// In ar, this message translates to:
+  /// **'المشاهدات (≥ 30 ث)'**
+  String get anViews;
+
+  /// No description provided for @anHours.
+  ///
+  /// In ar, this message translates to:
+  /// **'ساعات المشاهدة'**
+  String get anHours;
+
+  /// No description provided for @anTtff50.
+  ///
+  /// In ar, this message translates to:
+  /// **'زمن البدء (الوسيط)'**
+  String get anTtff50;
+
+  /// No description provided for @anTtff90.
+  ///
+  /// In ar, this message translates to:
+  /// **'زمن البدء (P90)'**
+  String get anTtff90;
+
+  /// No description provided for @anExport.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصدير CSV (يفتحه Excel)'**
+  String get anExport;
+
+  /// No description provided for @anNoData.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا بيانات بعد.'**
+  String get anNoData;
+
+  /// No description provided for @anHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'من أحداث تشغيل حقيقية فقط (لا من الفحص). النسبة تُعرض بعيّنة كافية، وزمن البدء عبر عدة أيام تقريبي.'**
+  String get anHint;
+
+  /// No description provided for @anDevices30.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} خلال 30 يومًا'**
+  String anDevices30(int n);
+
+  /// No description provided for @anTopChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأكثر مشاهدة'**
+  String get anTopChannels;
+
+  /// No description provided for @anChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'القناة'**
+  String get anChannel;
+
+  /// No description provided for @anWorstChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأقل نجاحًا'**
+  String get anWorstChannels;
+
+  /// No description provided for @anMinSample.
+  ///
+  /// In ar, this message translates to:
+  /// **'القنوات التي لها {n} محاولة على الأقل.'**
+  String anMinSample(int n);
+
+  /// No description provided for @anByHost.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسب الخادم (النطاق)'**
+  String get anByHost;
+
+  /// No description provided for @anHost.
+  ///
+  /// In ar, this message translates to:
+  /// **'النطاق'**
+  String get anHost;
+
+  /// No description provided for @anByPlatform.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسب المنصّة'**
+  String get anByPlatform;
+
+  /// No description provided for @anPlatform.
+  ///
+  /// In ar, this message translates to:
+  /// **'المنصّة'**
+  String get anPlatform;
+
+  /// No description provided for @anByCountry.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسب الدولة'**
+  String get anByCountry;
+
+  /// No description provided for @anCountry.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدولة'**
+  String get anCountry;
+
+  /// No description provided for @anByDay.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسب اليوم'**
+  String get anByDay;
+
+  /// No description provided for @anDay.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليوم'**
+  String get anDay;
+
+  /// No description provided for @anDevices.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأجهزة والإصدارات'**
+  String get anDevices;
+
+  /// No description provided for @anGroup.
+  ///
+  /// In ar, this message translates to:
+  /// **'المجموعة'**
+  String get anGroup;
+
+  /// No description provided for @anValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'القيمة'**
+  String get anValue;
+
+  /// No description provided for @anCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'العدد'**
+  String get anCount;
+
+  /// No description provided for @anVersion.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإصدار'**
+  String get anVersion;
+
+  /// No description provided for @anLanguage.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللغة'**
+  String get anLanguage;
+
+  /// No description provided for @anDevicesLine.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشطة: {a7} خلال 7 أيام، {a30} خلال 30 يومًا'**
+  String anDevicesLine(int a7, int a30);
+
+  /// No description provided for @anReportsLine.
+  ///
+  /// In ar, this message translates to:
+  /// **'{total} بلاغًا في الفترة، {open} منها مفتوحة'**
+  String anReportsLine(int total, int open);
+
+  /// No description provided for @anReason.
+  ///
+  /// In ar, this message translates to:
+  /// **'السبب'**
+  String get anReason;
+
+  /// No description provided for @anActivity.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشاط المهام (استيراد، فحص، دليل، نسخ…)'**
+  String get anActivity;
+
+  /// No description provided for @anTask.
+  ///
+  /// In ar, this message translates to:
+  /// **'المهمة'**
+  String get anTask;
+
+  /// No description provided for @anOk.
+  ///
+  /// In ar, this message translates to:
+  /// **'نجحت'**
+  String get anOk;
+
+  /// No description provided for @anFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فشلت'**
+  String get anFailed;
+
+  /// No description provided for @anEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تصل إحصاءات تشغيل بعد. تظهر بعد أن يشاهد المستخدمون بالإصدار الجديد ويُجمَّع اليوم.'**
+  String get anEmpty;
 
   /// No description provided for @epgAddSource.
   ///

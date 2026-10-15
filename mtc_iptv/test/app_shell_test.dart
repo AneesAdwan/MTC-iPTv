@@ -11,6 +11,7 @@ import 'package:mtc_iptv/app/shell/sidebar.dart';
 import 'package:mtc_iptv/core/backend/backend.dart';
 import 'package:mtc_iptv/core/settings/local_settings.dart';
 import 'package:mtc_iptv/core/storage/catalog_db.dart';
+import 'package:mtc_iptv/features/admin/analytics_screen.dart';
 
 /// [admin]: يعرض قسم الإدارة (جلسة مدير كاملة) دون خادم.
 Widget app(LocalSettings s, {bool admin = true}) => ProviderScope(
@@ -116,7 +117,7 @@ void main() {
   });
 
   group('navigation', () {
-    appTest('tapping a sidebar item opens its placeholder with the screen id', (tester) async {
+    appTest('tapping a sidebar item opens its screen', (tester) async {
       await pumpApp(tester, const LocalSettings());
       // القائمة كسولة: نمرّرها حتى يظهر العنصر
       await tester.scrollUntilVisible(find.text('التحليلات'), 200, scrollable: find.byType(Scrollable).first);
@@ -124,7 +125,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('التحليلات'));
       await tester.pumpAndSettle();
-      expect(find.text('ADM-I1'), findsOneWidget);
+      expect(find.byType(AnalyticsScreen), findsOneWidget);
     });
   });
 

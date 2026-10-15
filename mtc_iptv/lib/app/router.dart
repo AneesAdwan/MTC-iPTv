@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:flutter/material.dart';
 
+import '../features/admin/alerts_screen.dart';
+import '../features/admin/analytics_screen.dart';
 import '../features/admin/channels/channel_detail_screen.dart';
 import '../features/admin/channels/channels_admin_screen.dart';
 import '../features/admin/dashboard_screen.dart';
@@ -139,6 +141,8 @@ Widget _screenFor(ScreenDef s, GoRouterState state) {
     'ADM-G6' => const ReleasesScreen(),
     'ADM-F1' => const NotificationsAdminScreen(),
     'ADM-F2' => const AnnouncementsScreen(),
+    'ADM-A3' => const AlertsScreen(),
+    'ADM-I1' => const AnalyticsScreen(),
     _ => PlaceholderScreen(def: s),
   };
 }
