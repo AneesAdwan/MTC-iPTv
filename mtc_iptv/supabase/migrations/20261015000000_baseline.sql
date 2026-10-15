@@ -1359,4 +1359,14 @@ grant execute on function public.epg_now(text[]), public.epg_day(text, date) to 
 grant execute on function public.epg_cleanup() to service_role, authenticated;
 
 
+-- ─── Production drift (found by diffing `supabase db dump --linked` on 2026-10-15) ───
+-- Production differs from supabase/01_schema.sql in these points; the baseline mirrors production.
+-- (Its CHECK constraints are NOT VALID there — same rules, added later by 03_update.sql.)
+create policy "Admins see own membership" on public.admin_users for select to authenticated
+  using (user_id = (select auth.uid()));
+revoke all on function public.epg_cleanup() from public, anon;
+revoke all on function public.epg_day(text, date) from public;
+revoke all on function public.epg_now(text[]) from public;
+grant execute on function public.epg_day(text, date), public.epg_now(text[]) to anon, authenticated;
+grant execute on function public.epg_cleanup() to authenticated;
 notify pgrst, 'reload schema';
