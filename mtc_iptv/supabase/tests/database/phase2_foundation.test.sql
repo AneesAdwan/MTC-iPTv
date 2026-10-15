@@ -9,7 +9,7 @@ select plan(34);
 -- ── fixtures ────────────────────────────────────────────────────────────────
 -- sync assertions start from the revision just before the fixtures, so they hold on an
 -- empty database AND on a full one (the rehearsal DB has 5,241 channels = several pages)
-select set_config('test.since', (select coalesce(max(last_value), 0)::text from public.catalog_rev_seq), false);
+select set_config('test.since', (select (case when is_called then last_value else last_value - 1 end)::text from public.catalog_rev_seq) /* fresh sequence: last_value=1 but not yet handed out */, false);
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a1', 'admin@test.local', 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-0000000000b2', 'viewer@test.local', 'authenticated', 'authenticated');

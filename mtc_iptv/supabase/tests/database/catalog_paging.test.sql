@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 select plan(4);
 
-select set_config('test.since', (select coalesce(max(last_value), 0)::text from public.catalog_rev_seq), false);
+select set_config('test.since', (select (case when is_called then last_value else last_value - 1 end)::text from public.catalog_rev_seq) /* fresh sequence: last_value=1 but not yet handed out */, false);
 
 -- 25 published channels whose streams are inserted AFTER all channels (streams get higher revisions —
 -- exactly the shape that triggered the bug), plus 3 hidden channels.
