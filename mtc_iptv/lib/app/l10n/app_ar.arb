@@ -138,5 +138,81 @@
         "type": "String"
       }
     }
+  },
+  "featured": "مميزة",
+  "recentlyAdded": "مضافة حديثًا",
+  "continueWatching": "تابع المشاهدة",
+  "allChannels": "كل القنوات",
+  "seeAll": "عرض الكل",
+  "catalogEmpty": "لا توجد قنوات على الجهاز بعد.",
+  "catalogEmptyHint": "تُجلب القنوات تلقائيًا عند الاتصال بالإنترنت.",
+  "syncing": "جارٍ مزامنة القنوات…",
+  "filterAll": "الكل",
+  "country": "الدولة",
+  "category": "الفئة",
+  "channelsCount": "{n} قناة",
+  "searchChannelsHint": "ابحث باسم القناة أو رقمها…",
+  "noMatches": "لا توجد قنوات مطابقة.",
+  "favoritesEmpty": "لا توجد قنوات مفضلة بعد.",
+  "favoritesEmptyHint": "اضغط ♥ في صفحة أي قناة لإضافتها هنا.",
+  "addFavorite": "أضف للمفضلة",
+  "removeFavorite": "أزل من المفضلة",
+  "serverOf": "السيرفر {i} من {n}",
+  "switchingServer": "جارٍ التبديل إلى سيرفر آخر…",
+  "loadingStream": "جارٍ التحميل…",
+  "quality": "الجودة",
+  "auto": "تلقائي",
+  "audioTrack": "الصوت",
+  "subtitles": "الترجمة",
+  "off": "إيقاف",
+  "nextChannel": "القناة التالية",
+  "prevChannel": "القناة السابقة",
+  "fullscreen": "ملء الشاشة",
+  "exitFullscreen": "إنهاء ملء الشاشة",
+  "retry": "أعد المحاولة",
+  "tryNextServer": "جرّب سيرفرًا آخر",
+  "mute": "كتم",
+  "unmute": "إلغاء الكتم",
+  "play": "تشغيل",
+  "pause": "إيقاف مؤقت",
+  "errAuthFailed": "السيرفر رفض الوصول (قد تكون القناة محمية أو تحتاج اشتراكًا).",
+  "errUnavailable": "القناة غير متاحة حاليًا على هذا السيرفر.",
+  "errUnsupported": "صيغة هذا البث غير مدعومة.",
+  "errNetwork": "السيرفر لا يستجيب. تحقّق من اتصالك أو جرّب لاحقًا.",
+  "errGeneric": "تعذّر تشغيل القناة.",
+  "allServersFailed": "جُرّبت كل السيرفرات ({n}) دون نجاح.",
+  "noServers": "لا توجد روابط لهذه القناة.",
+  "back": "رجوع",
+  "channelNumber": "القناة {n}",
+  "@channelsCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@serverOf": {
+    "placeholders": {
+      "i": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@allServersFailed": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@channelNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
   }
 }

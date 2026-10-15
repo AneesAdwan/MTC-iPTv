@@ -341,4 +341,149 @@ class L10nAr extends L10n {
 
   @override
   String get copied => 'نُسخ';
+
+  @override
+  String get featured => 'مميزة';
+
+  @override
+  String get recentlyAdded => 'مضافة حديثًا';
+
+  @override
+  String get continueWatching => 'تابع المشاهدة';
+
+  @override
+  String get allChannels => 'كل القنوات';
+
+  @override
+  String get seeAll => 'عرض الكل';
+
+  @override
+  String get catalogEmpty => 'لا توجد قنوات على الجهاز بعد.';
+
+  @override
+  String get catalogEmptyHint =>
+      'تُجلب القنوات تلقائيًا عند الاتصال بالإنترنت.';
+
+  @override
+  String get syncing => 'جارٍ مزامنة القنوات…';
+
+  @override
+  String get filterAll => 'الكل';
+
+  @override
+  String get country => 'الدولة';
+
+  @override
+  String get category => 'الفئة';
+
+  @override
+  String channelsCount(int n) {
+    return '$n قناة';
+  }
+
+  @override
+  String get searchChannelsHint => 'ابحث باسم القناة أو رقمها…';
+
+  @override
+  String get noMatches => 'لا توجد قنوات مطابقة.';
+
+  @override
+  String get favoritesEmpty => 'لا توجد قنوات مفضلة بعد.';
+
+  @override
+  String get favoritesEmptyHint => 'اضغط ♥ في صفحة أي قناة لإضافتها هنا.';
+
+  @override
+  String get addFavorite => 'أضف للمفضلة';
+
+  @override
+  String get removeFavorite => 'أزل من المفضلة';
+
+  @override
+  String serverOf(int i, int n) {
+    return 'السيرفر $i من $n';
+  }
+
+  @override
+  String get switchingServer => 'جارٍ التبديل إلى سيرفر آخر…';
+
+  @override
+  String get loadingStream => 'جارٍ التحميل…';
+
+  @override
+  String get quality => 'الجودة';
+
+  @override
+  String get auto => 'تلقائي';
+
+  @override
+  String get audioTrack => 'الصوت';
+
+  @override
+  String get subtitles => 'الترجمة';
+
+  @override
+  String get off => 'إيقاف';
+
+  @override
+  String get nextChannel => 'القناة التالية';
+
+  @override
+  String get prevChannel => 'القناة السابقة';
+
+  @override
+  String get fullscreen => 'ملء الشاشة';
+
+  @override
+  String get exitFullscreen => 'إنهاء ملء الشاشة';
+
+  @override
+  String get retry => 'أعد المحاولة';
+
+  @override
+  String get tryNextServer => 'جرّب سيرفرًا آخر';
+
+  @override
+  String get mute => 'كتم';
+
+  @override
+  String get unmute => 'إلغاء الكتم';
+
+  @override
+  String get play => 'تشغيل';
+
+  @override
+  String get pause => 'إيقاف مؤقت';
+
+  @override
+  String get errAuthFailed =>
+      'السيرفر رفض الوصول (قد تكون القناة محمية أو تحتاج اشتراكًا).';
+
+  @override
+  String get errUnavailable => 'القناة غير متاحة حاليًا على هذا السيرفر.';
+
+  @override
+  String get errUnsupported => 'صيغة هذا البث غير مدعومة.';
+
+  @override
+  String get errNetwork => 'السيرفر لا يستجيب. تحقّق من اتصالك أو جرّب لاحقًا.';
+
+  @override
+  String get errGeneric => 'تعذّر تشغيل القناة.';
+
+  @override
+  String allServersFailed(int n) {
+    return 'جُرّبت كل السيرفرات ($n) دون نجاح.';
+  }
+
+  @override
+  String get noServers => 'لا توجد روابط لهذه القناة.';
+
+  @override
+  String get back => 'رجوع';
+
+  @override
+  String channelNumber(int n) {
+    return 'القناة $n';
+  }
 }

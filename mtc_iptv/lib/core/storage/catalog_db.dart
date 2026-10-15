@@ -29,8 +29,64 @@ class Channels extends Table {
   BoolColumn get parental => boolean().withDefault(const Constant(false))();
   DateTimeColumn get publishedAt => dateTime().nullable()();
 
+  /// مفتاح بحث مطبّع (matchKey للاسمين والأسماء البديلة + الرقم) يُحسب عند المزامنة (§20).
+  TextColumn get search => text().withDefault(const Constant(''))();
+
   @override
   Set<Column> get primaryKey => {id};
+}
+
+/// الدول/الفئات/اللغات المرئية (بيانات مرجعية صغيرة، تُجلب كاملة عند كل مزامنة).
+@DataClassName('CountryRow')
+class Countries extends Table {
+  TextColumn get code => text()();
+  TextColumn get nameAr => text()();
+  TextColumn get nameEn => text()();
+  TextColumn get flag => text().nullable()(); // emoji
+  TextColumn get continent => text().nullable()();
+  BoolColumn get isArab => boolean().withDefault(const Constant(false))();
+  IntColumn get sort => integer().withDefault(const Constant(100))();
+  @override
+  Set<Column> get primaryKey => {code};
+}
+
+@DataClassName('CategoryRow')
+class Categories extends Table {
+  TextColumn get slug => text()();
+  TextColumn get nameAr => text()();
+  TextColumn get nameEn => text()();
+  TextColumn get icon => text().withDefault(const Constant('tv'))();
+  IntColumn get hue => integer().withDefault(const Constant(220))();
+  IntColumn get sort => integer().withDefault(const Constant(100))();
+  @override
+  Set<Column> get primaryKey => {slug};
+}
+
+@DataClassName('LanguageRow')
+class Languages extends Table {
+  TextColumn get code => text()();
+  TextColumn get nameAr => text()();
+  TextColumn get nameEn => text()();
+  @override
+  Set<Column> get primaryKey => {code};
+}
+
+/// المفضلة محليًا (§8.3): ترتيب يدوي.
+class Favorites extends Table {
+  TextColumn get channelId => text()();
+  IntColumn get position => integer()();
+  DateTimeColumn get addedAt => dateTime()();
+  @override
+  Set<Column> get primaryKey => {channelId};
+}
+
+/// آخر المشاهدات (§8.3).
+class History extends Table {
+  TextColumn get channelId => text()();
+  DateTimeColumn get watchedAt => dateTime()();
+  IntColumn get seconds => integer().withDefault(const Constant(0))();
+  @override
+  Set<Column> get primaryKey => {channelId};
 }
 
 @DataClassName('StreamRow')
@@ -61,21 +117,38 @@ class SyncState extends Table {
   Set<Column> get primaryKey => {key};
 }
 
-@DriftDatabase(tables: [Channels, Streams, SyncState])
+@DriftDatabase(tables: [Channels, Streams, SyncState, Countries, Categories, Languages, Favorites, History])
 class CatalogDb extends _$CatalogDb {
   CatalogDb([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'mtc_catalog'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
           await m.createAll();
-          await customStatement('CREATE INDEX IF NOT EXISTS streams_channel_idx ON streams (channel_id, priority)');
-          await customStatement('CREATE INDEX IF NOT EXISTS channels_number_idx ON channels (number)');
+          await _indexes();
+        },
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(channels, channels.search);
+            for (final TableInfo t in [countries, categories, languages, favorites, history]) {
+              await m.createTable(t);
+            }
+            // مفتاح البحث الجديد يُملأ من المزامنة التالية: نصفّر رقم المزامنة لإعادة جلب الكل
+            await (delete(syncState)..where((s) => s.key.equals('catalog_rev'))).go();
+            await _indexes();
+          }
         },
       );
+
+  Future<void> _indexes() async {
+    await customStatement('CREATE INDEX IF NOT EXISTS streams_channel_idx ON streams (channel_id, priority)');
+    await customStatement('CREATE INDEX IF NOT EXISTS channels_number_idx ON channels (number)');
+    await customStatement('CREATE INDEX IF NOT EXISTS channels_country_idx ON channels (country)');
+    await customStatement('CREATE INDEX IF NOT EXISTS channels_category_idx ON channels (category)');
+  }
 
   Future<int> catalogRev() async {
     final row = await (select(syncState)..where((s) => s.key.equals('catalog_rev'))).getSingleOrNull();

@@ -225,6 +225,16 @@ class $ChannelsTable extends Channels
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _searchMeta = const VerificationMeta('search');
+  @override
+  late final GeneratedColumn<String> search = GeneratedColumn<String>(
+    'search',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -247,6 +257,7 @@ class $ChannelsTable extends Channels
     family,
     parental,
     publishedAt,
+    search,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -384,6 +395,12 @@ class $ChannelsTable extends Channels
         ),
       );
     }
+    if (data.containsKey('search')) {
+      context.handle(
+        _searchMeta,
+        search.isAcceptableOrUnknown(data['search']!, _searchMeta),
+      );
+    }
     return context;
   }
 
@@ -473,6 +490,10 @@ class $ChannelsTable extends Channels
         DriftSqlType.dateTime,
         data['${effectivePrefix}published_at'],
       ),
+      search: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}search'],
+      )!,
     );
   }
 
@@ -503,6 +524,9 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
   final String? family;
   final bool parental;
   final DateTime? publishedAt;
+
+  /// مفتاح بحث مطبّع (matchKey للاسمين والأسماء البديلة + الرقم) يُحسب عند المزامنة (§20).
+  final String search;
   const ChannelRow({
     required this.id,
     required this.uid,
@@ -524,6 +548,7 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
     this.family,
     required this.parental,
     this.publishedAt,
+    required this.search,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -572,6 +597,7 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
     if (!nullToAbsent || publishedAt != null) {
       map['published_at'] = Variable<DateTime>(publishedAt);
     }
+    map['search'] = Variable<String>(search);
     return map;
   }
 
@@ -621,6 +647,7 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
       publishedAt: publishedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(publishedAt),
+      search: Value(search),
     );
   }
 
@@ -650,6 +677,7 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
       family: serializer.fromJson<String?>(json['family']),
       parental: serializer.fromJson<bool>(json['parental']),
       publishedAt: serializer.fromJson<DateTime?>(json['publishedAt']),
+      search: serializer.fromJson<String>(json['search']),
     );
   }
   @override
@@ -676,6 +704,7 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
       'family': serializer.toJson<String?>(family),
       'parental': serializer.toJson<bool>(parental),
       'publishedAt': serializer.toJson<DateTime?>(publishedAt),
+      'search': serializer.toJson<String>(search),
     };
   }
 
@@ -700,6 +729,7 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
     Value<String?> family = const Value.absent(),
     bool? parental,
     Value<DateTime?> publishedAt = const Value.absent(),
+    String? search,
   }) => ChannelRow(
     id: id ?? this.id,
     uid: uid ?? this.uid,
@@ -721,6 +751,7 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
     family: family.present ? family.value : this.family,
     parental: parental ?? this.parental,
     publishedAt: publishedAt.present ? publishedAt.value : this.publishedAt,
+    search: search ?? this.search,
   );
   ChannelRow copyWithCompanion(ChannelsCompanion data) {
     return ChannelRow(
@@ -748,6 +779,7 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
       publishedAt: data.publishedAt.present
           ? data.publishedAt.value
           : this.publishedAt,
+      search: data.search.present ? data.search.value : this.search,
     );
   }
 
@@ -773,13 +805,14 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
           ..write('epgOffset: $epgOffset, ')
           ..write('family: $family, ')
           ..write('parental: $parental, ')
-          ..write('publishedAt: $publishedAt')
+          ..write('publishedAt: $publishedAt, ')
+          ..write('search: $search')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     uid,
     number,
@@ -800,7 +833,8 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
     family,
     parental,
     publishedAt,
-  );
+    search,
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -824,7 +858,8 @@ class ChannelRow extends DataClass implements Insertable<ChannelRow> {
           other.epgOffset == this.epgOffset &&
           other.family == this.family &&
           other.parental == this.parental &&
-          other.publishedAt == this.publishedAt);
+          other.publishedAt == this.publishedAt &&
+          other.search == this.search);
 }
 
 class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
@@ -848,6 +883,7 @@ class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
   final Value<String?> family;
   final Value<bool> parental;
   final Value<DateTime?> publishedAt;
+  final Value<String> search;
   final Value<int> rowid;
   const ChannelsCompanion({
     this.id = const Value.absent(),
@@ -870,6 +906,7 @@ class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
     this.family = const Value.absent(),
     this.parental = const Value.absent(),
     this.publishedAt = const Value.absent(),
+    this.search = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ChannelsCompanion.insert({
@@ -893,6 +930,7 @@ class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
     this.family = const Value.absent(),
     this.parental = const Value.absent(),
     this.publishedAt = const Value.absent(),
+    this.search = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        uid = Value(uid);
@@ -917,6 +955,7 @@ class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
     Expression<String>? family,
     Expression<bool>? parental,
     Expression<DateTime>? publishedAt,
+    Expression<String>? search,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -940,6 +979,7 @@ class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
       if (family != null) 'family': family,
       if (parental != null) 'parental': parental,
       if (publishedAt != null) 'published_at': publishedAt,
+      if (search != null) 'search': search,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -965,6 +1005,7 @@ class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
     Value<String?>? family,
     Value<bool>? parental,
     Value<DateTime?>? publishedAt,
+    Value<String>? search,
     Value<int>? rowid,
   }) {
     return ChannelsCompanion(
@@ -988,6 +1029,7 @@ class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
       family: family ?? this.family,
       parental: parental ?? this.parental,
       publishedAt: publishedAt ?? this.publishedAt,
+      search: search ?? this.search,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1055,6 +1097,9 @@ class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
     if (publishedAt.present) {
       map['published_at'] = Variable<DateTime>(publishedAt.value);
     }
+    if (search.present) {
+      map['search'] = Variable<String>(search.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1084,6 +1129,7 @@ class ChannelsCompanion extends UpdateCompanion<ChannelRow> {
           ..write('family: $family, ')
           ..write('parental: $parental, ')
           ..write('publishedAt: $publishedAt, ')
+          ..write('search: $search, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1993,12 +2039,1647 @@ class SyncStateCompanion extends UpdateCompanion<SyncStateData> {
   }
 }
 
+class $CountriesTable extends Countries
+    with TableInfo<$CountriesTable, CountryRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CountriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameArMeta = const VerificationMeta('nameAr');
+  @override
+  late final GeneratedColumn<String> nameAr = GeneratedColumn<String>(
+    'name_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
+  @override
+  late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
+    'name_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _flagMeta = const VerificationMeta('flag');
+  @override
+  late final GeneratedColumn<String> flag = GeneratedColumn<String>(
+    'flag',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _continentMeta = const VerificationMeta(
+    'continent',
+  );
+  @override
+  late final GeneratedColumn<String> continent = GeneratedColumn<String>(
+    'continent',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isArabMeta = const VerificationMeta('isArab');
+  @override
+  late final GeneratedColumn<bool> isArab = GeneratedColumn<bool>(
+    'is_arab',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_arab" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _sortMeta = const VerificationMeta('sort');
+  @override
+  late final GeneratedColumn<int> sort = GeneratedColumn<int>(
+    'sort',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(100),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    code,
+    nameAr,
+    nameEn,
+    flag,
+    continent,
+    isArab,
+    sort,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'countries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CountryRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('name_ar')) {
+      context.handle(
+        _nameArMeta,
+        nameAr.isAcceptableOrUnknown(data['name_ar']!, _nameArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameArMeta);
+    }
+    if (data.containsKey('name_en')) {
+      context.handle(
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameEnMeta);
+    }
+    if (data.containsKey('flag')) {
+      context.handle(
+        _flagMeta,
+        flag.isAcceptableOrUnknown(data['flag']!, _flagMeta),
+      );
+    }
+    if (data.containsKey('continent')) {
+      context.handle(
+        _continentMeta,
+        continent.isAcceptableOrUnknown(data['continent']!, _continentMeta),
+      );
+    }
+    if (data.containsKey('is_arab')) {
+      context.handle(
+        _isArabMeta,
+        isArab.isAcceptableOrUnknown(data['is_arab']!, _isArabMeta),
+      );
+    }
+    if (data.containsKey('sort')) {
+      context.handle(
+        _sortMeta,
+        sort.isAcceptableOrUnknown(data['sort']!, _sortMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {code};
+  @override
+  CountryRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CountryRow(
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      nameAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ar'],
+      )!,
+      nameEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_en'],
+      )!,
+      flag: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}flag'],
+      ),
+      continent: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}continent'],
+      ),
+      isArab: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_arab'],
+      )!,
+      sort: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort'],
+      )!,
+    );
+  }
+
+  @override
+  $CountriesTable createAlias(String alias) {
+    return $CountriesTable(attachedDatabase, alias);
+  }
+}
+
+class CountryRow extends DataClass implements Insertable<CountryRow> {
+  final String code;
+  final String nameAr;
+  final String nameEn;
+  final String? flag;
+  final String? continent;
+  final bool isArab;
+  final int sort;
+  const CountryRow({
+    required this.code,
+    required this.nameAr,
+    required this.nameEn,
+    this.flag,
+    this.continent,
+    required this.isArab,
+    required this.sort,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['code'] = Variable<String>(code);
+    map['name_ar'] = Variable<String>(nameAr);
+    map['name_en'] = Variable<String>(nameEn);
+    if (!nullToAbsent || flag != null) {
+      map['flag'] = Variable<String>(flag);
+    }
+    if (!nullToAbsent || continent != null) {
+      map['continent'] = Variable<String>(continent);
+    }
+    map['is_arab'] = Variable<bool>(isArab);
+    map['sort'] = Variable<int>(sort);
+    return map;
+  }
+
+  CountriesCompanion toCompanion(bool nullToAbsent) {
+    return CountriesCompanion(
+      code: Value(code),
+      nameAr: Value(nameAr),
+      nameEn: Value(nameEn),
+      flag: flag == null && nullToAbsent ? const Value.absent() : Value(flag),
+      continent: continent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(continent),
+      isArab: Value(isArab),
+      sort: Value(sort),
+    );
+  }
+
+  factory CountryRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CountryRow(
+      code: serializer.fromJson<String>(json['code']),
+      nameAr: serializer.fromJson<String>(json['nameAr']),
+      nameEn: serializer.fromJson<String>(json['nameEn']),
+      flag: serializer.fromJson<String?>(json['flag']),
+      continent: serializer.fromJson<String?>(json['continent']),
+      isArab: serializer.fromJson<bool>(json['isArab']),
+      sort: serializer.fromJson<int>(json['sort']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'code': serializer.toJson<String>(code),
+      'nameAr': serializer.toJson<String>(nameAr),
+      'nameEn': serializer.toJson<String>(nameEn),
+      'flag': serializer.toJson<String?>(flag),
+      'continent': serializer.toJson<String?>(continent),
+      'isArab': serializer.toJson<bool>(isArab),
+      'sort': serializer.toJson<int>(sort),
+    };
+  }
+
+  CountryRow copyWith({
+    String? code,
+    String? nameAr,
+    String? nameEn,
+    Value<String?> flag = const Value.absent(),
+    Value<String?> continent = const Value.absent(),
+    bool? isArab,
+    int? sort,
+  }) => CountryRow(
+    code: code ?? this.code,
+    nameAr: nameAr ?? this.nameAr,
+    nameEn: nameEn ?? this.nameEn,
+    flag: flag.present ? flag.value : this.flag,
+    continent: continent.present ? continent.value : this.continent,
+    isArab: isArab ?? this.isArab,
+    sort: sort ?? this.sort,
+  );
+  CountryRow copyWithCompanion(CountriesCompanion data) {
+    return CountryRow(
+      code: data.code.present ? data.code.value : this.code,
+      nameAr: data.nameAr.present ? data.nameAr.value : this.nameAr,
+      nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
+      flag: data.flag.present ? data.flag.value : this.flag,
+      continent: data.continent.present ? data.continent.value : this.continent,
+      isArab: data.isArab.present ? data.isArab.value : this.isArab,
+      sort: data.sort.present ? data.sort.value : this.sort,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CountryRow(')
+          ..write('code: $code, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('flag: $flag, ')
+          ..write('continent: $continent, ')
+          ..write('isArab: $isArab, ')
+          ..write('sort: $sort')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(code, nameAr, nameEn, flag, continent, isArab, sort);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CountryRow &&
+          other.code == this.code &&
+          other.nameAr == this.nameAr &&
+          other.nameEn == this.nameEn &&
+          other.flag == this.flag &&
+          other.continent == this.continent &&
+          other.isArab == this.isArab &&
+          other.sort == this.sort);
+}
+
+class CountriesCompanion extends UpdateCompanion<CountryRow> {
+  final Value<String> code;
+  final Value<String> nameAr;
+  final Value<String> nameEn;
+  final Value<String?> flag;
+  final Value<String?> continent;
+  final Value<bool> isArab;
+  final Value<int> sort;
+  final Value<int> rowid;
+  const CountriesCompanion({
+    this.code = const Value.absent(),
+    this.nameAr = const Value.absent(),
+    this.nameEn = const Value.absent(),
+    this.flag = const Value.absent(),
+    this.continent = const Value.absent(),
+    this.isArab = const Value.absent(),
+    this.sort = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CountriesCompanion.insert({
+    required String code,
+    required String nameAr,
+    required String nameEn,
+    this.flag = const Value.absent(),
+    this.continent = const Value.absent(),
+    this.isArab = const Value.absent(),
+    this.sort = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : code = Value(code),
+       nameAr = Value(nameAr),
+       nameEn = Value(nameEn);
+  static Insertable<CountryRow> custom({
+    Expression<String>? code,
+    Expression<String>? nameAr,
+    Expression<String>? nameEn,
+    Expression<String>? flag,
+    Expression<String>? continent,
+    Expression<bool>? isArab,
+    Expression<int>? sort,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (code != null) 'code': code,
+      if (nameAr != null) 'name_ar': nameAr,
+      if (nameEn != null) 'name_en': nameEn,
+      if (flag != null) 'flag': flag,
+      if (continent != null) 'continent': continent,
+      if (isArab != null) 'is_arab': isArab,
+      if (sort != null) 'sort': sort,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CountriesCompanion copyWith({
+    Value<String>? code,
+    Value<String>? nameAr,
+    Value<String>? nameEn,
+    Value<String?>? flag,
+    Value<String?>? continent,
+    Value<bool>? isArab,
+    Value<int>? sort,
+    Value<int>? rowid,
+  }) {
+    return CountriesCompanion(
+      code: code ?? this.code,
+      nameAr: nameAr ?? this.nameAr,
+      nameEn: nameEn ?? this.nameEn,
+      flag: flag ?? this.flag,
+      continent: continent ?? this.continent,
+      isArab: isArab ?? this.isArab,
+      sort: sort ?? this.sort,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (nameAr.present) {
+      map['name_ar'] = Variable<String>(nameAr.value);
+    }
+    if (nameEn.present) {
+      map['name_en'] = Variable<String>(nameEn.value);
+    }
+    if (flag.present) {
+      map['flag'] = Variable<String>(flag.value);
+    }
+    if (continent.present) {
+      map['continent'] = Variable<String>(continent.value);
+    }
+    if (isArab.present) {
+      map['is_arab'] = Variable<bool>(isArab.value);
+    }
+    if (sort.present) {
+      map['sort'] = Variable<int>(sort.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CountriesCompanion(')
+          ..write('code: $code, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('flag: $flag, ')
+          ..write('continent: $continent, ')
+          ..write('isArab: $isArab, ')
+          ..write('sort: $sort, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CategoriesTable extends Categories
+    with TableInfo<$CategoriesTable, CategoryRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CategoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _slugMeta = const VerificationMeta('slug');
+  @override
+  late final GeneratedColumn<String> slug = GeneratedColumn<String>(
+    'slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameArMeta = const VerificationMeta('nameAr');
+  @override
+  late final GeneratedColumn<String> nameAr = GeneratedColumn<String>(
+    'name_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
+  @override
+  late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
+    'name_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _iconMeta = const VerificationMeta('icon');
+  @override
+  late final GeneratedColumn<String> icon = GeneratedColumn<String>(
+    'icon',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('tv'),
+  );
+  static const VerificationMeta _hueMeta = const VerificationMeta('hue');
+  @override
+  late final GeneratedColumn<int> hue = GeneratedColumn<int>(
+    'hue',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(220),
+  );
+  static const VerificationMeta _sortMeta = const VerificationMeta('sort');
+  @override
+  late final GeneratedColumn<int> sort = GeneratedColumn<int>(
+    'sort',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(100),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [slug, nameAr, nameEn, icon, hue, sort];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'categories';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CategoryRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('slug')) {
+      context.handle(
+        _slugMeta,
+        slug.isAcceptableOrUnknown(data['slug']!, _slugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slugMeta);
+    }
+    if (data.containsKey('name_ar')) {
+      context.handle(
+        _nameArMeta,
+        nameAr.isAcceptableOrUnknown(data['name_ar']!, _nameArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameArMeta);
+    }
+    if (data.containsKey('name_en')) {
+      context.handle(
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameEnMeta);
+    }
+    if (data.containsKey('icon')) {
+      context.handle(
+        _iconMeta,
+        icon.isAcceptableOrUnknown(data['icon']!, _iconMeta),
+      );
+    }
+    if (data.containsKey('hue')) {
+      context.handle(
+        _hueMeta,
+        hue.isAcceptableOrUnknown(data['hue']!, _hueMeta),
+      );
+    }
+    if (data.containsKey('sort')) {
+      context.handle(
+        _sortMeta,
+        sort.isAcceptableOrUnknown(data['sort']!, _sortMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {slug};
+  @override
+  CategoryRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CategoryRow(
+      slug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slug'],
+      )!,
+      nameAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ar'],
+      )!,
+      nameEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_en'],
+      )!,
+      icon: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}icon'],
+      )!,
+      hue: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hue'],
+      )!,
+      sort: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort'],
+      )!,
+    );
+  }
+
+  @override
+  $CategoriesTable createAlias(String alias) {
+    return $CategoriesTable(attachedDatabase, alias);
+  }
+}
+
+class CategoryRow extends DataClass implements Insertable<CategoryRow> {
+  final String slug;
+  final String nameAr;
+  final String nameEn;
+  final String icon;
+  final int hue;
+  final int sort;
+  const CategoryRow({
+    required this.slug,
+    required this.nameAr,
+    required this.nameEn,
+    required this.icon,
+    required this.hue,
+    required this.sort,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['slug'] = Variable<String>(slug);
+    map['name_ar'] = Variable<String>(nameAr);
+    map['name_en'] = Variable<String>(nameEn);
+    map['icon'] = Variable<String>(icon);
+    map['hue'] = Variable<int>(hue);
+    map['sort'] = Variable<int>(sort);
+    return map;
+  }
+
+  CategoriesCompanion toCompanion(bool nullToAbsent) {
+    return CategoriesCompanion(
+      slug: Value(slug),
+      nameAr: Value(nameAr),
+      nameEn: Value(nameEn),
+      icon: Value(icon),
+      hue: Value(hue),
+      sort: Value(sort),
+    );
+  }
+
+  factory CategoryRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CategoryRow(
+      slug: serializer.fromJson<String>(json['slug']),
+      nameAr: serializer.fromJson<String>(json['nameAr']),
+      nameEn: serializer.fromJson<String>(json['nameEn']),
+      icon: serializer.fromJson<String>(json['icon']),
+      hue: serializer.fromJson<int>(json['hue']),
+      sort: serializer.fromJson<int>(json['sort']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'slug': serializer.toJson<String>(slug),
+      'nameAr': serializer.toJson<String>(nameAr),
+      'nameEn': serializer.toJson<String>(nameEn),
+      'icon': serializer.toJson<String>(icon),
+      'hue': serializer.toJson<int>(hue),
+      'sort': serializer.toJson<int>(sort),
+    };
+  }
+
+  CategoryRow copyWith({
+    String? slug,
+    String? nameAr,
+    String? nameEn,
+    String? icon,
+    int? hue,
+    int? sort,
+  }) => CategoryRow(
+    slug: slug ?? this.slug,
+    nameAr: nameAr ?? this.nameAr,
+    nameEn: nameEn ?? this.nameEn,
+    icon: icon ?? this.icon,
+    hue: hue ?? this.hue,
+    sort: sort ?? this.sort,
+  );
+  CategoryRow copyWithCompanion(CategoriesCompanion data) {
+    return CategoryRow(
+      slug: data.slug.present ? data.slug.value : this.slug,
+      nameAr: data.nameAr.present ? data.nameAr.value : this.nameAr,
+      nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
+      icon: data.icon.present ? data.icon.value : this.icon,
+      hue: data.hue.present ? data.hue.value : this.hue,
+      sort: data.sort.present ? data.sort.value : this.sort,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CategoryRow(')
+          ..write('slug: $slug, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('icon: $icon, ')
+          ..write('hue: $hue, ')
+          ..write('sort: $sort')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(slug, nameAr, nameEn, icon, hue, sort);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CategoryRow &&
+          other.slug == this.slug &&
+          other.nameAr == this.nameAr &&
+          other.nameEn == this.nameEn &&
+          other.icon == this.icon &&
+          other.hue == this.hue &&
+          other.sort == this.sort);
+}
+
+class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
+  final Value<String> slug;
+  final Value<String> nameAr;
+  final Value<String> nameEn;
+  final Value<String> icon;
+  final Value<int> hue;
+  final Value<int> sort;
+  final Value<int> rowid;
+  const CategoriesCompanion({
+    this.slug = const Value.absent(),
+    this.nameAr = const Value.absent(),
+    this.nameEn = const Value.absent(),
+    this.icon = const Value.absent(),
+    this.hue = const Value.absent(),
+    this.sort = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CategoriesCompanion.insert({
+    required String slug,
+    required String nameAr,
+    required String nameEn,
+    this.icon = const Value.absent(),
+    this.hue = const Value.absent(),
+    this.sort = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : slug = Value(slug),
+       nameAr = Value(nameAr),
+       nameEn = Value(nameEn);
+  static Insertable<CategoryRow> custom({
+    Expression<String>? slug,
+    Expression<String>? nameAr,
+    Expression<String>? nameEn,
+    Expression<String>? icon,
+    Expression<int>? hue,
+    Expression<int>? sort,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (slug != null) 'slug': slug,
+      if (nameAr != null) 'name_ar': nameAr,
+      if (nameEn != null) 'name_en': nameEn,
+      if (icon != null) 'icon': icon,
+      if (hue != null) 'hue': hue,
+      if (sort != null) 'sort': sort,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CategoriesCompanion copyWith({
+    Value<String>? slug,
+    Value<String>? nameAr,
+    Value<String>? nameEn,
+    Value<String>? icon,
+    Value<int>? hue,
+    Value<int>? sort,
+    Value<int>? rowid,
+  }) {
+    return CategoriesCompanion(
+      slug: slug ?? this.slug,
+      nameAr: nameAr ?? this.nameAr,
+      nameEn: nameEn ?? this.nameEn,
+      icon: icon ?? this.icon,
+      hue: hue ?? this.hue,
+      sort: sort ?? this.sort,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (slug.present) {
+      map['slug'] = Variable<String>(slug.value);
+    }
+    if (nameAr.present) {
+      map['name_ar'] = Variable<String>(nameAr.value);
+    }
+    if (nameEn.present) {
+      map['name_en'] = Variable<String>(nameEn.value);
+    }
+    if (icon.present) {
+      map['icon'] = Variable<String>(icon.value);
+    }
+    if (hue.present) {
+      map['hue'] = Variable<int>(hue.value);
+    }
+    if (sort.present) {
+      map['sort'] = Variable<int>(sort.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CategoriesCompanion(')
+          ..write('slug: $slug, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('icon: $icon, ')
+          ..write('hue: $hue, ')
+          ..write('sort: $sort, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LanguagesTable extends Languages
+    with TableInfo<$LanguagesTable, LanguageRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LanguagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameArMeta = const VerificationMeta('nameAr');
+  @override
+  late final GeneratedColumn<String> nameAr = GeneratedColumn<String>(
+    'name_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
+  @override
+  late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
+    'name_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [code, nameAr, nameEn];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'languages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LanguageRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('name_ar')) {
+      context.handle(
+        _nameArMeta,
+        nameAr.isAcceptableOrUnknown(data['name_ar']!, _nameArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameArMeta);
+    }
+    if (data.containsKey('name_en')) {
+      context.handle(
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameEnMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {code};
+  @override
+  LanguageRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LanguageRow(
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      nameAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ar'],
+      )!,
+      nameEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_en'],
+      )!,
+    );
+  }
+
+  @override
+  $LanguagesTable createAlias(String alias) {
+    return $LanguagesTable(attachedDatabase, alias);
+  }
+}
+
+class LanguageRow extends DataClass implements Insertable<LanguageRow> {
+  final String code;
+  final String nameAr;
+  final String nameEn;
+  const LanguageRow({
+    required this.code,
+    required this.nameAr,
+    required this.nameEn,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['code'] = Variable<String>(code);
+    map['name_ar'] = Variable<String>(nameAr);
+    map['name_en'] = Variable<String>(nameEn);
+    return map;
+  }
+
+  LanguagesCompanion toCompanion(bool nullToAbsent) {
+    return LanguagesCompanion(
+      code: Value(code),
+      nameAr: Value(nameAr),
+      nameEn: Value(nameEn),
+    );
+  }
+
+  factory LanguageRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LanguageRow(
+      code: serializer.fromJson<String>(json['code']),
+      nameAr: serializer.fromJson<String>(json['nameAr']),
+      nameEn: serializer.fromJson<String>(json['nameEn']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'code': serializer.toJson<String>(code),
+      'nameAr': serializer.toJson<String>(nameAr),
+      'nameEn': serializer.toJson<String>(nameEn),
+    };
+  }
+
+  LanguageRow copyWith({String? code, String? nameAr, String? nameEn}) =>
+      LanguageRow(
+        code: code ?? this.code,
+        nameAr: nameAr ?? this.nameAr,
+        nameEn: nameEn ?? this.nameEn,
+      );
+  LanguageRow copyWithCompanion(LanguagesCompanion data) {
+    return LanguageRow(
+      code: data.code.present ? data.code.value : this.code,
+      nameAr: data.nameAr.present ? data.nameAr.value : this.nameAr,
+      nameEn: data.nameEn.present ? data.nameEn.value : this.nameEn,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LanguageRow(')
+          ..write('code: $code, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(code, nameAr, nameEn);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LanguageRow &&
+          other.code == this.code &&
+          other.nameAr == this.nameAr &&
+          other.nameEn == this.nameEn);
+}
+
+class LanguagesCompanion extends UpdateCompanion<LanguageRow> {
+  final Value<String> code;
+  final Value<String> nameAr;
+  final Value<String> nameEn;
+  final Value<int> rowid;
+  const LanguagesCompanion({
+    this.code = const Value.absent(),
+    this.nameAr = const Value.absent(),
+    this.nameEn = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LanguagesCompanion.insert({
+    required String code,
+    required String nameAr,
+    required String nameEn,
+    this.rowid = const Value.absent(),
+  }) : code = Value(code),
+       nameAr = Value(nameAr),
+       nameEn = Value(nameEn);
+  static Insertable<LanguageRow> custom({
+    Expression<String>? code,
+    Expression<String>? nameAr,
+    Expression<String>? nameEn,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (code != null) 'code': code,
+      if (nameAr != null) 'name_ar': nameAr,
+      if (nameEn != null) 'name_en': nameEn,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LanguagesCompanion copyWith({
+    Value<String>? code,
+    Value<String>? nameAr,
+    Value<String>? nameEn,
+    Value<int>? rowid,
+  }) {
+    return LanguagesCompanion(
+      code: code ?? this.code,
+      nameAr: nameAr ?? this.nameAr,
+      nameEn: nameEn ?? this.nameEn,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (nameAr.present) {
+      map['name_ar'] = Variable<String>(nameAr.value);
+    }
+    if (nameEn.present) {
+      map['name_en'] = Variable<String>(nameEn.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LanguagesCompanion(')
+          ..write('code: $code, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('nameEn: $nameEn, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FavoritesTable extends Favorites
+    with TableInfo<$FavoritesTable, Favorite> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FavoritesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _channelIdMeta = const VerificationMeta(
+    'channelId',
+  );
+  @override
+  late final GeneratedColumn<String> channelId = GeneratedColumn<String>(
+    'channel_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _addedAtMeta = const VerificationMeta(
+    'addedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> addedAt = GeneratedColumn<DateTime>(
+    'added_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [channelId, position, addedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'favorites';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Favorite> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('channel_id')) {
+      context.handle(
+        _channelIdMeta,
+        channelId.isAcceptableOrUnknown(data['channel_id']!, _channelIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_channelIdMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('added_at')) {
+      context.handle(
+        _addedAtMeta,
+        addedAt.isAcceptableOrUnknown(data['added_at']!, _addedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_addedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {channelId};
+  @override
+  Favorite map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Favorite(
+      channelId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}channel_id'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      addedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}added_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FavoritesTable createAlias(String alias) {
+    return $FavoritesTable(attachedDatabase, alias);
+  }
+}
+
+class Favorite extends DataClass implements Insertable<Favorite> {
+  final String channelId;
+  final int position;
+  final DateTime addedAt;
+  const Favorite({
+    required this.channelId,
+    required this.position,
+    required this.addedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['channel_id'] = Variable<String>(channelId);
+    map['position'] = Variable<int>(position);
+    map['added_at'] = Variable<DateTime>(addedAt);
+    return map;
+  }
+
+  FavoritesCompanion toCompanion(bool nullToAbsent) {
+    return FavoritesCompanion(
+      channelId: Value(channelId),
+      position: Value(position),
+      addedAt: Value(addedAt),
+    );
+  }
+
+  factory Favorite.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Favorite(
+      channelId: serializer.fromJson<String>(json['channelId']),
+      position: serializer.fromJson<int>(json['position']),
+      addedAt: serializer.fromJson<DateTime>(json['addedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'channelId': serializer.toJson<String>(channelId),
+      'position': serializer.toJson<int>(position),
+      'addedAt': serializer.toJson<DateTime>(addedAt),
+    };
+  }
+
+  Favorite copyWith({String? channelId, int? position, DateTime? addedAt}) =>
+      Favorite(
+        channelId: channelId ?? this.channelId,
+        position: position ?? this.position,
+        addedAt: addedAt ?? this.addedAt,
+      );
+  Favorite copyWithCompanion(FavoritesCompanion data) {
+    return Favorite(
+      channelId: data.channelId.present ? data.channelId.value : this.channelId,
+      position: data.position.present ? data.position.value : this.position,
+      addedAt: data.addedAt.present ? data.addedAt.value : this.addedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Favorite(')
+          ..write('channelId: $channelId, ')
+          ..write('position: $position, ')
+          ..write('addedAt: $addedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(channelId, position, addedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Favorite &&
+          other.channelId == this.channelId &&
+          other.position == this.position &&
+          other.addedAt == this.addedAt);
+}
+
+class FavoritesCompanion extends UpdateCompanion<Favorite> {
+  final Value<String> channelId;
+  final Value<int> position;
+  final Value<DateTime> addedAt;
+  final Value<int> rowid;
+  const FavoritesCompanion({
+    this.channelId = const Value.absent(),
+    this.position = const Value.absent(),
+    this.addedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FavoritesCompanion.insert({
+    required String channelId,
+    required int position,
+    required DateTime addedAt,
+    this.rowid = const Value.absent(),
+  }) : channelId = Value(channelId),
+       position = Value(position),
+       addedAt = Value(addedAt);
+  static Insertable<Favorite> custom({
+    Expression<String>? channelId,
+    Expression<int>? position,
+    Expression<DateTime>? addedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (channelId != null) 'channel_id': channelId,
+      if (position != null) 'position': position,
+      if (addedAt != null) 'added_at': addedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FavoritesCompanion copyWith({
+    Value<String>? channelId,
+    Value<int>? position,
+    Value<DateTime>? addedAt,
+    Value<int>? rowid,
+  }) {
+    return FavoritesCompanion(
+      channelId: channelId ?? this.channelId,
+      position: position ?? this.position,
+      addedAt: addedAt ?? this.addedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (channelId.present) {
+      map['channel_id'] = Variable<String>(channelId.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (addedAt.present) {
+      map['added_at'] = Variable<DateTime>(addedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavoritesCompanion(')
+          ..write('channelId: $channelId, ')
+          ..write('position: $position, ')
+          ..write('addedAt: $addedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $HistoryTable extends History with TableInfo<$HistoryTable, HistoryData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HistoryTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _channelIdMeta = const VerificationMeta(
+    'channelId',
+  );
+  @override
+  late final GeneratedColumn<String> channelId = GeneratedColumn<String>(
+    'channel_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _watchedAtMeta = const VerificationMeta(
+    'watchedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> watchedAt = GeneratedColumn<DateTime>(
+    'watched_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _secondsMeta = const VerificationMeta(
+    'seconds',
+  );
+  @override
+  late final GeneratedColumn<int> seconds = GeneratedColumn<int>(
+    'seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [channelId, watchedAt, seconds];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'history';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HistoryData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('channel_id')) {
+      context.handle(
+        _channelIdMeta,
+        channelId.isAcceptableOrUnknown(data['channel_id']!, _channelIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_channelIdMeta);
+    }
+    if (data.containsKey('watched_at')) {
+      context.handle(
+        _watchedAtMeta,
+        watchedAt.isAcceptableOrUnknown(data['watched_at']!, _watchedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_watchedAtMeta);
+    }
+    if (data.containsKey('seconds')) {
+      context.handle(
+        _secondsMeta,
+        seconds.isAcceptableOrUnknown(data['seconds']!, _secondsMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {channelId};
+  @override
+  HistoryData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HistoryData(
+      channelId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}channel_id'],
+      )!,
+      watchedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}watched_at'],
+      )!,
+      seconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}seconds'],
+      )!,
+    );
+  }
+
+  @override
+  $HistoryTable createAlias(String alias) {
+    return $HistoryTable(attachedDatabase, alias);
+  }
+}
+
+class HistoryData extends DataClass implements Insertable<HistoryData> {
+  final String channelId;
+  final DateTime watchedAt;
+  final int seconds;
+  const HistoryData({
+    required this.channelId,
+    required this.watchedAt,
+    required this.seconds,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['channel_id'] = Variable<String>(channelId);
+    map['watched_at'] = Variable<DateTime>(watchedAt);
+    map['seconds'] = Variable<int>(seconds);
+    return map;
+  }
+
+  HistoryCompanion toCompanion(bool nullToAbsent) {
+    return HistoryCompanion(
+      channelId: Value(channelId),
+      watchedAt: Value(watchedAt),
+      seconds: Value(seconds),
+    );
+  }
+
+  factory HistoryData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HistoryData(
+      channelId: serializer.fromJson<String>(json['channelId']),
+      watchedAt: serializer.fromJson<DateTime>(json['watchedAt']),
+      seconds: serializer.fromJson<int>(json['seconds']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'channelId': serializer.toJson<String>(channelId),
+      'watchedAt': serializer.toJson<DateTime>(watchedAt),
+      'seconds': serializer.toJson<int>(seconds),
+    };
+  }
+
+  HistoryData copyWith({
+    String? channelId,
+    DateTime? watchedAt,
+    int? seconds,
+  }) => HistoryData(
+    channelId: channelId ?? this.channelId,
+    watchedAt: watchedAt ?? this.watchedAt,
+    seconds: seconds ?? this.seconds,
+  );
+  HistoryData copyWithCompanion(HistoryCompanion data) {
+    return HistoryData(
+      channelId: data.channelId.present ? data.channelId.value : this.channelId,
+      watchedAt: data.watchedAt.present ? data.watchedAt.value : this.watchedAt,
+      seconds: data.seconds.present ? data.seconds.value : this.seconds,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HistoryData(')
+          ..write('channelId: $channelId, ')
+          ..write('watchedAt: $watchedAt, ')
+          ..write('seconds: $seconds')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(channelId, watchedAt, seconds);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HistoryData &&
+          other.channelId == this.channelId &&
+          other.watchedAt == this.watchedAt &&
+          other.seconds == this.seconds);
+}
+
+class HistoryCompanion extends UpdateCompanion<HistoryData> {
+  final Value<String> channelId;
+  final Value<DateTime> watchedAt;
+  final Value<int> seconds;
+  final Value<int> rowid;
+  const HistoryCompanion({
+    this.channelId = const Value.absent(),
+    this.watchedAt = const Value.absent(),
+    this.seconds = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  HistoryCompanion.insert({
+    required String channelId,
+    required DateTime watchedAt,
+    this.seconds = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : channelId = Value(channelId),
+       watchedAt = Value(watchedAt);
+  static Insertable<HistoryData> custom({
+    Expression<String>? channelId,
+    Expression<DateTime>? watchedAt,
+    Expression<int>? seconds,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (channelId != null) 'channel_id': channelId,
+      if (watchedAt != null) 'watched_at': watchedAt,
+      if (seconds != null) 'seconds': seconds,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  HistoryCompanion copyWith({
+    Value<String>? channelId,
+    Value<DateTime>? watchedAt,
+    Value<int>? seconds,
+    Value<int>? rowid,
+  }) {
+    return HistoryCompanion(
+      channelId: channelId ?? this.channelId,
+      watchedAt: watchedAt ?? this.watchedAt,
+      seconds: seconds ?? this.seconds,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (channelId.present) {
+      map['channel_id'] = Variable<String>(channelId.value);
+    }
+    if (watchedAt.present) {
+      map['watched_at'] = Variable<DateTime>(watchedAt.value);
+    }
+    if (seconds.present) {
+      map['seconds'] = Variable<int>(seconds.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HistoryCompanion(')
+          ..write('channelId: $channelId, ')
+          ..write('watchedAt: $watchedAt, ')
+          ..write('seconds: $seconds, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$CatalogDb extends GeneratedDatabase {
   _$CatalogDb(QueryExecutor e) : super(e);
   $CatalogDbManager get managers => $CatalogDbManager(this);
   late final $ChannelsTable channels = $ChannelsTable(this);
   late final $StreamsTable streams = $StreamsTable(this);
   late final $SyncStateTable syncState = $SyncStateTable(this);
+  late final $CountriesTable countries = $CountriesTable(this);
+  late final $CategoriesTable categories = $CategoriesTable(this);
+  late final $LanguagesTable languages = $LanguagesTable(this);
+  late final $FavoritesTable favorites = $FavoritesTable(this);
+  late final $HistoryTable history = $HistoryTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2007,6 +3688,11 @@ abstract class _$CatalogDb extends GeneratedDatabase {
     channels,
     streams,
     syncState,
+    countries,
+    categories,
+    languages,
+    favorites,
+    history,
   ];
 }
 
@@ -2031,6 +3717,7 @@ typedef $$ChannelsTableCreateCompanionBuilder = ChannelsCompanion Function({
   Value<String?> family,
   Value<bool> parental,
   Value<DateTime?> publishedAt,
+  Value<String> search,
   Value<int> rowid,
 });
 typedef $$ChannelsTableUpdateCompanionBuilder = ChannelsCompanion Function({
@@ -2054,6 +3741,7 @@ typedef $$ChannelsTableUpdateCompanionBuilder = ChannelsCompanion Function({
   Value<String?> family,
   Value<bool> parental,
   Value<DateTime?> publishedAt,
+  Value<String> search,
   Value<int> rowid,
 });
 
@@ -2163,6 +3851,11 @@ class $$ChannelsTableFilterComposer
 
   ColumnFilters<DateTime> get publishedAt => $composableBuilder(
     column: $table.publishedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get search => $composableBuilder(
+    column: $table.search,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2275,6 +3968,11 @@ class $$ChannelsTableOrderingComposer
     column: $table.publishedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get search => $composableBuilder(
+    column: $table.search,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ChannelsTableAnnotationComposer
@@ -2349,6 +4047,9 @@ class $$ChannelsTableAnnotationComposer
     column: $table.publishedAt,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get search =>
+      $composableBuilder(column: $table.search, builder: (column) => column);
 }
 
 class $$ChannelsTableTableManager
@@ -2399,6 +4100,7 @@ class $$ChannelsTableTableManager
                 Value<String?> family = const Value.absent(),
                 Value<bool> parental = const Value.absent(),
                 Value<DateTime?> publishedAt = const Value.absent(),
+                Value<String> search = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ChannelsCompanion(
                 id: id,
@@ -2421,6 +4123,7 @@ class $$ChannelsTableTableManager
                 family: family,
                 parental: parental,
                 publishedAt: publishedAt,
+                search: search,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -2445,6 +4148,7 @@ class $$ChannelsTableTableManager
                 Value<String?> family = const Value.absent(),
                 Value<bool> parental = const Value.absent(),
                 Value<DateTime?> publishedAt = const Value.absent(),
+                Value<String> search = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ChannelsCompanion.insert(
                 id: id,
@@ -2467,6 +4171,7 @@ class $$ChannelsTableTableManager
                 family: family,
                 parental: parental,
                 publishedAt: publishedAt,
+                search: search,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -2974,6 +4679,966 @@ typedef $$SyncStateTableProcessedTableManager =
       SyncStateData,
       PrefetchHooks Function()
     >;
+typedef $$CountriesTableCreateCompanionBuilder = CountriesCompanion Function({
+  required String code,
+  required String nameAr,
+  required String nameEn,
+  Value<String?> flag,
+  Value<String?> continent,
+  Value<bool> isArab,
+  Value<int> sort,
+  Value<int> rowid,
+});
+typedef $$CountriesTableUpdateCompanionBuilder = CountriesCompanion Function({
+  Value<String> code,
+  Value<String> nameAr,
+  Value<String> nameEn,
+  Value<String?> flag,
+  Value<String?> continent,
+  Value<bool> isArab,
+  Value<int> sort,
+  Value<int> rowid,
+});
+
+class $$CountriesTableFilterComposer
+    extends Composer<_$CatalogDb, $CountriesTable> {
+  $$CountriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get flag => $composableBuilder(
+    column: $table.flag,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get continent => $composableBuilder(
+    column: $table.continent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isArab => $composableBuilder(
+    column: $table.isArab,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sort => $composableBuilder(
+    column: $table.sort,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CountriesTableOrderingComposer
+    extends Composer<_$CatalogDb, $CountriesTable> {
+  $$CountriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get flag => $composableBuilder(
+    column: $table.flag,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get continent => $composableBuilder(
+    column: $table.continent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isArab => $composableBuilder(
+    column: $table.isArab,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sort => $composableBuilder(
+    column: $table.sort,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CountriesTableAnnotationComposer
+    extends Composer<_$CatalogDb, $CountriesTable> {
+  $$CountriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get nameAr =>
+      $composableBuilder(column: $table.nameAr, builder: (column) => column);
+
+  GeneratedColumn<String> get nameEn =>
+      $composableBuilder(column: $table.nameEn, builder: (column) => column);
+
+  GeneratedColumn<String> get flag =>
+      $composableBuilder(column: $table.flag, builder: (column) => column);
+
+  GeneratedColumn<String> get continent =>
+      $composableBuilder(column: $table.continent, builder: (column) => column);
+
+  GeneratedColumn<bool> get isArab =>
+      $composableBuilder(column: $table.isArab, builder: (column) => column);
+
+  GeneratedColumn<int> get sort =>
+      $composableBuilder(column: $table.sort, builder: (column) => column);
+}
+
+class $$CountriesTableTableManager
+    extends
+        RootTableManager<
+          _$CatalogDb,
+          $CountriesTable,
+          CountryRow,
+          $$CountriesTableFilterComposer,
+          $$CountriesTableOrderingComposer,
+          $$CountriesTableAnnotationComposer,
+          $$CountriesTableCreateCompanionBuilder,
+          $$CountriesTableUpdateCompanionBuilder,
+          (
+            CountryRow,
+            BaseReferences<_$CatalogDb, $CountriesTable, CountryRow>,
+          ),
+          CountryRow,
+          PrefetchHooks Function()
+        > {
+  $$CountriesTableTableManager(_$CatalogDb db, $CountriesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CountriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CountriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CountriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> code = const Value.absent(),
+                Value<String> nameAr = const Value.absent(),
+                Value<String> nameEn = const Value.absent(),
+                Value<String?> flag = const Value.absent(),
+                Value<String?> continent = const Value.absent(),
+                Value<bool> isArab = const Value.absent(),
+                Value<int> sort = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CountriesCompanion(
+                code: code,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                flag: flag,
+                continent: continent,
+                isArab: isArab,
+                sort: sort,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String code,
+                required String nameAr,
+                required String nameEn,
+                Value<String?> flag = const Value.absent(),
+                Value<String?> continent = const Value.absent(),
+                Value<bool> isArab = const Value.absent(),
+                Value<int> sort = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CountriesCompanion.insert(
+                code: code,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                flag: flag,
+                continent: continent,
+                isArab: isArab,
+                sort: sort,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CountriesTable, CountryRow>(table),
+                  BaseReferences<_$CatalogDb, $CountriesTable, CountryRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CountriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$CatalogDb,
+      $CountriesTable,
+      CountryRow,
+      $$CountriesTableFilterComposer,
+      $$CountriesTableOrderingComposer,
+      $$CountriesTableAnnotationComposer,
+      $$CountriesTableCreateCompanionBuilder,
+      $$CountriesTableUpdateCompanionBuilder,
+      (CountryRow, BaseReferences<_$CatalogDb, $CountriesTable, CountryRow>),
+      CountryRow,
+      PrefetchHooks Function()
+    >;
+typedef $$CategoriesTableCreateCompanionBuilder = CategoriesCompanion Function({
+  required String slug,
+  required String nameAr,
+  required String nameEn,
+  Value<String> icon,
+  Value<int> hue,
+  Value<int> sort,
+  Value<int> rowid,
+});
+typedef $$CategoriesTableUpdateCompanionBuilder = CategoriesCompanion Function({
+  Value<String> slug,
+  Value<String> nameAr,
+  Value<String> nameEn,
+  Value<String> icon,
+  Value<int> hue,
+  Value<int> sort,
+  Value<int> rowid,
+});
+
+class $$CategoriesTableFilterComposer
+    extends Composer<_$CatalogDb, $CategoriesTable> {
+  $$CategoriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get icon => $composableBuilder(
+    column: $table.icon,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hue => $composableBuilder(
+    column: $table.hue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sort => $composableBuilder(
+    column: $table.sort,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CategoriesTableOrderingComposer
+    extends Composer<_$CatalogDb, $CategoriesTable> {
+  $$CategoriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get icon => $composableBuilder(
+    column: $table.icon,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hue => $composableBuilder(
+    column: $table.hue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sort => $composableBuilder(
+    column: $table.sort,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CategoriesTableAnnotationComposer
+    extends Composer<_$CatalogDb, $CategoriesTable> {
+  $$CategoriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get slug =>
+      $composableBuilder(column: $table.slug, builder: (column) => column);
+
+  GeneratedColumn<String> get nameAr =>
+      $composableBuilder(column: $table.nameAr, builder: (column) => column);
+
+  GeneratedColumn<String> get nameEn =>
+      $composableBuilder(column: $table.nameEn, builder: (column) => column);
+
+  GeneratedColumn<String> get icon =>
+      $composableBuilder(column: $table.icon, builder: (column) => column);
+
+  GeneratedColumn<int> get hue =>
+      $composableBuilder(column: $table.hue, builder: (column) => column);
+
+  GeneratedColumn<int> get sort =>
+      $composableBuilder(column: $table.sort, builder: (column) => column);
+}
+
+class $$CategoriesTableTableManager
+    extends
+        RootTableManager<
+          _$CatalogDb,
+          $CategoriesTable,
+          CategoryRow,
+          $$CategoriesTableFilterComposer,
+          $$CategoriesTableOrderingComposer,
+          $$CategoriesTableAnnotationComposer,
+          $$CategoriesTableCreateCompanionBuilder,
+          $$CategoriesTableUpdateCompanionBuilder,
+          (
+            CategoryRow,
+            BaseReferences<_$CatalogDb, $CategoriesTable, CategoryRow>,
+          ),
+          CategoryRow,
+          PrefetchHooks Function()
+        > {
+  $$CategoriesTableTableManager(_$CatalogDb db, $CategoriesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CategoriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CategoriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CategoriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> slug = const Value.absent(),
+                Value<String> nameAr = const Value.absent(),
+                Value<String> nameEn = const Value.absent(),
+                Value<String> icon = const Value.absent(),
+                Value<int> hue = const Value.absent(),
+                Value<int> sort = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CategoriesCompanion(
+                slug: slug,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                icon: icon,
+                hue: hue,
+                sort: sort,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String slug,
+                required String nameAr,
+                required String nameEn,
+                Value<String> icon = const Value.absent(),
+                Value<int> hue = const Value.absent(),
+                Value<int> sort = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CategoriesCompanion.insert(
+                slug: slug,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                icon: icon,
+                hue: hue,
+                sort: sort,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CategoriesTable, CategoryRow>(table),
+                  BaseReferences<_$CatalogDb, $CategoriesTable, CategoryRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CategoriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$CatalogDb,
+      $CategoriesTable,
+      CategoryRow,
+      $$CategoriesTableFilterComposer,
+      $$CategoriesTableOrderingComposer,
+      $$CategoriesTableAnnotationComposer,
+      $$CategoriesTableCreateCompanionBuilder,
+      $$CategoriesTableUpdateCompanionBuilder,
+      (CategoryRow, BaseReferences<_$CatalogDb, $CategoriesTable, CategoryRow>),
+      CategoryRow,
+      PrefetchHooks Function()
+    >;
+typedef $$LanguagesTableCreateCompanionBuilder = LanguagesCompanion Function({
+  required String code,
+  required String nameAr,
+  required String nameEn,
+  Value<int> rowid,
+});
+typedef $$LanguagesTableUpdateCompanionBuilder = LanguagesCompanion Function({
+  Value<String> code,
+  Value<String> nameAr,
+  Value<String> nameEn,
+  Value<int> rowid,
+});
+
+class $$LanguagesTableFilterComposer
+    extends Composer<_$CatalogDb, $LanguagesTable> {
+  $$LanguagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LanguagesTableOrderingComposer
+    extends Composer<_$CatalogDb, $LanguagesTable> {
+  $$LanguagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameEn => $composableBuilder(
+    column: $table.nameEn,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LanguagesTableAnnotationComposer
+    extends Composer<_$CatalogDb, $LanguagesTable> {
+  $$LanguagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get nameAr =>
+      $composableBuilder(column: $table.nameAr, builder: (column) => column);
+
+  GeneratedColumn<String> get nameEn =>
+      $composableBuilder(column: $table.nameEn, builder: (column) => column);
+}
+
+class $$LanguagesTableTableManager
+    extends
+        RootTableManager<
+          _$CatalogDb,
+          $LanguagesTable,
+          LanguageRow,
+          $$LanguagesTableFilterComposer,
+          $$LanguagesTableOrderingComposer,
+          $$LanguagesTableAnnotationComposer,
+          $$LanguagesTableCreateCompanionBuilder,
+          $$LanguagesTableUpdateCompanionBuilder,
+          (
+            LanguageRow,
+            BaseReferences<_$CatalogDb, $LanguagesTable, LanguageRow>,
+          ),
+          LanguageRow,
+          PrefetchHooks Function()
+        > {
+  $$LanguagesTableTableManager(_$CatalogDb db, $LanguagesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LanguagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LanguagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LanguagesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> code = const Value.absent(),
+                Value<String> nameAr = const Value.absent(),
+                Value<String> nameEn = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LanguagesCompanion(
+                code: code,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String code,
+                required String nameAr,
+                required String nameEn,
+                Value<int> rowid = const Value.absent(),
+              }) => LanguagesCompanion.insert(
+                code: code,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LanguagesTable, LanguageRow>(table),
+                  BaseReferences<_$CatalogDb, $LanguagesTable, LanguageRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LanguagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$CatalogDb,
+      $LanguagesTable,
+      LanguageRow,
+      $$LanguagesTableFilterComposer,
+      $$LanguagesTableOrderingComposer,
+      $$LanguagesTableAnnotationComposer,
+      $$LanguagesTableCreateCompanionBuilder,
+      $$LanguagesTableUpdateCompanionBuilder,
+      (LanguageRow, BaseReferences<_$CatalogDb, $LanguagesTable, LanguageRow>),
+      LanguageRow,
+      PrefetchHooks Function()
+    >;
+typedef $$FavoritesTableCreateCompanionBuilder = FavoritesCompanion Function({
+  required String channelId,
+  required int position,
+  required DateTime addedAt,
+  Value<int> rowid,
+});
+typedef $$FavoritesTableUpdateCompanionBuilder = FavoritesCompanion Function({
+  Value<String> channelId,
+  Value<int> position,
+  Value<DateTime> addedAt,
+  Value<int> rowid,
+});
+
+class $$FavoritesTableFilterComposer
+    extends Composer<_$CatalogDb, $FavoritesTable> {
+  $$FavoritesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get channelId => $composableBuilder(
+    column: $table.channelId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get addedAt => $composableBuilder(
+    column: $table.addedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FavoritesTableOrderingComposer
+    extends Composer<_$CatalogDb, $FavoritesTable> {
+  $$FavoritesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get channelId => $composableBuilder(
+    column: $table.channelId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get addedAt => $composableBuilder(
+    column: $table.addedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FavoritesTableAnnotationComposer
+    extends Composer<_$CatalogDb, $FavoritesTable> {
+  $$FavoritesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get channelId =>
+      $composableBuilder(column: $table.channelId, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get addedAt =>
+      $composableBuilder(column: $table.addedAt, builder: (column) => column);
+}
+
+class $$FavoritesTableTableManager
+    extends
+        RootTableManager<
+          _$CatalogDb,
+          $FavoritesTable,
+          Favorite,
+          $$FavoritesTableFilterComposer,
+          $$FavoritesTableOrderingComposer,
+          $$FavoritesTableAnnotationComposer,
+          $$FavoritesTableCreateCompanionBuilder,
+          $$FavoritesTableUpdateCompanionBuilder,
+          (Favorite, BaseReferences<_$CatalogDb, $FavoritesTable, Favorite>),
+          Favorite,
+          PrefetchHooks Function()
+        > {
+  $$FavoritesTableTableManager(_$CatalogDb db, $FavoritesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FavoritesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FavoritesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FavoritesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> channelId = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<DateTime> addedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FavoritesCompanion(
+                channelId: channelId,
+                position: position,
+                addedAt: addedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String channelId,
+                required int position,
+                required DateTime addedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => FavoritesCompanion.insert(
+                channelId: channelId,
+                position: position,
+                addedAt: addedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$FavoritesTable, Favorite>(table),
+                  BaseReferences<_$CatalogDb, $FavoritesTable, Favorite>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FavoritesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$CatalogDb,
+      $FavoritesTable,
+      Favorite,
+      $$FavoritesTableFilterComposer,
+      $$FavoritesTableOrderingComposer,
+      $$FavoritesTableAnnotationComposer,
+      $$FavoritesTableCreateCompanionBuilder,
+      $$FavoritesTableUpdateCompanionBuilder,
+      (Favorite, BaseReferences<_$CatalogDb, $FavoritesTable, Favorite>),
+      Favorite,
+      PrefetchHooks Function()
+    >;
+typedef $$HistoryTableCreateCompanionBuilder = HistoryCompanion Function({
+  required String channelId,
+  required DateTime watchedAt,
+  Value<int> seconds,
+  Value<int> rowid,
+});
+typedef $$HistoryTableUpdateCompanionBuilder = HistoryCompanion Function({
+  Value<String> channelId,
+  Value<DateTime> watchedAt,
+  Value<int> seconds,
+  Value<int> rowid,
+});
+
+class $$HistoryTableFilterComposer
+    extends Composer<_$CatalogDb, $HistoryTable> {
+  $$HistoryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get channelId => $composableBuilder(
+    column: $table.channelId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get watchedAt => $composableBuilder(
+    column: $table.watchedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get seconds => $composableBuilder(
+    column: $table.seconds,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$HistoryTableOrderingComposer
+    extends Composer<_$CatalogDb, $HistoryTable> {
+  $$HistoryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get channelId => $composableBuilder(
+    column: $table.channelId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get watchedAt => $composableBuilder(
+    column: $table.watchedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get seconds => $composableBuilder(
+    column: $table.seconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HistoryTableAnnotationComposer
+    extends Composer<_$CatalogDb, $HistoryTable> {
+  $$HistoryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get channelId =>
+      $composableBuilder(column: $table.channelId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get watchedAt =>
+      $composableBuilder(column: $table.watchedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get seconds =>
+      $composableBuilder(column: $table.seconds, builder: (column) => column);
+}
+
+class $$HistoryTableTableManager
+    extends
+        RootTableManager<
+          _$CatalogDb,
+          $HistoryTable,
+          HistoryData,
+          $$HistoryTableFilterComposer,
+          $$HistoryTableOrderingComposer,
+          $$HistoryTableAnnotationComposer,
+          $$HistoryTableCreateCompanionBuilder,
+          $$HistoryTableUpdateCompanionBuilder,
+          (
+            HistoryData,
+            BaseReferences<_$CatalogDb, $HistoryTable, HistoryData>,
+          ),
+          HistoryData,
+          PrefetchHooks Function()
+        > {
+  $$HistoryTableTableManager(_$CatalogDb db, $HistoryTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HistoryTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HistoryTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HistoryTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> channelId = const Value.absent(),
+                Value<DateTime> watchedAt = const Value.absent(),
+                Value<int> seconds = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HistoryCompanion(
+                channelId: channelId,
+                watchedAt: watchedAt,
+                seconds: seconds,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String channelId,
+                required DateTime watchedAt,
+                Value<int> seconds = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HistoryCompanion.insert(
+                channelId: channelId,
+                watchedAt: watchedAt,
+                seconds: seconds,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$HistoryTable, HistoryData>(table),
+                  BaseReferences<_$CatalogDb, $HistoryTable, HistoryData>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$HistoryTableProcessedTableManager =
+    ProcessedTableManager<
+      _$CatalogDb,
+      $HistoryTable,
+      HistoryData,
+      $$HistoryTableFilterComposer,
+      $$HistoryTableOrderingComposer,
+      $$HistoryTableAnnotationComposer,
+      $$HistoryTableCreateCompanionBuilder,
+      $$HistoryTableUpdateCompanionBuilder,
+      (HistoryData, BaseReferences<_$CatalogDb, $HistoryTable, HistoryData>),
+      HistoryData,
+      PrefetchHooks Function()
+    >;
 
 class $CatalogDbManager {
   final _$CatalogDb _db;
@@ -2984,4 +5649,14 @@ class $CatalogDbManager {
       $$StreamsTableTableManager(_db, _db.streams);
   $$SyncStateTableTableManager get syncState =>
       $$SyncStateTableTableManager(_db, _db.syncState);
+  $$CountriesTableTableManager get countries =>
+      $$CountriesTableTableManager(_db, _db.countries);
+  $$CategoriesTableTableManager get categories =>
+      $$CategoriesTableTableManager(_db, _db.categories);
+  $$LanguagesTableTableManager get languages =>
+      $$LanguagesTableTableManager(_db, _db.languages);
+  $$FavoritesTableTableManager get favorites =>
+      $$FavoritesTableTableManager(_db, _db.favorites);
+  $$HistoryTableTableManager get history =>
+      $$HistoryTableTableManager(_db, _db.history);
 }

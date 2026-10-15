@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -16,6 +17,7 @@ import 'core/settings/local_settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized(); // libmpv (ADR-02)
   await initLogging();
   log.info('start v${Env.version} env=${Env.name} ${Platform.operatingSystem}');
 

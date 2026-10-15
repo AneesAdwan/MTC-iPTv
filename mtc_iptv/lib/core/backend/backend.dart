@@ -61,6 +61,8 @@ final startupSyncProvider = FutureProvider<SyncResult?>((ref) async {
   final sync = ref.watch(catalogSyncProvider);
   if (sync == null) return null;
   try {
+    // المرجعية أولًا (أسماء الدول والفئات للشاشات)، ثم القنوات
+    await sync.syncReference().catchError((Object e) => log.warning('reference sync failed', e));
     return await sync.run();
   } catch (e, s) {
     log.warning('catalog sync failed (offline?)', e, s);

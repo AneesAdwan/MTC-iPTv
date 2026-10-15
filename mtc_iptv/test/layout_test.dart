@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mtc_iptv/app/layout/form_factor.dart';
 import 'package:mtc_iptv/core/settings/local_settings.dart';
 
-import 'app_shell_test.dart' show app;
+import 'app_shell_test.dart' show app, appTest;
 
 Future<void> pumpAt(WidgetTester tester, Size size, {FormFactor? ff, LocalSettings s = const LocalSettings()}) async {
   debugFormFactorOverride = ff;
@@ -17,7 +17,7 @@ Future<void> pumpAt(WidgetTester tester, Size size, {FormFactor? ff, LocalSettin
 }
 
 void main() {
-  testWidgets('phone: bottom navigation + drawer menu, no title bar', (tester) async {
+  appTest('phone: bottom navigation + drawer menu, no title bar', (tester) async {
     await pumpAt(tester, const Size(400, 820), ff: FormFactor.phone);
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byIcon(Icons.menu_rounded), findsOneWidget);
@@ -30,17 +30,18 @@ void main() {
     await tester.tap(find.text('الدول').last);
     await tester.pumpAndSettle();
     expect(find.byType(Drawer), findsNothing);
-    expect(find.text('V-04'), findsOneWidget);
+    // الكتالوج فارغ في الاختبار: شاشة الدول تعرض حالتها الفارغة
+    expect(find.byIcon(Icons.public_off_rounded), findsOneWidget);
   });
 
-  testWidgets('phone: bottom tab switches screen', (tester) async {
+  appTest('phone: bottom tab switches screen', (tester) async {
     await pumpAt(tester, const Size(400, 820), ff: FormFactor.phone);
     await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('البحث')));
     await tester.pumpAndSettle();
-    expect(find.text('V-05'), findsOneWidget);
+    expect(find.byIcon(Icons.manage_search_rounded), findsOneWidget);
   });
 
-  testWidgets('tablet: sidebar is icons-only and has no collapse button', (tester) async {
+  appTest('tablet: sidebar is icons-only and has no collapse button', (tester) async {
     await pumpAt(tester, const Size(1024, 768), ff: FormFactor.tablet);
     expect(find.text('طي القائمة'), findsNothing);
     expect(find.byType(NavigationBar), findsNothing);
@@ -48,7 +49,7 @@ void main() {
     expect(find.byTooltip('القنوات'), findsWidgets);
   });
 
-  testWidgets('desktop: keyboard Tab moves focus into the sidebar items', (tester) async {
+  appTest('desktop: keyboard Tab moves focus into the sidebar items', (tester) async {
     await pumpAt(tester, const Size(1280, 800));
     for (var i = 0; i < 6; i++) {
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);

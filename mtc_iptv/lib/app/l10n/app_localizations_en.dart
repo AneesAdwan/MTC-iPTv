@@ -343,4 +343,151 @@ class L10nEn extends L10n {
 
   @override
   String get copied => 'Copied';
+
+  @override
+  String get featured => 'Featured';
+
+  @override
+  String get recentlyAdded => 'Recently added';
+
+  @override
+  String get continueWatching => 'Continue watching';
+
+  @override
+  String get allChannels => 'All channels';
+
+  @override
+  String get seeAll => 'See all';
+
+  @override
+  String get catalogEmpty => 'No channels on this device yet.';
+
+  @override
+  String get catalogEmptyHint =>
+      'Channels are fetched automatically when you are online.';
+
+  @override
+  String get syncing => 'Syncing channels…';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get country => 'Country';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String channelsCount(int n) {
+    return '$n channels';
+  }
+
+  @override
+  String get searchChannelsHint => 'Search by channel name or number…';
+
+  @override
+  String get noMatches => 'No matching channels.';
+
+  @override
+  String get favoritesEmpty => 'No favorite channels yet.';
+
+  @override
+  String get favoritesEmptyHint => 'Tap ♥ on any channel to add it here.';
+
+  @override
+  String get addFavorite => 'Add to favorites';
+
+  @override
+  String get removeFavorite => 'Remove from favorites';
+
+  @override
+  String serverOf(int i, int n) {
+    return 'Server $i of $n';
+  }
+
+  @override
+  String get switchingServer => 'Switching to another server…';
+
+  @override
+  String get loadingStream => 'Loading…';
+
+  @override
+  String get quality => 'Quality';
+
+  @override
+  String get auto => 'Auto';
+
+  @override
+  String get audioTrack => 'Audio';
+
+  @override
+  String get subtitles => 'Subtitles';
+
+  @override
+  String get off => 'Off';
+
+  @override
+  String get nextChannel => 'Next channel';
+
+  @override
+  String get prevChannel => 'Previous channel';
+
+  @override
+  String get fullscreen => 'Full screen';
+
+  @override
+  String get exitFullscreen => 'Exit full screen';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get tryNextServer => 'Try another server';
+
+  @override
+  String get mute => 'Mute';
+
+  @override
+  String get unmute => 'Unmute';
+
+  @override
+  String get play => 'Play';
+
+  @override
+  String get pause => 'Pause';
+
+  @override
+  String get errAuthFailed =>
+      'The server refused access (the channel may be protected or need a subscription).';
+
+  @override
+  String get errUnavailable =>
+      'The channel is not available on this server right now.';
+
+  @override
+  String get errUnsupported => 'This stream format is not supported.';
+
+  @override
+  String get errNetwork =>
+      'The server is not responding. Check your connection or try later.';
+
+  @override
+  String get errGeneric => 'The channel could not be played.';
+
+  @override
+  String allServersFailed(int n) {
+    return 'All servers ($n) were tried without success.';
+  }
+
+  @override
+  String get noServers => 'This channel has no streams.';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String channelNumber(int n) {
+    return 'Channel $n';
+  }
 }

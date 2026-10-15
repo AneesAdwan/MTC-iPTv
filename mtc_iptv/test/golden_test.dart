@@ -12,7 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mtc_iptv/app/layout/form_factor.dart';
 import 'package:mtc_iptv/core/settings/local_settings.dart';
 
-import 'app_shell_test.dart' show app;
+import 'app_shell_test.dart' show app, appTest;
 
 Future<void> loadFonts() async {
   final plex = FontLoader('IBMPlexSansArabic');
@@ -43,7 +43,7 @@ void main() {
   };
 
   for (final MapEntry(key: name, value: (size, ff, s)) in cases.entries) {
-    testWidgets(name, (tester) async {
+    appTest(name, (tester) async {
       debugFormFactorOverride = ff;
       addTearDown(() => debugFormFactorOverride = null);
       tester.view.physicalSize = size;

@@ -4,6 +4,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:mtc_core/mtc_core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/logging/log.dart';
@@ -12,6 +13,9 @@ import '../../core/storage/catalog_db.dart';
 /// مصدر التغييرات (مجرّد للاختبار).
 abstract interface class CatalogApi {
   Future<Map<String, dynamic>> changes({required int since, required int maxRows});
+
+  /// الدول/الفئات/اللغات المرئية (صغيرة: تُجلب كاملة).
+  Future<({List<Map> countries, List<Map> categories, List<Map> languages})> reference();
 }
 
 class SupabaseCatalogApi implements CatalogApi {
@@ -21,6 +25,16 @@ class SupabaseCatalogApi implements CatalogApi {
   @override
   Future<Map<String, dynamic>> changes({required int since, required int maxRows}) async =>
       Map<String, dynamic>.from(await client.rpc('catalog_changes', params: {'since': since, 'max_rows': maxRows}) as Map);
+
+  @override
+  Future<({List<Map> countries, List<Map> categories, List<Map> languages})> reference() async {
+    final r = await Future.wait([
+      client.from('countries').select('code,name_ar,name_en,flag_emoji,continent,is_arab,sort_order'),
+      client.from('categories').select('slug,name_ar,name_en,icon,hue,sort_order'),
+      client.from('languages').select('code,name_ar,name_en'),
+    ]);
+    return (countries: r[0].cast<Map>(), categories: r[1].cast<Map>(), languages: r[2].cast<Map>());
+  }
 }
 
 class SyncResult {
@@ -36,6 +50,44 @@ class CatalogSync {
   final CatalogApi api;
   final int pageSize;
   CatalogSync(this.db, this.api, {this.pageSize = 2000});
+
+  /// البيانات المرجعية: استبدال كامل في معاملة واحدة (صغيرة، وتتغيّر نادرًا).
+  Future<void> syncReference() async {
+    final r = await api.reference();
+    await db.transaction(() async {
+      await db.delete(db.countries).go();
+      await db.delete(db.categories).go();
+      await db.delete(db.languages).go();
+      await db.batch((b) {
+        b.insertAll(db.countries, [
+          for (final c in r.countries)
+            CountriesCompanion.insert(
+              code: c['code'] as String,
+              nameAr: c['name_ar'] as String,
+              nameEn: c['name_en'] as String,
+              flag: Value(c['flag_emoji'] as String?),
+              continent: Value(c['continent'] as String?),
+              isArab: Value(c['is_arab'] == true),
+              sort: Value((c['sort_order'] as num?)?.toInt() ?? 100),
+            ),
+        ]);
+        b.insertAll(db.categories, [
+          for (final c in r.categories)
+            CategoriesCompanion.insert(
+              slug: c['slug'] as String,
+              nameAr: c['name_ar'] as String,
+              nameEn: c['name_en'] as String,
+              icon: Value((c['icon'] as String?) ?? 'tv'),
+              hue: Value((c['hue'] as num?)?.toInt() ?? 220),
+              sort: Value((c['sort_order'] as num?)?.toInt() ?? 100),
+            ),
+        ]);
+        b.insertAll(db.languages, [
+          for (final l in r.languages) LanguagesCompanion.insert(code: l['code'] as String, nameAr: l['name_ar'] as String, nameEn: l['name_en'] as String),
+        ]);
+      });
+    });
+  }
 
   Future<SyncResult> run({int maxPages = 50}) async {
     final from = await db.catalogRev();
@@ -99,7 +151,13 @@ class CatalogSync {
         family: Value(j['family'] as String?),
         parental: Value(j['parental'] == true),
         publishedAt: Value(j['published_at'] == null ? null : DateTime.tryParse(j['published_at'] as String)),
+        search: Value(searchKey(j)),
       );
+
+  /// كل ما يمكن البحث به، مطبّعًا: الاسمان، الأسماء البديلة، الشبكة، والرقم.
+  static String searchKey(Map j) => [
+        j['name_ar'], j['name_en'], ...?(j['alt_names'] as List?), j['network'],
+      ].whereType<String>().map(matchKey).join(' ') + (j['number'] == null ? '' : ' #${j['number']}');
 
   static StreamsCompanion _stream(Map j) => StreamsCompanion.insert(
         id: j['id'] as String,

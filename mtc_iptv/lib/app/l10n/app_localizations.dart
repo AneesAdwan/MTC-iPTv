@@ -744,6 +744,276 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'نُسخ'**
   String get copied;
+
+  /// No description provided for @featured.
+  ///
+  /// In ar, this message translates to:
+  /// **'مميزة'**
+  String get featured;
+
+  /// No description provided for @recentlyAdded.
+  ///
+  /// In ar, this message translates to:
+  /// **'مضافة حديثًا'**
+  String get recentlyAdded;
+
+  /// No description provided for @continueWatching.
+  ///
+  /// In ar, this message translates to:
+  /// **'تابع المشاهدة'**
+  String get continueWatching;
+
+  /// No description provided for @allChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل القنوات'**
+  String get allChannels;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض الكل'**
+  String get seeAll;
+
+  /// No description provided for @catalogEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد قنوات على الجهاز بعد.'**
+  String get catalogEmpty;
+
+  /// No description provided for @catalogEmptyHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُجلب القنوات تلقائيًا عند الاتصال بالإنترنت.'**
+  String get catalogEmptyHint;
+
+  /// No description provided for @syncing.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ مزامنة القنوات…'**
+  String get syncing;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكل'**
+  String get filterAll;
+
+  /// No description provided for @country.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدولة'**
+  String get country;
+
+  /// No description provided for @category.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئة'**
+  String get category;
+
+  /// No description provided for @channelsCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} قناة'**
+  String channelsCount(int n);
+
+  /// No description provided for @searchChannelsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث باسم القناة أو رقمها…'**
+  String get searchChannelsHint;
+
+  /// No description provided for @noMatches.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد قنوات مطابقة.'**
+  String get noMatches;
+
+  /// No description provided for @favoritesEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد قنوات مفضلة بعد.'**
+  String get favoritesEmpty;
+
+  /// No description provided for @favoritesEmptyHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط ♥ في صفحة أي قناة لإضافتها هنا.'**
+  String get favoritesEmptyHint;
+
+  /// No description provided for @addFavorite.
+  ///
+  /// In ar, this message translates to:
+  /// **'أضف للمفضلة'**
+  String get addFavorite;
+
+  /// No description provided for @removeFavorite.
+  ///
+  /// In ar, this message translates to:
+  /// **'أزل من المفضلة'**
+  String get removeFavorite;
+
+  /// No description provided for @serverOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'السيرفر {i} من {n}'**
+  String serverOf(int i, int n);
+
+  /// No description provided for @switchingServer.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ التبديل إلى سيرفر آخر…'**
+  String get switchingServer;
+
+  /// No description provided for @loadingStream.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ التحميل…'**
+  String get loadingStream;
+
+  /// No description provided for @quality.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجودة'**
+  String get quality;
+
+  /// No description provided for @auto.
+  ///
+  /// In ar, this message translates to:
+  /// **'تلقائي'**
+  String get auto;
+
+  /// No description provided for @audioTrack.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصوت'**
+  String get audioTrack;
+
+  /// No description provided for @subtitles.
+  ///
+  /// In ar, this message translates to:
+  /// **'الترجمة'**
+  String get subtitles;
+
+  /// No description provided for @off.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف'**
+  String get off;
+
+  /// No description provided for @nextChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'القناة التالية'**
+  String get nextChannel;
+
+  /// No description provided for @prevChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'القناة السابقة'**
+  String get prevChannel;
+
+  /// No description provided for @fullscreen.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملء الشاشة'**
+  String get fullscreen;
+
+  /// No description provided for @exitFullscreen.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنهاء ملء الشاشة'**
+  String get exitFullscreen;
+
+  /// No description provided for @retry.
+  ///
+  /// In ar, this message translates to:
+  /// **'أعد المحاولة'**
+  String get retry;
+
+  /// No description provided for @tryNextServer.
+  ///
+  /// In ar, this message translates to:
+  /// **'جرّب سيرفرًا آخر'**
+  String get tryNextServer;
+
+  /// No description provided for @mute.
+  ///
+  /// In ar, this message translates to:
+  /// **'كتم'**
+  String get mute;
+
+  /// No description provided for @unmute.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء الكتم'**
+  String get unmute;
+
+  /// No description provided for @play.
+  ///
+  /// In ar, this message translates to:
+  /// **'تشغيل'**
+  String get play;
+
+  /// No description provided for @pause.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف مؤقت'**
+  String get pause;
+
+  /// No description provided for @errAuthFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'السيرفر رفض الوصول (قد تكون القناة محمية أو تحتاج اشتراكًا).'**
+  String get errAuthFailed;
+
+  /// No description provided for @errUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'القناة غير متاحة حاليًا على هذا السيرفر.'**
+  String get errUnavailable;
+
+  /// No description provided for @errUnsupported.
+  ///
+  /// In ar, this message translates to:
+  /// **'صيغة هذا البث غير مدعومة.'**
+  String get errUnsupported;
+
+  /// No description provided for @errNetwork.
+  ///
+  /// In ar, this message translates to:
+  /// **'السيرفر لا يستجيب. تحقّق من اتصالك أو جرّب لاحقًا.'**
+  String get errNetwork;
+
+  /// No description provided for @errGeneric.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تشغيل القناة.'**
+  String get errGeneric;
+
+  /// No description provided for @allServersFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'جُرّبت كل السيرفرات ({n}) دون نجاح.'**
+  String allServersFailed(int n);
+
+  /// No description provided for @noServers.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد روابط لهذه القناة.'**
+  String get noServers;
+
+  /// No description provided for @back.
+  ///
+  /// In ar, this message translates to:
+  /// **'رجوع'**
+  String get back;
+
+  /// No description provided for @channelNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'القناة {n}'**
+  String channelNumber(int n);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

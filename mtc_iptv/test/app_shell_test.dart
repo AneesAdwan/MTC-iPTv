@@ -1,3 +1,4 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,13 +8,31 @@ import 'package:mtc_iptv/app/l10n/app_localizations_ar.dart';
 import 'package:mtc_iptv/app/l10n/app_localizations_en.dart';
 import 'package:mtc_iptv/app/screens.dart';
 import 'package:mtc_iptv/app/shell/sidebar.dart';
+import 'package:mtc_iptv/core/backend/backend.dart';
 import 'package:mtc_iptv/core/settings/local_settings.dart';
+import 'package:mtc_iptv/core/storage/catalog_db.dart';
 
 /// [admin]: يعرض قسم الإدارة (جلسة مدير كاملة) دون خادم.
 Widget app(LocalSettings s, {bool admin = true}) => ProviderScope(
-      overrides: [initialSettingsProvider.overrideWithValue(s), isAdminProvider.overrideWithValue(admin)],
+      overrides: [
+        initialSettingsProvider.overrideWithValue(s),
+        isAdminProvider.overrideWithValue(admin),
+        catalogDbProvider.overrideWith((ref) {
+          final db = CatalogDb(NativeDatabase.memory());
+          ref.onDispose(db.close);
+          return db;
+        }),
+      ],
       child: const MtcApp(),
     );
+
+/// testWidgets + إزالة الشجرة في النهاية: استعلامات drift المراقَبة تُغلق بمؤقت صفري عند الإلغاء،
+/// فنُفرغ الشجرة وننفّذ المؤقت داخل الاختبار بدل أن يبقى معلّقًا.
+void appTest(String name, Future<void> Function(WidgetTester) body, {Object? tags}) => testWidgets(name, (tester) async {
+      await body(tester);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(Duration.zero);
+    }, tags: tags);
 
 Future<void> pumpApp(WidgetTester tester, LocalSettings s) async {
   tester.view.physicalSize = const Size(1280, 800);
@@ -50,7 +69,7 @@ void main() {
   });
 
   group('direction & language (§6.4)', () {
-    testWidgets('Arabic is RTL by default and shows Arabic titles', (tester) async {
+    appTest('Arabic is RTL by default and shows Arabic titles', (tester) async {
       await pumpApp(tester, const LocalSettings());
       final dir = Directionality.of(tester.element(find.byType(Scaffold).first));
       expect(dir, TextDirection.rtl);
@@ -58,7 +77,7 @@ void main() {
       expect(find.text('الإدارة'), findsOneWidget);
     });
 
-    testWidgets('English is LTR and shows English titles', (tester) async {
+    appTest('English is LTR and shows English titles', (tester) async {
       await pumpApp(tester, const LocalSettings(locale: Locale('en')));
       final dir = Directionality.of(tester.element(find.byType(Scaffold).first));
       expect(dir, TextDirection.ltr);
@@ -66,14 +85,14 @@ void main() {
       expect(find.text('Admin'), findsOneWidget);
     });
 
-    testWidgets('light theme builds', (tester) async {
+    appTest('light theme builds', (tester) async {
       await pumpApp(tester, const LocalSettings(themeMode: ThemeMode.light));
       expect(Theme.of(tester.element(find.byType(Scaffold).first)).brightness, Brightness.light);
     });
   });
 
   group('admin guard (UX only; the server enforces is_admin + MFA)', () {
-    testWidgets('non-admin sees only the admin sign-in entry, not the admin sections', (tester) async {
+    appTest('non-admin sees only the admin sign-in entry, not the admin sections', (tester) async {
       tester.view.physicalSize = const Size(1280, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -83,7 +102,7 @@ void main() {
       expect(find.text('لوحة المعلومات'), findsNothing);
     });
 
-    testWidgets('non-admin opening an admin route lands on the sign-in screen', (tester) async {
+    appTest('non-admin opening an admin route lands on the sign-in screen', (tester) async {
       tester.view.physicalSize = const Size(1280, 800);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -97,7 +116,7 @@ void main() {
   });
 
   group('navigation', () {
-    testWidgets('tapping a sidebar item opens its placeholder with the screen id', (tester) async {
+    appTest('tapping a sidebar item opens its placeholder with the screen id', (tester) async {
       await pumpApp(tester, const LocalSettings());
       // القائمة كسولة: نمرّرها حتى يظهر العنصر
       await tester.scrollUntilVisible(find.text('صحة البث'), 200, scrollable: find.byType(Scrollable).first);
