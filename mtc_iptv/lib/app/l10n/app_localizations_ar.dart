@@ -1460,4 +1460,171 @@ class L10nAr extends L10n {
 
   @override
   String get setLogo => 'تعيين الشعار';
+
+  @override
+  String get imFile => 'ملف';
+
+  @override
+  String get imUrl => 'رابط';
+
+  @override
+  String get imPaste => 'لصق';
+
+  @override
+  String get imXtream => 'حساب Xtream';
+
+  @override
+  String get imChooseFiles => 'اختر ملفًا…';
+
+  @override
+  String get imPasteHint =>
+      'الصق M3U أو CSV أو JSON أو روابط (رابط في كل سطر)…';
+
+  @override
+  String get imAnalyze => 'تحليل';
+
+  @override
+  String get imXServer => 'الخادم (http://host:port)';
+
+  @override
+  String get imXUser => 'اسم المستخدم';
+
+  @override
+  String get imXPass => 'كلمة المرور';
+
+  @override
+  String get imXtreamNote =>
+      'يُستخدم الحساب مرة واحدة لهذا الاستيراد ولا يُحفظ.';
+
+  @override
+  String get imAnalyzing => 'جارٍ التحليل…';
+
+  @override
+  String imFormat(String f, String e) {
+    return 'الصيغة $f · الترميز $e';
+  }
+
+  @override
+  String imIssues(int n) {
+    return 'أسطر لم تُقرأ ($n)';
+  }
+
+  @override
+  String get kNew => 'قنوات جديدة';
+
+  @override
+  String get kUpdate => 'إضافة لقناة موجودة';
+
+  @override
+  String get kExisting => 'موجودة في الكتالوج';
+
+  @override
+  String get kInFile => 'مكررة في الملف';
+
+  @override
+  String get kFailed => 'غير مدعومة';
+
+  @override
+  String imCommit(int n) {
+    return 'استيراد المحدد ($n)';
+  }
+
+  @override
+  String get imCommitHint =>
+      'لا يُكتب شيء قبل الاستيراد. القنوات الجديدة تذهب لقيد المراجعة؛ والموجودة يُضاف لها الرابط الجديد فقط (تعديلاتك تبقى كما هي).';
+
+  @override
+  String get imDone => 'انتهى الاستيراد';
+
+  @override
+  String imResult(int channels, int streams, int disabled) {
+    return 'أُضيفت $channels قناة و$streams رابط · عُطّل $disabled رابط';
+  }
+
+  @override
+  String get imGoReview => 'فتح قيد المراجعة';
+
+  @override
+  String get imNew => 'استيراد جديد';
+
+  @override
+  String imVanished(int n) {
+    return '$n رابط من هذا المصدر لم يعد موجودًا فيه';
+  }
+
+  @override
+  String get imDisableVanished => 'تعطيلها (لا حذف)';
+
+  @override
+  String get imPossibleDup => 'مكررة محتملة';
+
+  @override
+  String get imAll => 'الكل';
+
+  @override
+  String get imNone => 'لا شيء';
+
+  @override
+  String get srcAdd => 'إضافة مصدر';
+
+  @override
+  String get srcName => 'الاسم';
+
+  @override
+  String get srcUrl => 'رابط القائمة (https)';
+
+  @override
+  String get srcRefresh => 'جلب ومراجعة';
+
+  @override
+  String srcLast(String t) {
+    return 'آخر استيراد $t';
+  }
+
+  @override
+  String srcCounts(int c, int s) {
+    return '$c قناة · $s رابط';
+  }
+
+  @override
+  String get srcRemove => 'إزالة المصدر';
+
+  @override
+  String get srcRemoveConfirm =>
+      'إزالة هذا المصدر؟ روابطه وقنواته تبقى في الكتالوج.';
+
+  @override
+  String get srcActive => 'مفعّل';
+
+  @override
+  String get srcScheduleLater =>
+      'التحديث التلقائي المجدول يأتي مع المُجدوِل (المرحلة 6). الآن: «جلب ومراجعة».';
+
+  @override
+  String get srcEmpty => 'لا مصادر بعد.';
+
+  @override
+  String get exFormat => 'الصيغة';
+
+  @override
+  String get exWorkingOnly => 'الروابط العاملة فقط';
+
+  @override
+  String get exBestOnly => 'أفضل رابط فقط';
+
+  @override
+  String get exSkipCreds => 'استبعاد الروابط ذات بيانات الاعتماد';
+
+  @override
+  String get exExport => 'تصدير…';
+
+  @override
+  String exDone(int n) {
+    return 'صُدّرت $n قناة.';
+  }
+
+  @override
+  String exChannels(int n) {
+    return '$n قناة مطابقة';
+  }
 }

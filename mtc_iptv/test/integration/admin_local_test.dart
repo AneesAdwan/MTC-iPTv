@@ -6,7 +6,9 @@ library;
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mtc_core/mtc_core.dart';
 import 'package:mtc_iptv/data/admin/admin_repository.dart';
+import 'package:mtc_iptv/data/admin/import_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'local_backend_test.dart' show admin, anonKey, serviceKey, totp, url;
@@ -148,6 +150,65 @@ void main() {
     final runs = await repo.taskRuns();
     expect(runs.firstWhere((x) => x['id'] == run)['status'], 'ok');
     expect(await repo.scheduledTasks(), isNotEmpty);
+  }, skip: skip);
+
+  test('phase 5a: import (dry run -> commit), sources without deletion, export', () async {
+    // كتالوج قائم: قناة بمعرّف tvg ورابط
+    final r0 = await admin('POST', '/rest/v1/channels', {'uid': 'Imp$stamp.sa', 'name': 'Existing $stamp', 'country_code': null});
+    final existingId = ((jsonDecode(r0.body) as List).single as Map)['id'] as String;
+    await admin('POST', '/rest/v1/streams', {'channel_id': existingId, 'url': 'https://example.com/imp/$stamp/old.m3u8'});
+    final created = <String>[existingId];
+    addTearDown(() async {
+      for (final id in created) {
+        await admin('DELETE', '/rest/v1/channels?id=eq.$id');
+      }
+    });
+
+    final m3u = '#EXTM3U\n'
+        '#EXTINF:-1 tvg-id="Imp$stamp.sa@HD",Existing (1080p)\nhttps://example.com/imp/$stamp/new-server.m3u8\n'
+        '#EXTINF:-1 tvg-id="Brand$stamp.eg" group-title="News",Brand New $stamp\n#EXTVLCOPT:http-user-agent=TestUA\nhttps://example.com/imp/$stamp/brand.m3u8\n'
+        '#EXTINF:-1,Old link\nhttps://example.com/imp/$stamp/old.m3u8\n';
+
+    // التشغيل التجريبي (نفس ما تفعله الشاشة) — لا كتابة
+    final (channels, streams) = await repo.matchingCatalog();
+    final index = CatalogIndex([
+      for (final c in channels) CatalogChannel(id: c['id'] as String, uid: c['uid'] as String, name: '${c['name']}', country: c['country_code'] as String?, epgId: c['epg_id'] as String?),
+    ], {for (final s in streams) s['url'] as String: s['channel_id'] as String});
+    final rep = matchImport(parseImport(m3u).items, index);
+    expect(rep.results.map((r) => r.kind), ['update', 'new', 'existing']);
+    expect(rep.results.first.channelId, existingId);
+
+    // القبول
+    final items = [
+      for (final r in rep.results.where((r) => r.kind != 'existing'))
+        {'uid': r.uid, 'name': r.item.name, 'logo': r.item.logo, 'country': r.item.country, 'category': mapCategory(r.item.group, await repo.categories()), 'quality': r.item.quality, 'url': r.item.url},
+    ];
+    final (ch, st) = await repo.importItems(null, items);
+    expect(st, 2);
+    expect(ch, greaterThanOrEqualTo(1));
+    await repo.setStreamHeaders('https://example.com/imp/$stamp/brand.m3u8', userAgent: 'TestUA');
+
+    // الموجودة: الاسم لم يتغير (لا استبدال لبيانات المدير) وأصبح لها رابطان
+    expect((await repo.channel(existingId))!.name, 'Existing $stamp');
+    expect((await repo.streamsOf(existingId)).length, 2);
+    // الجديدة: قيد المراجعة دائمًا، بفئة من group-title وترويسة الرابط
+    final brand = (await repo.channels(ChannelQuery(search: 'Brand New $stamp'))).items.single;
+    created.add(brand.id);
+    expect(brand.publishState, 'pending');
+    expect(brand.countryCode, 'EG');
+    expect((await repo.streamsOf(brand.id)).single.userAgent, 'TestUA');
+
+    // المصدر: الإزالة لا تحذف الروابط (القيد الأصلي cascade)
+    final src = await repo.addSource('Test $stamp', 'https://example.com/src-$stamp.m3u');
+    await repo.importItems(src, [{'uid': 'Brand$stamp.eg', 'name': 'Brand New $stamp', 'url': 'https://example.com/imp/$stamp/from-source.m3u8'}]);
+    await repo.markSourceImported(src);
+    expect((await repo.sources()).firstWhere((s) => s['id'] == src)['stream_count'], 1);
+    await repo.removeSource(src);
+    expect((await repo.streamsOf(brand.id)).map((s) => s.url), contains('https://example.com/imp/$stamp/from-source.m3u8'));
+
+    // التصدير
+    final rows = await repo.exportRows(state: 'pending');
+    expect(rows.map((r) => r['uid']), contains('Brand$stamp.eg'));
   }, skip: skip);
 
   test('batch 4c: reversible merge, duplicates, logos, networks, home layout', () async {

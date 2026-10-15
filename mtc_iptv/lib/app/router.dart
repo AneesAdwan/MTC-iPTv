@@ -10,7 +10,10 @@ import '../features/admin/channels/channels_admin_screen.dart';
 import '../features/admin/dashboard_screen.dart';
 import '../features/admin/compare_screen.dart';
 import '../features/admin/duplicates_screen.dart';
+import '../features/admin/export_screen.dart';
 import '../features/admin/health_screen.dart';
+import '../features/admin/import_screen.dart';
+import '../features/admin/sources_screen.dart';
 import '../features/admin/home_layout_screen.dart';
 import '../features/admin/logos_screen.dart';
 import '../features/admin/networks_screen.dart';
@@ -108,6 +111,9 @@ Widget _screenFor(ScreenDef s, GoRouterState state) {
     'ADM-B5' => const TaxonomyScreen(),
     'ADM-B7' => const NumberingScreen(),
     'ADM-D1' => const ReviewScreen(),
+    'ADM-C1' || 'ADM-C2' => const ImportScreen(),
+    'ADM-C3' => const SourcesScreen(),
+    'ADM-C5' => const ExportScreen(),
     'ADM-D4' => HealthScreen(key: ValueKey(state.uri.toString()), initialState: q['state']),
     'ADM-D6' => const ReportsAdminScreen(),
     _ => PlaceholderScreen(def: s),

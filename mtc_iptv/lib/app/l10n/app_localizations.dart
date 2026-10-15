@@ -2796,6 +2796,294 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'تعيين الشعار'**
   String get setLogo;
+
+  /// No description provided for @imFile.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملف'**
+  String get imFile;
+
+  /// No description provided for @imUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط'**
+  String get imUrl;
+
+  /// No description provided for @imPaste.
+  ///
+  /// In ar, this message translates to:
+  /// **'لصق'**
+  String get imPaste;
+
+  /// No description provided for @imXtream.
+  ///
+  /// In ar, this message translates to:
+  /// **'حساب Xtream'**
+  String get imXtream;
+
+  /// No description provided for @imChooseFiles.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر ملفًا…'**
+  String get imChooseFiles;
+
+  /// No description provided for @imPasteHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصق M3U أو CSV أو JSON أو روابط (رابط في كل سطر)…'**
+  String get imPasteHint;
+
+  /// No description provided for @imAnalyze.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحليل'**
+  String get imAnalyze;
+
+  /// No description provided for @imXServer.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخادم (http://host:port)'**
+  String get imXServer;
+
+  /// No description provided for @imXUser.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم المستخدم'**
+  String get imXUser;
+
+  /// No description provided for @imXPass.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور'**
+  String get imXPass;
+
+  /// No description provided for @imXtreamNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُستخدم الحساب مرة واحدة لهذا الاستيراد ولا يُحفظ.'**
+  String get imXtreamNote;
+
+  /// No description provided for @imAnalyzing.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ التحليل…'**
+  String get imAnalyzing;
+
+  /// No description provided for @imFormat.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصيغة {f} · الترميز {e}'**
+  String imFormat(String f, String e);
+
+  /// No description provided for @imIssues.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسطر لم تُقرأ ({n})'**
+  String imIssues(int n);
+
+  /// No description provided for @kNew.
+  ///
+  /// In ar, this message translates to:
+  /// **'قنوات جديدة'**
+  String get kNew;
+
+  /// No description provided for @kUpdate.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة لقناة موجودة'**
+  String get kUpdate;
+
+  /// No description provided for @kExisting.
+  ///
+  /// In ar, this message translates to:
+  /// **'موجودة في الكتالوج'**
+  String get kExisting;
+
+  /// No description provided for @kInFile.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكررة في الملف'**
+  String get kInFile;
+
+  /// No description provided for @kFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير مدعومة'**
+  String get kFailed;
+
+  /// No description provided for @imCommit.
+  ///
+  /// In ar, this message translates to:
+  /// **'استيراد المحدد ({n})'**
+  String imCommit(int n);
+
+  /// No description provided for @imCommitHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يُكتب شيء قبل الاستيراد. القنوات الجديدة تذهب لقيد المراجعة؛ والموجودة يُضاف لها الرابط الجديد فقط (تعديلاتك تبقى كما هي).'**
+  String get imCommitHint;
+
+  /// No description provided for @imDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهى الاستيراد'**
+  String get imDone;
+
+  /// No description provided for @imResult.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُضيفت {channels} قناة و{streams} رابط · عُطّل {disabled} رابط'**
+  String imResult(int channels, int streams, int disabled);
+
+  /// No description provided for @imGoReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح قيد المراجعة'**
+  String get imGoReview;
+
+  /// No description provided for @imNew.
+  ///
+  /// In ar, this message translates to:
+  /// **'استيراد جديد'**
+  String get imNew;
+
+  /// No description provided for @imVanished.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} رابط من هذا المصدر لم يعد موجودًا فيه'**
+  String imVanished(int n);
+
+  /// No description provided for @imDisableVanished.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعطيلها (لا حذف)'**
+  String get imDisableVanished;
+
+  /// No description provided for @imPossibleDup.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكررة محتملة'**
+  String get imPossibleDup;
+
+  /// No description provided for @imAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكل'**
+  String get imAll;
+
+  /// No description provided for @imNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا شيء'**
+  String get imNone;
+
+  /// No description provided for @srcAdd.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة مصدر'**
+  String get srcAdd;
+
+  /// No description provided for @srcName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم'**
+  String get srcName;
+
+  /// No description provided for @srcUrl.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط القائمة (https)'**
+  String get srcUrl;
+
+  /// No description provided for @srcRefresh.
+  ///
+  /// In ar, this message translates to:
+  /// **'جلب ومراجعة'**
+  String get srcRefresh;
+
+  /// No description provided for @srcLast.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر استيراد {t}'**
+  String srcLast(String t);
+
+  /// No description provided for @srcCounts.
+  ///
+  /// In ar, this message translates to:
+  /// **'{c} قناة · {s} رابط'**
+  String srcCounts(int c, int s);
+
+  /// No description provided for @srcRemove.
+  ///
+  /// In ar, this message translates to:
+  /// **'إزالة المصدر'**
+  String get srcRemove;
+
+  /// No description provided for @srcRemoveConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'إزالة هذا المصدر؟ روابطه وقنواته تبقى في الكتالوج.'**
+  String get srcRemoveConfirm;
+
+  /// No description provided for @srcActive.
+  ///
+  /// In ar, this message translates to:
+  /// **'مفعّل'**
+  String get srcActive;
+
+  /// No description provided for @srcScheduleLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحديث التلقائي المجدول يأتي مع المُجدوِل (المرحلة 6). الآن: «جلب ومراجعة».'**
+  String get srcScheduleLater;
+
+  /// No description provided for @srcEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا مصادر بعد.'**
+  String get srcEmpty;
+
+  /// No description provided for @exFormat.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصيغة'**
+  String get exFormat;
+
+  /// No description provided for @exWorkingOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'الروابط العاملة فقط'**
+  String get exWorkingOnly;
+
+  /// No description provided for @exBestOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'أفضل رابط فقط'**
+  String get exBestOnly;
+
+  /// No description provided for @exSkipCreds.
+  ///
+  /// In ar, this message translates to:
+  /// **'استبعاد الروابط ذات بيانات الاعتماد'**
+  String get exSkipCreds;
+
+  /// No description provided for @exExport.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصدير…'**
+  String get exExport;
+
+  /// No description provided for @exDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'صُدّرت {n} قناة.'**
+  String exDone(int n);
+
+  /// No description provided for @exChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} قناة مطابقة'**
+  String exChannels(int n);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

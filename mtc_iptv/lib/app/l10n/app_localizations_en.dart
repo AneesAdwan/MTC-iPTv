@@ -1469,4 +1469,170 @@ class L10nEn extends L10n {
 
   @override
   String get setLogo => 'Set logo';
+
+  @override
+  String get imFile => 'File';
+
+  @override
+  String get imUrl => 'Link';
+
+  @override
+  String get imPaste => 'Paste';
+
+  @override
+  String get imXtream => 'Xtream account';
+
+  @override
+  String get imChooseFiles => 'Choose a file…';
+
+  @override
+  String get imPasteHint => 'Paste M3U, CSV, JSON or links (one per line)…';
+
+  @override
+  String get imAnalyze => 'Analyze';
+
+  @override
+  String get imXServer => 'Server (http://host:port)';
+
+  @override
+  String get imXUser => 'Username';
+
+  @override
+  String get imXPass => 'Password';
+
+  @override
+  String get imXtreamNote =>
+      'The account is used once for this import and is not saved.';
+
+  @override
+  String get imAnalyzing => 'Analyzing…';
+
+  @override
+  String imFormat(String f, String e) {
+    return 'Format $f · encoding $e';
+  }
+
+  @override
+  String imIssues(int n) {
+    return 'Lines that could not be read ($n)';
+  }
+
+  @override
+  String get kNew => 'New channels';
+
+  @override
+  String get kUpdate => 'Add to existing';
+
+  @override
+  String get kExisting => 'Already in catalog';
+
+  @override
+  String get kInFile => 'Duplicate in file';
+
+  @override
+  String get kFailed => 'Not supported';
+
+  @override
+  String imCommit(int n) {
+    return 'Import selected ($n)';
+  }
+
+  @override
+  String get imCommitHint =>
+      'Nothing is written until you import. New channels go to Pending review; existing channels only get the new streams (your edits stay as they are).';
+
+  @override
+  String get imDone => 'Import finished';
+
+  @override
+  String imResult(int channels, int streams, int disabled) {
+    return '$channels channels and $streams streams added · $disabled streams disabled';
+  }
+
+  @override
+  String get imGoReview => 'Open pending review';
+
+  @override
+  String get imNew => 'New import';
+
+  @override
+  String imVanished(int n) {
+    return '$n streams of this source are no longer in it';
+  }
+
+  @override
+  String get imDisableVanished => 'Disable them (not delete)';
+
+  @override
+  String get imPossibleDup => 'possible duplicate';
+
+  @override
+  String get imAll => 'All';
+
+  @override
+  String get imNone => 'None';
+
+  @override
+  String get srcAdd => 'Add source';
+
+  @override
+  String get srcName => 'Name';
+
+  @override
+  String get srcUrl => 'Playlist link (https)';
+
+  @override
+  String get srcRefresh => 'Fetch & review';
+
+  @override
+  String srcLast(String t) {
+    return 'Last import $t';
+  }
+
+  @override
+  String srcCounts(int c, int s) {
+    return '$c channels · $s streams';
+  }
+
+  @override
+  String get srcRemove => 'Remove source';
+
+  @override
+  String get srcRemoveConfirm =>
+      'Remove this source? Its streams and channels stay in the catalog.';
+
+  @override
+  String get srcActive => 'Active';
+
+  @override
+  String get srcScheduleLater =>
+      'Automatic refresh on a schedule arrives with the scheduler (phase 6). For now: Fetch & review.';
+
+  @override
+  String get srcEmpty => 'No sources yet.';
+
+  @override
+  String get exFormat => 'Format';
+
+  @override
+  String get exWorkingOnly => 'Working streams only';
+
+  @override
+  String get exBestOnly => 'Best stream only';
+
+  @override
+  String get exSkipCreds => 'Leave out links with credentials';
+
+  @override
+  String get exExport => 'Export…';
+
+  @override
+  String exDone(int n) {
+    return 'Exported $n channels.';
+  }
+
+  @override
+  String exChannels(int n) {
+    return '$n channels match';
+  }
 }

@@ -232,6 +232,18 @@ class AdminRepository {
   static const _streamCols =
       'id,channel_id,url,label,quality,priority,user_agent,referrer,headers,protocol,has_credentials,health_state,health_reason,health_score,http_status,response_ms,last_checked_at';
 
+  /// كل الصفوف على صفحات (PostgREST يعيد 1000 صف كحد أقصى في الطلب الواحد على Supabase).
+  /// [page] يجب أن يرتّب بمفتاح فريد ليكون التقسيم ثابتًا.
+  Future<List<Map<String, dynamic>>> _all(PostgrestTransformBuilder<PostgrestList> Function(int from, int to) page) async {
+    const size = 1000;
+    final out = <Map<String, dynamic>>[];
+    for (var from = 0;; from += size) {
+      final rows = await page(from, from + size - 1);
+      out.addAll(rows);
+      if (rows.length < size) return out;
+    }
+  }
+
   // ── لوحة المعلومات ───────────────────────────────────────────────────────
   Future<Dashboard> dashboard() async {
     final ch = <String, int>{};
@@ -243,14 +255,16 @@ class AdminRepository {
     final reports = await db.from('reports').count().eq('status', 'open');
     // تغطية EPG: القنوات المنشورة التي لها برامج خلال 24 ساعة (§9.3)
     final now = DateTime.now().toUtc();
-    final epgRows = await db
+    final epgRows = await _all((a, b) => db
         .from('epg_programmes')
-        .select('channel_uid')
+        .select('channel_uid,start_at')
         .gte('end_at', now.toIso8601String())
         .lte('start_at', now.add(const Duration(hours: 24)).toIso8601String())
-        .limit(20000);
+        .order('channel_uid', ascending: true)
+        .order('start_at', ascending: true)
+        .range(a, b));
     final uids = {for (final r in epgRows) r['channel_uid'] as String};
-    final published = await db.from('channels').select('uid').eq('publish_state', 'published').limit(20000);
+    final published = await _all((a, b) => db.from('channels').select('uid').eq('publish_state', 'published').order('id', ascending: true).range(a, b));
     final covered = published.where((r) => uids.contains(r['uid'])).length;
     return Dashboard(ch, st, reports, covered, await recentAudit(limit: 10));
   }
@@ -402,7 +416,7 @@ class AdminRepository {
 
   // ── قيد المراجعة (ADM-D1): العرض review_queue والدوال الموجودة في الإنتاج ──
   Future<Map<String, int>> reviewCounts() async {
-    final rows = await db.from('review_queue').select('bucket').limit(20000);
+    final rows = await _all((a, b) => db.from('review_queue').select('id,bucket').order('id', ascending: true).range(a, b));
     final m = <String, int>{};
     for (final r in rows) {
       m['${r['bucket']}'] = (m['${r['bucket']}'] ?? 0) + 1;
@@ -422,7 +436,7 @@ class AdminRepository {
     return (res.data, res.count);
   }
 
-  Future<List<String>> reviewIds(String bucket) async => [for (final r in await db.from('review_queue').select('id').eq('bucket', bucket).limit(20000)) r['id'] as String];
+  Future<List<String>> reviewIds(String bucket) async => [for (final r in await _all((a, b) => db.from('review_queue').select('id').eq('bucket', bucket).order('id', ascending: true).range(a, b))) r['id'] as String];
 
   /// approve نشر · reject حذف نهائي · merge دمج المكررة في أصلها.
   Future<int> reviewApply(String action, List<String> ids) async => ((await db.rpc('admin_review_apply', params: {'p_action': action, 'p_ids': ids})) as num).toInt();
@@ -455,7 +469,7 @@ class AdminRepository {
   /// عدد القنوات لكل عنصر (لعرضه ولمنع حذف المستخدم).
   Future<Map<String, int>> taxonomyUsage(String table) async {
     final col = _channelColumn[table]!;
-    final rows = await db.from('channels').select(col).not(col, 'is', null).limit(50000);
+    final rows = await _all((a, b) => db.from('channels').select('id,$col').not(col, 'is', null).order('id', ascending: true).range(a, b));
     final m = <String, int>{};
     for (final r in rows) {
       m['${r[col]}'] = (m['${r[col]}'] ?? 0) + 1;
@@ -485,7 +499,7 @@ class AdminRepository {
 
   /// ملخّص النطاقات: عدد الروابط والعاملة لكل نطاق.
   Future<List<(String, int, int)>> hosts() async {
-    final rows = await db.from('streams').select('host,health_state').limit(50000);
+    final rows = await _all((a, b) => db.from('streams').select('id,host,health_state').order('id', ascending: true).range(a, b));
     final total = <String, int>{}, ok = <String, int>{};
     for (final r in rows) {
       final h = '${r['host'] ?? '?'}';
@@ -572,7 +586,7 @@ class AdminRepository {
   // ── الشبكات (ADM-B6) ─────────────────────────────────────────────────────
   /// (الشبكة، عدد القنوات، شعار ممثّل).
   Future<List<(String, int, String?)>> networks() async {
-    final rows = await db.from('channels').select('network,logo_url').not('network', 'is', null).limit(50000);
+    final rows = await _all((a, b) => db.from('channels').select('id,network,logo_url').not('network', 'is', null).order('id', ascending: true).range(a, b));
     final n = <String, int>{}, logo = <String, String?>{};
     for (final r in rows) {
       final k = '${r['network']}'.trim();
@@ -597,6 +611,71 @@ class AdminRepository {
     final hero = (layout['hero'] as List?)?.cast<String>() ?? const [];
     await db.from('site_settings').upsert({'key': 'hero', 'value': {'channel_id': hero.isEmpty ? null : hero.first}, 'is_public': true});
   }
+
+  // ── الاستيراد (ADM-C1/C2/C3، §10) ─────────────────────────────────────────
+  /// فهرس المطابقة: كل القنوات (حقول المطابقة فقط) وكل الروابط.
+  Future<(List<Map<String, dynamic>>, List<Map<String, dynamic>>)> matchingCatalog() async => (
+        await _all((a, b) => db.from('channels').select('id,uid,name,name_ar,name_en,alt_names,country_code,epg_id,publish_state').order('id', ascending: true).range(a, b)),
+        await _all((a, b) => db.from('streams').select('id,url,channel_id,source_id').order('id', ascending: true).range(a, b)),
+      );
+
+  /// admin_import في الإنتاج: القنوات الجديدة تمرّ ببوابة المراجعة (تصبح «قيد المراجعة» دائمًا، §10.4)،
+  /// والموجودة (بنفس uid) لا تتغير بياناتها — يُضاف الرابط فقط ويُملأ الشعار إن كان فارغًا.
+  Future<(int, int)> importItems(String? sourceId, List<Map<String, dynamic>> items) async {
+    var ch = 0, st = 0;
+    for (var i = 0; i < items.length; i += 500) {
+      final r = Map<String, dynamic>.from(await db.rpc('admin_import',
+          params: {'p_source': sourceId, 'p_items': items.sublist(i, (i + 500).clamp(0, items.length)), 'p_publish': true}) as Map);
+      ch += (r['channels'] as num?)?.toInt() ?? 0;
+      st += (r['streams'] as num?)?.toInt() ?? 0;
+    }
+    return (ch, st);
+  }
+
+  /// ترويسات الروابط (admin_import لا يستقبلها).
+  Future<void> setStreamHeaders(String url, {String? userAgent, String? referrer, Map<String, String> headers = const {}}) => db
+      .from('streams')
+      .update({'user_agent': ?userAgent, 'referrer': ?referrer, if (headers.isNotEmpty) 'headers': headers})
+      .eq('url', url);
+
+  // ── المصادر (ADM-C3) ─────────────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> sources() => db.from('playlist_sources').select().order('name', ascending: true);
+
+  Future<String> addSource(String name, String url) async =>
+      (await db.from('playlist_sources').insert({'name': name.trim(), 'url': url.trim(), 'auto_publish': false}).select('id').single())['id'] as String;
+
+  Future<void> updateSource(String id, Map<String, dynamic> fields) => db.from('playlist_sources').update(fields).eq('id', id);
+
+  /// حذف المصدر **دون** حذف روابطه وقنواته (§10.4 «لا حذف»؛ القيد الأصلي cascade كان سيحذفها).
+  Future<void> removeSource(String id) async {
+    await db.from('streams').update({'source_id': null}).eq('source_id', id);
+    await db.from('playlist_sources').delete().eq('id', id);
+  }
+
+  Future<List<Map<String, dynamic>>> sourceStreams(String id) =>
+      _all((a, b) => db.from('streams').select('id,url,health_state').eq('source_id', id).order('id', ascending: true).range(a, b));
+
+  Future<void> markSourceImported(String id) async {
+    final s = await sourceStreams(id);
+    final chans = await _all((a, b) => db.from('streams').select('id,channel_id').eq('source_id', id).order('id', ascending: true).range(a, b));
+    await updateSource(id, {
+      'status': 'ready',
+      'last_error': null,
+      'last_import_at': DateTime.now().toUtc().toIso8601String(),
+      'stream_count': s.length,
+      'channel_count': {for (final r in chans) r['channel_id']}.length,
+    });
+  }
+
+  // ── التصدير (ADM-C5) ─────────────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> exportRows({String? state, String? country, String? category}) => _all((a, b) {
+        var f = db.from('channels').select(
+            'id,uid,number,name,name_ar,name_en,logo_url,country_code,category_slug,language_code,epg_id,publish_state,streams(url,user_agent,referrer,label,health_state,has_credentials,priority)');
+        if (state != null) f = f.eq('publish_state', state);
+        if (country != null) f = f.eq('country_code', country);
+        if (category != null) f = f.eq('category_slug', category);
+        return f.order('number', ascending: true, nullsFirst: false).order('id', ascending: true).range(a, b);
+      });
 
   // ── المهام (ADM-A2) ──────────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> taskRuns({int limit = 100}) =>
