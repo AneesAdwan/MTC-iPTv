@@ -5,9 +5,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
+import 'core/backend/backend.dart';
 import 'core/config/env.dart';
 import 'core/logging/log.dart';
 import 'core/settings/local_settings.dart';
@@ -28,6 +30,11 @@ Future<void> main() async {
   };
 
   final settings = await loadSettings();
+  // بلا اتصال أو بلا خادم مُعدّ: يعمل التطبيق من الكتالوج المحلي (§22)
+  final hasBackend = await initBackend().catchError((Object e) {
+    log.warning('backend init failed', e);
+    return false;
+  });
 
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     await windowManager.ensureInitialized();
@@ -48,7 +55,10 @@ Future<void> main() async {
   }
 
   runApp(ProviderScope(
-    overrides: [initialSettingsProvider.overrideWithValue(settings)],
+    overrides: [
+      initialSettingsProvider.overrideWithValue(settings),
+      if (hasBackend) supabaseProvider.overrideWithValue(Supabase.instance.client),
+    ],
     child: const MtcApp(),
   ));
 }

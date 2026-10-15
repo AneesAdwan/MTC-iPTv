@@ -630,6 +630,120 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'طي/توسيع القائمة الجانبية'**
   String get cmdToggleSidebar;
+
+  /// No description provided for @adminSignIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'دخول المدير'**
+  String get adminSignIn;
+
+  /// No description provided for @email.
+  ///
+  /// In ar, this message translates to:
+  /// **'البريد الإلكتروني'**
+  String get email;
+
+  /// No description provided for @password.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور'**
+  String get password;
+
+  /// No description provided for @signIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'دخول'**
+  String get signIn;
+
+  /// No description provided for @signOut.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
+  String get signOut;
+
+  /// No description provided for @signedInAs.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسجّل باسم {email}'**
+  String signedInAs(String email);
+
+  /// No description provided for @mfaEnrollTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'فعّل التحقق بخطوتين'**
+  String get mfaEnrollTitle;
+
+  /// No description provided for @mfaEnrollBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'امسح الرمز بتطبيق مصادقة (Google Authenticator أو Microsoft Authenticator أو غيرهما)، ثم أدخل الرمز المكوّن من 6 أرقام. احفظ المفتاح السري في مكان آمن: تحتاجه إن فقدت جوالك.'**
+  String get mfaEnrollBody;
+
+  /// No description provided for @mfaSecret.
+  ///
+  /// In ar, this message translates to:
+  /// **'المفتاح السري'**
+  String get mfaSecret;
+
+  /// No description provided for @mfaCodeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز التحقق'**
+  String get mfaCodeTitle;
+
+  /// No description provided for @mfaCodeBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.'**
+  String get mfaCodeBody;
+
+  /// No description provided for @mfaCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرمز'**
+  String get mfaCode;
+
+  /// No description provided for @verify.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحقّق'**
+  String get verify;
+
+  /// No description provided for @notAdminTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الحساب ليس المدير'**
+  String get notAdminTitle;
+
+  /// No description provided for @notAdminBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'مركز الإدارة متاح لحساب المدير فقط.'**
+  String get notAdminBody;
+
+  /// No description provided for @noBackendBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد خادم مُعدّ لهذه البيئة ({env}).'**
+  String noBackendBody(String env);
+
+  /// No description provided for @authFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر الدخول: تحقّق من البريد وكلمة المرور.'**
+  String get authFailed;
+
+  /// No description provided for @codeFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرمز غير صحيح أو انتهت صلاحيته.'**
+  String get codeFailed;
+
+  /// No description provided for @copied.
+  ///
+  /// In ar, this message translates to:
+  /// **'نُسخ'**
+  String get copied;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

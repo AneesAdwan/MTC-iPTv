@@ -4,8 +4,13 @@
   "company": "مجموعة شركات مركز تكنولوجيا الشرق الأوسط — MTC-Group",
   "developedBy": "برمجة وتطوير: أنيس عدوان",
   "version": "الإصدار {v}",
-  "@version": {"placeholders": {"v": {"type": "String"}}},
-
+  "@version": {
+    "placeholders": {
+      "v": {
+        "type": "String"
+      }
+    }
+  },
   "groupViewer": "المشاهدة",
   "groupAdmin": "الإدارة",
   "groupA": "نظرة عامة",
@@ -17,7 +22,6 @@
   "groupG": "الإعدادات",
   "groupH": "الأمن والنظام",
   "groupI": "التقارير",
-
   "sV01": "البداية",
   "sV02": "الرئيسية",
   "sV03": "القنوات",
@@ -30,7 +34,6 @@
   "sV10": "الإعدادات",
   "sV11": "حول",
   "sV12": "الإبلاغ عن مشكلة",
-
   "sA1": "لوحة المعلومات",
   "sA2": "المهام والطوابير",
   "sA3": "التنبيهات",
@@ -70,7 +73,6 @@
   "sH4": "النسخ الاحتياطي",
   "sH5": "الصيانة والتشخيص",
   "sI1": "التحليلات",
-
   "searchHint": "بحث عام…",
   "searchShortcut": "Ctrl+K",
   "paletteHint": "اكتب اسم شاشة أو أمر…",
@@ -84,11 +86,18 @@
   "maximize": "تكبير",
   "restore": "استعادة",
   "close": "إغلاق",
-
   "placeholderTitle": "قيد البناء",
   "placeholderBody": "هذه الشاشة ({id}) تُبنى في المرحلة {phase} من الخطة.",
-  "@placeholderBody": {"placeholders": {"id": {"type": "String"}, "phase": {"type": "String"}}},
-
+  "@placeholderBody": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
   "language": "اللغة",
   "theme": "المظهر",
   "themeDark": "داكن",
@@ -96,5 +105,38 @@
   "themeSystem": "حسب النظام",
   "cmdToggleLanguage": "تبديل اللغة",
   "cmdToggleTheme": "تبديل المظهر",
-  "cmdToggleSidebar": "طي/توسيع القائمة الجانبية"
+  "cmdToggleSidebar": "طي/توسيع القائمة الجانبية",
+  "adminSignIn": "دخول المدير",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "signIn": "دخول",
+  "signOut": "تسجيل الخروج",
+  "signedInAs": "مسجّل باسم {email}",
+  "mfaEnrollTitle": "فعّل التحقق بخطوتين",
+  "mfaEnrollBody": "امسح الرمز بتطبيق مصادقة (Google Authenticator أو Microsoft Authenticator أو غيرهما)، ثم أدخل الرمز المكوّن من 6 أرقام. احفظ المفتاح السري في مكان آمن: تحتاجه إن فقدت جوالك.",
+  "mfaSecret": "المفتاح السري",
+  "mfaCodeTitle": "رمز التحقق",
+  "mfaCodeBody": "أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+  "mfaCode": "الرمز",
+  "verify": "تحقّق",
+  "notAdminTitle": "هذا الحساب ليس المدير",
+  "notAdminBody": "مركز الإدارة متاح لحساب المدير فقط.",
+  "noBackendBody": "لا يوجد خادم مُعدّ لهذه البيئة ({env}).",
+  "authFailed": "تعذّر الدخول: تحقّق من البريد وكلمة المرور.",
+  "codeFailed": "الرمز غير صحيح أو انتهت صلاحيته.",
+  "copied": "نُسخ",
+  "@signedInAs": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@noBackendBody": {
+    "placeholders": {
+      "env": {
+        "type": "String"
+      }
+    }
+  }
 }

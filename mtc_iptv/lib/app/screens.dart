@@ -100,7 +100,11 @@ final screens = <ScreenDef>[
   ScreenDef('ADM-I1', '/admin/analytics', Icons.insights_rounded, ScreenGroup.i, 6, (t) => t.sI1),
 ];
 
+/// دخول المدير (جزء من ADM-H1) — خارج القائمة والتوجيه العام، يظهر لغير المدير فقط.
+final adminLoginScreen = ScreenDef('ADM-H1-login', '/admin/login', Icons.lock_person_rounded, ScreenGroup.h, 2, (t) => t.adminSignIn, inSidebar: false);
+
 ScreenDef? screenForPath(String path) {
+  if (path == adminLoginScreen.path) return adminLoginScreen;
   for (final s in screens) {
     if (path == s.path || path.startsWith('${s.path}/')) return s;
   }

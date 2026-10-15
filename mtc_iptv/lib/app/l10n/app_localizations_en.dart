@@ -279,4 +279,68 @@ class L10nEn extends L10n {
 
   @override
   String get cmdToggleSidebar => 'Collapse/expand sidebar';
+
+  @override
+  String get adminSignIn => 'Admin sign-in';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get signIn => 'Sign in';
+
+  @override
+  String get signOut => 'Sign out';
+
+  @override
+  String signedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get mfaEnrollTitle => 'Turn on two-step verification';
+
+  @override
+  String get mfaEnrollBody =>
+      'Scan the code with an authenticator app (Google Authenticator, Microsoft Authenticator, …), then enter the 6-digit code. Keep the secret key somewhere safe: you need it if you lose your phone.';
+
+  @override
+  String get mfaSecret => 'Secret key';
+
+  @override
+  String get mfaCodeTitle => 'Verification code';
+
+  @override
+  String get mfaCodeBody =>
+      'Enter the 6-digit code from your authenticator app.';
+
+  @override
+  String get mfaCode => 'Code';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get notAdminTitle => 'This account is not the admin';
+
+  @override
+  String get notAdminBody =>
+      'The admin center is only available to the admin account.';
+
+  @override
+  String noBackendBody(String env) {
+    return 'No server is configured for this environment ($env).';
+  }
+
+  @override
+  String get authFailed => 'Sign-in failed: check the email and password.';
+
+  @override
+  String get codeFailed => 'The code is wrong or expired.';
+
+  @override
+  String get copied => 'Copied';
 }

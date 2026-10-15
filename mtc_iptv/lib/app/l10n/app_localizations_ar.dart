@@ -279,4 +279,66 @@ class L10nAr extends L10n {
 
   @override
   String get cmdToggleSidebar => 'طي/توسيع القائمة الجانبية';
+
+  @override
+  String get adminSignIn => 'دخول المدير';
+
+  @override
+  String get email => 'البريد الإلكتروني';
+
+  @override
+  String get password => 'كلمة المرور';
+
+  @override
+  String get signIn => 'دخول';
+
+  @override
+  String get signOut => 'تسجيل الخروج';
+
+  @override
+  String signedInAs(String email) {
+    return 'مسجّل باسم $email';
+  }
+
+  @override
+  String get mfaEnrollTitle => 'فعّل التحقق بخطوتين';
+
+  @override
+  String get mfaEnrollBody =>
+      'امسح الرمز بتطبيق مصادقة (Google Authenticator أو Microsoft Authenticator أو غيرهما)، ثم أدخل الرمز المكوّن من 6 أرقام. احفظ المفتاح السري في مكان آمن: تحتاجه إن فقدت جوالك.';
+
+  @override
+  String get mfaSecret => 'المفتاح السري';
+
+  @override
+  String get mfaCodeTitle => 'رمز التحقق';
+
+  @override
+  String get mfaCodeBody => 'أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.';
+
+  @override
+  String get mfaCode => 'الرمز';
+
+  @override
+  String get verify => 'تحقّق';
+
+  @override
+  String get notAdminTitle => 'هذا الحساب ليس المدير';
+
+  @override
+  String get notAdminBody => 'مركز الإدارة متاح لحساب المدير فقط.';
+
+  @override
+  String noBackendBody(String env) {
+    return 'لا يوجد خادم مُعدّ لهذه البيئة ($env).';
+  }
+
+  @override
+  String get authFailed => 'تعذّر الدخول: تحقّق من البريد وكلمة المرور.';
+
+  @override
+  String get codeFailed => 'الرمز غير صحيح أو انتهت صلاحيته.';
+
+  @override
+  String get copied => 'نُسخ';
 }

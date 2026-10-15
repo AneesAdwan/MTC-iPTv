@@ -4,7 +4,6 @@
   "company": "Middle East Technology Center Group — MTC-Group",
   "developedBy": "Developed by: Anees Adwan",
   "version": "Version {v}",
-
   "groupViewer": "Watch",
   "groupAdmin": "Admin",
   "groupA": "Overview",
@@ -16,7 +15,6 @@
   "groupG": "Settings",
   "groupH": "Security & System",
   "groupI": "Reports",
-
   "sV01": "Splash",
   "sV02": "Home",
   "sV03": "Channels",
@@ -29,7 +27,6 @@
   "sV10": "Settings",
   "sV11": "About",
   "sV12": "Report a problem",
-
   "sA1": "Dashboard",
   "sA2": "Jobs & Queues",
   "sA3": "Alerts",
@@ -69,7 +66,6 @@
   "sH4": "Backups",
   "sH5": "Maintenance & Diagnostics",
   "sI1": "Analytics",
-
   "searchHint": "Search everything…",
   "searchShortcut": "Ctrl+K",
   "paletteHint": "Type a screen or command…",
@@ -83,10 +79,8 @@
   "maximize": "Maximize",
   "restore": "Restore",
   "close": "Close",
-
   "placeholderTitle": "Under construction",
   "placeholderBody": "This screen ({id}) is built in phase {phase} of the plan.",
-
   "language": "Language",
   "theme": "Theme",
   "themeDark": "Dark",
@@ -94,5 +88,24 @@
   "themeSystem": "System",
   "cmdToggleLanguage": "Toggle language",
   "cmdToggleTheme": "Toggle theme",
-  "cmdToggleSidebar": "Collapse/expand sidebar"
+  "cmdToggleSidebar": "Collapse/expand sidebar",
+  "adminSignIn": "Admin sign-in",
+  "email": "Email",
+  "password": "Password",
+  "signIn": "Sign in",
+  "signOut": "Sign out",
+  "signedInAs": "Signed in as {email}",
+  "mfaEnrollTitle": "Turn on two-step verification",
+  "mfaEnrollBody": "Scan the code with an authenticator app (Google Authenticator, Microsoft Authenticator, …), then enter the 6-digit code. Keep the secret key somewhere safe: you need it if you lose your phone.",
+  "mfaSecret": "Secret key",
+  "mfaCodeTitle": "Verification code",
+  "mfaCodeBody": "Enter the 6-digit code from your authenticator app.",
+  "mfaCode": "Code",
+  "verify": "Verify",
+  "notAdminTitle": "This account is not the admin",
+  "notAdminBody": "The admin center is only available to the admin account.",
+  "noBackendBody": "No server is configured for this environment ({env}).",
+  "authFailed": "Sign-in failed: check the email and password.",
+  "codeFailed": "The code is wrong or expired.",
+  "copied": "Copied"
 }

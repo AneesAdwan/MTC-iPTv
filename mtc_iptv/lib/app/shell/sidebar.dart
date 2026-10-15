@@ -5,12 +5,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/settings/local_settings.dart';
+import '../../data/auth/admin_auth.dart';
 import '../l10n/app_localizations.dart';
 import '../screens.dart';
 import '../theme/tokens.dart';
 
-/// المرحلة 2 تستبدله بالمصادقة الفعلية (is_admin + MFA). حتى ذلك يظهر قسم الإدارة للتطوير.
-final isAdminProvider = Provider<bool>((_) => true);
+/// قسم الإدارة يظهر فقط لجلسة مدير كاملة (admin_users + MFA). تجربة استخدام فقط:
+/// الخادم يرفض أي عملية إدارية لغير ذلك (is_admin()).
+final isAdminProvider = Provider<bool>((ref) => ref.watch(adminStateProvider).value?.isAdmin ?? false);
 
 class Sidebar extends ConsumerWidget {
   final String location;
@@ -38,6 +40,10 @@ class Sidebar extends ConsumerWidget {
         lastGroup = s.group;
       }
       items.add(_NavItem(def: s, selected: current?.id == s.id, collapsed: collapsed, closeDrawer: inDrawer));
+    }
+    if (!isAdmin) {
+      items.add(_SectionDivider(label: t.groupAdmin, collapsed: collapsed, strong: true));
+      items.add(_NavItem(def: adminLoginScreen, selected: location == adminLoginScreen.path, collapsed: collapsed, closeDrawer: inDrawer));
     }
 
     return AnimatedContainer(

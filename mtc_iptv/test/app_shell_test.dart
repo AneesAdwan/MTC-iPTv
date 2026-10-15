@@ -6,10 +6,12 @@ import 'package:mtc_iptv/app/app.dart';
 import 'package:mtc_iptv/app/l10n/app_localizations_ar.dart';
 import 'package:mtc_iptv/app/l10n/app_localizations_en.dart';
 import 'package:mtc_iptv/app/screens.dart';
+import 'package:mtc_iptv/app/shell/sidebar.dart';
 import 'package:mtc_iptv/core/settings/local_settings.dart';
 
-Widget app(LocalSettings s) => ProviderScope(
-      overrides: [initialSettingsProvider.overrideWithValue(s)],
+/// [admin]: يعرض قسم الإدارة (جلسة مدير كاملة) دون خادم.
+Widget app(LocalSettings s, {bool admin = true}) => ProviderScope(
+      overrides: [initialSettingsProvider.overrideWithValue(s), isAdminProvider.overrideWithValue(admin)],
       child: const MtcApp(),
     );
 
@@ -67,6 +69,30 @@ void main() {
     testWidgets('light theme builds', (tester) async {
       await pumpApp(tester, const LocalSettings(themeMode: ThemeMode.light));
       expect(Theme.of(tester.element(find.byType(Scaffold).first)).brightness, Brightness.light);
+    });
+  });
+
+  group('admin guard (UX only; the server enforces is_admin + MFA)', () {
+    testWidgets('non-admin sees only the admin sign-in entry, not the admin sections', (tester) async {
+      tester.view.physicalSize = const Size(1280, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(app(const LocalSettings(), admin: false));
+      await tester.pumpAndSettle();
+      expect(find.text('دخول المدير'), findsOneWidget);
+      expect(find.text('لوحة المعلومات'), findsNothing);
+    });
+
+    testWidgets('non-admin opening an admin route lands on the sign-in screen', (tester) async {
+      tester.view.physicalSize = const Size(1280, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(app(const LocalSettings(), admin: false));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('دخول المدير'));
+      await tester.pumpAndSettle();
+      // بلا خادم في الاختبار: شاشة الدخول تشرح أن البيئة بلا خادم
+      expect(find.byIcon(Icons.cloud_off_rounded), findsOneWidget);
     });
   });
 

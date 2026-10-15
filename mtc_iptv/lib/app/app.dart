@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/backend/backend.dart';
 import '../core/settings/local_settings.dart';
 import '../features/splash/splash_gate.dart';
 import 'l10n/app_localizations.dart';
@@ -14,6 +15,7 @@ class MtcApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(settingsProvider);
+    ref.watch(startupSyncProvider); // مزامنة الكتالوج في الخلفية عند البدء
     return MaterialApp.router(
       title: 'MTC-iPTv',
       debugShowCheckedModeBanner: false,

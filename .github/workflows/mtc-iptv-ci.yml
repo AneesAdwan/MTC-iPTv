@@ -25,6 +25,18 @@ jobs:
       - run: dart analyze --fatal-infos
       - run: dart test
 
+  database:
+    name: database (migrations + pgTAP)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: mtc_iptv } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+      # applies supabase/migrations (baseline + additive) on a fresh local stack, then runs pgTAP
+      - run: supabase db start
+      - run: supabase test db
+
   app:
     name: app (analyze, test, build Windows)
     runs-on: windows-latest
@@ -35,7 +47,7 @@ jobs:
         with: { channel: stable, flutter-version: 3.47.7, cache: true }
       - run: flutter pub get
       - run: flutter analyze --fatal-infos
-      - run: flutter test --exclude-tags golden   # golden images are machine-specific (fonts); run locally
+      - run: flutter test --exclude-tags golden,local   # goldens are machine-specific; 'local' needs the local Supabase
       - run: flutter build windows --release --dart-define=MTC_ENV=staging
       - uses: actions/upload-artifact@v4
         with:
