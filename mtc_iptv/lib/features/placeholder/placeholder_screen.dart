@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/screens.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/text/bidi.dart';
 
 class PlaceholderScreen extends StatelessWidget {
   final ScreenDef def;
@@ -43,7 +44,7 @@ class PlaceholderScreen extends StatelessWidget {
               ]),
             ),
             const SizedBox(height: Space.md),
-            Text(t.placeholderBody(def.id, '${def.phase}'), textAlign: TextAlign.center, style: TextStyle(color: c.textMuted)),
+            Text(t.placeholderBody(ltr(def.id), '${def.phase}'), textAlign: TextAlign.center, style: TextStyle(color: c.textMuted)),
           ]),
         ),
       ),

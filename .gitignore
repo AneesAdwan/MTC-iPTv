@@ -7,12 +7,12 @@ supabase/.cache/
 PROJECT_FILES.md
 
 # مشروع تطبيق الأندرويد (React Native) — خاص بالجهاز فقط، لا يُرفع على GitHub
-app/
-MTCiPTv/
-phone/
+/app/
+/MTCiPTv/
+/phone/
 
 # مخطّطات ووثائق داخلية — لا تُرفع
-md/
+/md/
 
 # دليل بناء APK ومفتاح التوقيع — خاص بك، لا يُرفع
 APK_BUILD_GUIDE.md
