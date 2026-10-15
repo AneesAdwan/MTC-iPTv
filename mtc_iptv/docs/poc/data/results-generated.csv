@@ -1,0 +1,27 @@
+﻿id,group,case,expect,note,url,mpv_ok,vlc_ok,mpv_first_frame,vlc_first_frame,mpv_err,vcodec,acodecs,resolution,audio_tracks,sub_tracks
+G01,generated,P01,ok,HLS H.264/AAC,http://127.0.0.1:8791/g01_hls_h264_aac/index.m3u8,True,True,0.066,0.06524180003907531,,h264,aac,1280x720,1,0
+G02,generated,P02,ok,HLS متعدد الجودات 360/720/1080,http://127.0.0.1:8791/g02_hls_abr/index.m3u8,True,True,0.108,0.05971200007479638,,h264,aac/aac/aac,1920x1080,3,0
+G03,generated,P03,ok,HLS بمسارَي صوت ara/eng,http://127.0.0.1:8791/g03_hls_multiaudio/index.m3u8,True,True,0.076,0.07469469995703548,,h264,aac/aac,1280x720,2,0
+G04,generated,P04,ok,HLS + ترجمة WebVTT,http://127.0.0.1:8791/g04_hls_webvtt/index.m3u8,True,True,0.066,0.0836835999507457,,h264,aac,1280x720,1,1
+G05,generated,P05,ok,MPEG-TS مباشر H.264/AAC,http://127.0.0.1:8791/g05_ts_h264_aac/stream.ts,True,True,0.039,0.04243479995056987,,h264,aac,1280x720,1,0
+G06,generated,P06,ok,MPEG-TS HEVC/AAC,http://127.0.0.1:8791/g06_ts_hevc_aac/stream.ts,True,True,0.049,0.04000310006085783,,hevc,aac,1280x720,1,0
+G07,generated,P07,ok,MPEG-TS H.264/AC3,http://127.0.0.1:8791/g07_ts_h264_ac3/stream.ts,True,True,0.047,0.04143989994190633,,h264,ac3,1280x720,1,0
+G08,generated,P07,ok,MPEG-TS H.264/E-AC3,http://127.0.0.1:8791/g08_ts_h264_eac3/stream.ts,True,True,0.047,0.04045550001319498,,h264,eac3,1280x720,1,0
+G09,generated,P08,ok,MPEG-TS MPEG-2/MP2 (DVB),http://127.0.0.1:8791/g09_ts_mpeg2_mp2/stream.ts,True,True,0.023,0.04202699998859316,,mpeg2video,mp2,720x576,1,0
+G10,generated,P06,ok,HLS HEVC 1080p/AC3,http://127.0.0.1:8791/g10_hls_hevc_ac3/index.m3u8,True,True,0.057,0.08961080003064126,,hevc,ac3,1920x1080,1,0
+G11,generated,P05,ok,MP4 تقدّمي,http://127.0.0.1:8791/g11_mp4_progressive/video.mp4,True,True,0.037,0.048660799977369606,,h264,aac,1280x720,1,0
+G12,generated,P05,ok,FLV عبر HTTP,http://127.0.0.1:8791/g12_flv_h264_aac/stream.flv,True,True,0.04,0.05418259999714792,,h264,aac,1280x720,1,0
+G13,generated,P22,ok,DASH,http://127.0.0.1:8791/g13_dash/manifest.mpd,False,True,,0.047908199951052666,unsupported,,,,0,0
+G14,generated,P20,ok,4K HEVC,http://127.0.0.1:8791/g14_ts_4k_hevc/stream.ts,True,True,0.146,0.041796799981966615,,hevc,aac,3840x2160,1,0
+G15,generated,P01,ok,HLS بمقاطع fMP4,http://127.0.0.1:8791/g15_hls_fmp4/index.m3u8,True,True,0.093,0.05291410000063479,,h264,aac,1280x720,1,0
+G16,generated,P18,fail,ملف تالف,http://127.0.0.1:8791/g16_garbage/stream.ts,False,False,,,unsupported,,,,0,0
+R09a,generated,P09,ok,يتطلب User-Agent — مع الترويسة,http://127.0.0.1:8791/ua/g01_hls_h264_aac/index.m3u8,True,True,0.045,0.06421460001729429,,h264,aac,1280x720,1,0
+R09b,generated,P09,fail,يتطلب User-Agent — بدونها,http://127.0.0.1:8791/ua/g01_hls_h264_aac/index.m3u8,False,False,,,auth_failed,,,,0,0
+R10a,generated,P10,ok,يتطلب Referer — مع الترويسة,http://127.0.0.1:8791/ref/g01_hls_h264_aac/index.m3u8,True,True,0.058,0.07163730007596314,,h264,aac,1280x720,1,0
+R10b,generated,P10,fail,يتطلب Referer — بدونها,http://127.0.0.1:8791/ref/g01_hls_h264_aac/index.m3u8,False,False,,,auth_failed,,,,0,0
+R12,generated,P12,ok,3 تحويلات 302 متتالية,http://127.0.0.1:8791/redir/3/g01_hls_h264_aac/index.m3u8,True,True,0.06,0.08439630002249032,,h264,aac,1280x720,1,0
+R13,generated,P13,policy,HTTPS بشهادة موقّعة ذاتيًا,https://127.0.0.1:8792/g01_hls_h264_aac/index.m3u8,True,False,0.054,,,h264,aac,1280x720,1,0
+R14,generated,P14,fail,404,http://127.0.0.1:8791/notfound,False,False,,,unavailable,,,,0,0
+R15,generated,P15,fail,401,http://127.0.0.1:8791/auth/g01_hls_h264_aac/index.m3u8,False,False,,,auth_failed,,,,0,0
+R16,generated,P16,fail,سيرفر يتأخر 20 ثانية,http://127.0.0.1:8791/slow/g01_hls_h264_aac/index.m3u8,False,False,,,inconclusive,,,,0,0
+R21,generated,P21,ok,RTMP (خادم ffmpeg محلي),rtmp://127.0.0.1:19350/live/test,True,True,1.099,1.2082888999721035,,h264,aac,1280x720,1,0

@@ -1,0 +1,44 @@
+# MTC-iPTv (Flutter) — CI للمرحلة 1: تحليل + اختبارات + بناء Windows عند أي تغيير في mtc_iptv/
+name: mtc_iptv CI
+
+on:
+  push:
+    paths: ['mtc_iptv/**', '.github/workflows/mtc-iptv-ci.yml']
+  pull_request:
+    paths: ['mtc_iptv/**', '.github/workflows/mtc-iptv-ci.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: mtc-iptv-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core:
+    name: mtc_core (Dart)
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: mtc_iptv/packages/mtc_core } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, flutter-version: 3.47.7, cache: true }
+      - run: dart pub get
+      - run: dart analyze --fatal-infos
+      - run: dart test
+
+  app:
+    name: app (analyze, test, build Windows)
+    runs-on: windows-latest
+    defaults: { run: { working-directory: mtc_iptv } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, flutter-version: 3.47.7, cache: true }
+      - run: flutter pub get
+      - run: flutter analyze --fatal-infos
+      - run: flutter test
+      - run: flutter build windows --release --dart-define=MTC_ENV=staging
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mtc_iptv-windows-staging
+          path: mtc_iptv/build/windows/x64/runner/Release/
+          retention-days: 7

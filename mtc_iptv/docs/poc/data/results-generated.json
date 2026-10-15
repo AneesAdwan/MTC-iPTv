@@ -1,0 +1,1346 @@
+{
+ "run_at": "2026-10-14 17:56",
+ "params": {
+  "only": "generated",
+  "play": 20,
+  "ff_timeout": 15,
+  "attempts": 1,
+  "workers": 4
+ },
+ "mpv": "mpv v0.41.0-dev-g41f6a6450 Copyright آ© 2000-2025 mpv/MPlayer/mplayer2 projects",
+ "duration_min": 4.1,
+ "results": [
+  {
+   "id": "G01",
+   "group": "generated",
+   "case": "P01",
+   "url": "http://127.0.0.1:8791/g01_hls_h264_aac/index.m3u8",
+   "note": "HLS H.264/AAC",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.066,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.19,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.06524180003907531,
+     "first_play": 0.7512129000388086,
+     "played": 20.03,
+     "max_stall": 0.75,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.06524180003907531,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G02",
+   "group": "generated",
+   "case": "P02",
+   "url": "http://127.0.0.1:8791/g02_hls_abr/index.m3u8",
+   "note": "HLS متعدد الجودات 360/720/1080",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.108,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.23,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac",
+      "aac",
+      "aac"
+     ],
+     "resolution": "1920x1080",
+     "audio_tracks": 3,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.05971200007479638,
+     "first_play": 1.502343300031498,
+     "played": 20.03,
+     "max_stall": 0.75,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)",
+       "H264 - MPEG-4 AVC (part 10)",
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio",
+       "MPEG AAC Audio",
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.05971200007479638,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G03",
+   "group": "generated",
+   "case": "P03",
+   "url": "http://127.0.0.1:8791/g03_hls_multiaudio/index.m3u8",
+   "note": "HLS بمسارَي صوت ara/eng",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.076,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.19,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac",
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 2,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.07469469995703548,
+     "first_play": 1.5025434999261051,
+     "played": 20.03,
+     "max_stall": 0.75,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)",
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio",
+       "MPEG AAC Audio",
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.07469469995703548,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G04",
+   "group": "generated",
+   "case": "P04",
+   "url": "http://127.0.0.1:8791/g04_hls_webvtt/index.m3u8",
+   "note": "HLS + ترجمة WebVTT",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.066,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.21,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 1,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.0836835999507457,
+     "first_play": 1.5022155999904498,
+     "played": 20.03,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)",
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio",
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.0836835999507457,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G05",
+   "group": "generated",
+   "case": "P05",
+   "url": "http://127.0.0.1:8791/g05_ts_h264_aac/stream.ts",
+   "note": "MPEG-TS مباشر H.264/AAC",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.039,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.16,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.04243479995056987,
+     "first_play": 0.5007044000085443,
+     "played": 20.03,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.04243479995056987,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G06",
+   "group": "generated",
+   "case": "P06",
+   "url": "http://127.0.0.1:8791/g06_ts_hevc_aac/stream.ts",
+   "note": "MPEG-TS HEVC/AAC",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.049,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.15,
+     "vcodec": "hevc",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.04000310006085783,
+     "first_play": 0.5010540999937803,
+     "played": 20.03,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "MPEG-H Part2/HEVC (H.265)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.04000310006085783,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G07",
+   "group": "generated",
+   "case": "P07",
+   "url": "http://127.0.0.1:8791/g07_ts_h264_ac3/stream.ts",
+   "note": "MPEG-TS H.264/AC3",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.047,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.17,
+     "vcodec": "h264",
+     "acodecs": [
+      "ac3"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.04143989994190633,
+     "first_play": 0.7517480999231339,
+     "played": 20.02,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "A52 Audio (aka AC3)"
+      ]
+     },
+     "start": 0.04143989994190633,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G08",
+   "group": "generated",
+   "case": "P07",
+   "url": "http://127.0.0.1:8791/g08_ts_h264_eac3/stream.ts",
+   "note": "MPEG-TS H.264/E-AC3",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.047,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.19,
+     "vcodec": "h264",
+     "acodecs": [
+      "eac3"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.04045550001319498,
+     "first_play": 0.5014666999923065,
+     "played": 20.03,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "A/52 B Audio (aka E-AC3)"
+      ]
+     },
+     "start": 0.04045550001319498,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G09",
+   "group": "generated",
+   "case": "P08",
+   "url": "http://127.0.0.1:8791/g09_ts_mpeg2_mp2/stream.ts",
+   "note": "MPEG-TS MPEG-2/MP2 (DVB)",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.023,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.14,
+     "vcodec": "mpeg2video",
+     "acodecs": [
+      "mp2"
+     ],
+     "resolution": "720x576",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.04202699998859316,
+     "first_play": 0.5010977999772877,
+     "played": 20.03,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "MPEG-1/2 Video"
+      ],
+      "audio": [
+       "MPEG Audio layer 1/2"
+      ]
+     },
+     "start": 0.04202699998859316,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G10",
+   "group": "generated",
+   "case": "P06",
+   "url": "http://127.0.0.1:8791/g10_hls_hevc_ac3/index.m3u8",
+   "note": "HLS HEVC 1080p/AC3",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.057,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.17,
+     "vcodec": "hevc",
+     "acodecs": [
+      "ac3"
+     ],
+     "resolution": "1920x1080",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.08961080003064126,
+     "first_play": 0.7515467000193894,
+     "played": 20.03,
+     "max_stall": 1.0,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "MPEG-H Part2/HEVC (H.265)"
+      ],
+      "audio": [
+       "A52 Audio (aka AC3)"
+      ]
+     },
+     "start": 0.08961080003064126,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G11",
+   "group": "generated",
+   "case": "P05",
+   "url": "http://127.0.0.1:8791/g11_mp4_progressive/video.mp4",
+   "note": "MP4 تقدّمي",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.037,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.17,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.048660799977369606,
+     "first_play": 0.501425200025551,
+     "played": 20.03,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)",
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio",
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.048660799977369606,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G12",
+   "group": "generated",
+   "case": "P05",
+   "url": "http://127.0.0.1:8791/g12_flv_h264_aac/stream.flv",
+   "note": "FLV عبر HTTP",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.04,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.17,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.05418259999714792,
+     "first_play": 0.5014236000133678,
+     "played": 20.03,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.05418259999714792,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G13",
+   "group": "generated",
+   "case": "P22",
+   "url": "http://127.0.0.1:8791/g13_dash/manifest.mpd",
+   "note": "DASH",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": null,
+     "video": false,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "exit": "Errors when loading file",
+     "wall": 0.12,
+     "vcodec": null,
+     "acodecs": [],
+     "resolution": null,
+     "audio_tracks": 0,
+     "sub_tracks": 0,
+     "err_class": "unsupported",
+     "err_tail": "[   0.020][e][ytdl_hook] Subprocess failed: init\n[   0.021][e][ytdl_hook] Subprocess failed: init\n[   0.022][e][ytdl_hook] Subprocess failed: init\n[   0.022][e][ytdl_hook] \n[   0.022][e][ytdl_hook] youtube-dl failed: not found or not enough permissions\n[   0.022][e][cplayer] Failed to recognize file format.",
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.047908199951052666,
+     "first_play": 0.7516947999829426,
+     "played": 20.03,
+     "max_stall": 1.0,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)",
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio",
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.047908199951052666,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": false,
+   "vlc_ok": true
+  },
+  {
+   "id": "G14",
+   "group": "generated",
+   "case": "P20",
+   "url": "http://127.0.0.1:8791/g14_ts_4k_hevc/stream.ts",
+   "note": "4K HEVC",
+   "expect": "ok",
+   "play": 10,
+   "mpv": [
+    {
+     "first_frame": 0.146,
+     "video": true,
+     "played": 9.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 10.28,
+     "vcodec": "hevc",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "3840x2160",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 10,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.041796799981966615,
+     "first_play": 0.7511359000345692,
+     "played": 10.01,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "MPEG-H Part2/HEVC (H.265)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.041796799981966615,
+     "_len": 10,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G15",
+   "group": "generated",
+   "case": "P01",
+   "url": "http://127.0.0.1:8791/g15_hls_fmp4/index.m3u8",
+   "note": "HLS بمقاطع fMP4",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.093,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.21,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.05291410000063479,
+     "first_play": 1.502046399982646,
+     "played": 20.03,
+     "max_stall": 0.75,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.05291410000063479,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "G16",
+   "group": "generated",
+   "case": "P18",
+   "url": "http://127.0.0.1:8791/g16_garbage/stream.ts",
+   "note": "ملف تالف",
+   "expect": "fail",
+   "mpv": [
+    {
+     "first_frame": null,
+     "video": false,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "exit": "Errors when loading file",
+     "wall": 0.36,
+     "vcodec": null,
+     "acodecs": [],
+     "resolution": null,
+     "audio_tracks": 0,
+     "sub_tracks": 0,
+     "err_class": "unsupported",
+     "err_tail": "[   0.252][e][ytdl_hook] Subprocess failed: init\n[   0.253][e][ytdl_hook] Subprocess failed: init\n[   0.254][e][ytdl_hook] Subprocess failed: init\n[   0.254][e][ytdl_hook] \n[   0.254][e][ytdl_hook] youtube-dl failed: not found or not enough permissions\n[   0.254][e][cplayer] Failed to recognize file format.",
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": null,
+     "first_play": null,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "error": false,
+     "ended": true,
+     "tracks": {
+      "video": [],
+      "audio": [
+       "MPEG Audio layer 3"
+      ]
+     },
+     "start": null,
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "mpv_ok": false,
+   "vlc_ok": false
+  },
+  {
+   "id": "R09a",
+   "group": "generated",
+   "case": "P09",
+   "url": "http://127.0.0.1:8791/ua/g01_hls_h264_aac/index.m3u8",
+   "note": "يتطلب User-Agent — مع الترويسة",
+   "expect": "ok",
+   "ua": "MTC-Test/1.0",
+   "mpv": [
+    {
+     "first_frame": 0.045,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.19,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.06421460001729429,
+     "first_play": 0.7522290999768302,
+     "played": 20.03,
+     "max_stall": 0.75,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.06421460001729429,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "R09b",
+   "group": "generated",
+   "case": "P09",
+   "url": "http://127.0.0.1:8791/ua/g01_hls_h264_aac/index.m3u8",
+   "note": "يتطلب User-Agent — بدونها",
+   "expect": "fail",
+   "mpv": [
+    {
+     "first_frame": null,
+     "video": false,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "exit": "Errors when loading file",
+     "wall": 0.14,
+     "vcodec": null,
+     "acodecs": [],
+     "resolution": null,
+     "audio_tracks": 0,
+     "sub_tracks": 0,
+     "err_class": "auth_failed",
+     "err_tail": "[   0.021][w][ffmpeg] http: HTTP error 403 Forbidden\n[   0.021][e][stream] Failed to open http://127.0.0.1:8791/ua/g01_hls_h264_aac/index.m3u8.\n[   0.022][e][ytdl_hook] Subprocess failed: init\n[   0.023][e][ytdl_hook] Subprocess failed: init\n[   0.024][e][ytdl_hook] Subprocess failed: init\n[   0.024][e][ytdl_hook] \n[   0.024][e][ytdl_hook] youtube-dl failed: not found or not enough permissions",
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": null,
+     "first_play": null,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "error": true,
+     "ended": false,
+     "tracks": {
+      "video": [],
+      "audio": []
+     },
+     "start": null,
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "mpv_ok": false,
+   "vlc_ok": false
+  },
+  {
+   "id": "R10a",
+   "group": "generated",
+   "case": "P10",
+   "url": "http://127.0.0.1:8791/ref/g01_hls_h264_aac/index.m3u8",
+   "note": "يتطلب Referer — مع الترويسة",
+   "expect": "ok",
+   "ref": "https://mtc-test.local/",
+   "mpv": [
+    {
+     "first_frame": 0.058,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.2,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.07163730007596314,
+     "first_play": 1.0023340000770986,
+     "played": 20.03,
+     "max_stall": 1.0,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.07163730007596314,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "R10b",
+   "group": "generated",
+   "case": "P10",
+   "url": "http://127.0.0.1:8791/ref/g01_hls_h264_aac/index.m3u8",
+   "note": "يتطلب Referer — بدونها",
+   "expect": "fail",
+   "mpv": [
+    {
+     "first_frame": null,
+     "video": false,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "exit": "Errors when loading file",
+     "wall": 0.13,
+     "vcodec": null,
+     "acodecs": [],
+     "resolution": null,
+     "audio_tracks": 0,
+     "sub_tracks": 0,
+     "err_class": "auth_failed",
+     "err_tail": "[   0.012][w][ffmpeg] http: HTTP error 403 Forbidden\n[   0.012][e][stream] Failed to open http://127.0.0.1:8791/ref/g01_hls_h264_aac/index.m3u8.\n[   0.013][e][ytdl_hook] Subprocess failed: init\n[   0.014][e][ytdl_hook] Subprocess failed: init\n[   0.015][e][ytdl_hook] Subprocess failed: init\n[   0.015][e][ytdl_hook] \n[   0.015][e][ytdl_hook] youtube-dl failed: not found or not enough permissions",
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": null,
+     "first_play": null,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "error": true,
+     "ended": false,
+     "tracks": {
+      "video": [],
+      "audio": []
+     },
+     "start": null,
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "mpv_ok": false,
+   "vlc_ok": false
+  },
+  {
+   "id": "R12",
+   "group": "generated",
+   "case": "P12",
+   "url": "http://127.0.0.1:8791/redir/3/g01_hls_h264_aac/index.m3u8",
+   "note": "3 تحويلات 302 متتالية",
+   "expect": "ok",
+   "mpv": [
+    {
+     "first_frame": 0.06,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.2,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 0.08439630002249032,
+     "first_play": 1.0015802000416443,
+     "played": 20.03,
+     "max_stall": 0.75,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 0.08439630002249032,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  },
+  {
+   "id": "R13",
+   "group": "generated",
+   "case": "P13",
+   "url": "https://127.0.0.1:8792/g01_hls_h264_aac/index.m3u8",
+   "note": "HTTPS بشهادة موقّعة ذاتيًا",
+   "expect": "policy",
+   "mpv": [
+    {
+     "first_frame": 0.054,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 20.17,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": null,
+     "first_play": null,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "error": true,
+     "ended": false,
+     "tracks": {
+      "video": [],
+      "audio": []
+     },
+     "start": null,
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": false
+  },
+  {
+   "id": "R14",
+   "group": "generated",
+   "case": "P14",
+   "url": "http://127.0.0.1:8791/notfound",
+   "note": "404",
+   "expect": "fail",
+   "mpv": [
+    {
+     "first_frame": null,
+     "video": false,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "exit": "Errors when loading file",
+     "wall": 0.14,
+     "vcodec": null,
+     "acodecs": [],
+     "resolution": null,
+     "audio_tracks": 0,
+     "sub_tracks": 0,
+     "err_class": "unavailable",
+     "err_tail": "[   0.014][w][ffmpeg] http: HTTP error 404 Not Found\n[   0.014][e][stream] Failed to open http://127.0.0.1:8791/notfound.\n[   0.016][e][ytdl_hook] Subprocess failed: init\n[   0.017][e][ytdl_hook] Subprocess failed: init\n[   0.018][e][ytdl_hook] Subprocess failed: init\n[   0.018][e][ytdl_hook] \n[   0.018][e][ytdl_hook] youtube-dl failed: not found or not enough permissions",
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": null,
+     "first_play": null,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "error": true,
+     "ended": false,
+     "tracks": {
+      "video": [],
+      "audio": []
+     },
+     "start": null,
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "mpv_ok": false,
+   "vlc_ok": false
+  },
+  {
+   "id": "R15",
+   "group": "generated",
+   "case": "P15",
+   "url": "http://127.0.0.1:8791/auth/g01_hls_h264_aac/index.m3u8",
+   "note": "401",
+   "expect": "fail",
+   "mpv": [
+    {
+     "first_frame": null,
+     "video": false,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "exit": "Errors when loading file",
+     "wall": 0.14,
+     "vcodec": null,
+     "acodecs": [],
+     "resolution": null,
+     "audio_tracks": 0,
+     "sub_tracks": 0,
+     "err_class": "auth_failed",
+     "err_tail": "   0.024][w][ffmpeg] http: HTTP error 401 Unauthorized\n[   0.024][e][stream] Failed to open http://127.0.0.1:8791/auth/g01_hls_h264_aac/index.m3u8.\n[   0.025][e][ytdl_hook] Subprocess failed: init\n[   0.027][e][ytdl_hook] Subprocess failed: init\n[   0.028][e][ytdl_hook] Subprocess failed: init\n[   0.028][e][ytdl_hook] \n[   0.028][e][ytdl_hook] youtube-dl failed: not found or not enough permissions",
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": null,
+     "first_play": null,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "error": true,
+     "ended": false,
+     "tracks": {
+      "video": [],
+      "audio": []
+     },
+     "start": null,
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "mpv_ok": false,
+   "vlc_ok": false
+  },
+  {
+   "id": "R16",
+   "group": "generated",
+   "case": "P16",
+   "url": "http://127.0.0.1:8791/slow/g01_hls_h264_aac/index.m3u8",
+   "note": "سيرفر يتأخر 20 ثانية",
+   "expect": "fail",
+   "mpv": [
+    {
+     "first_frame": null,
+     "video": false,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "exit": "Errors when loading file",
+     "wall": 15.31,
+     "vcodec": null,
+     "acodecs": [],
+     "resolution": null,
+     "audio_tracks": 0,
+     "sub_tracks": 0,
+     "err_class": "inconclusive",
+     "err_tail": "[  15.201][e][stream] Failed to open http://127.0.0.1:8791/slow/g01_hls_h264_aac/index.m3u8?p=mpv.\n[  15.203][e][ytdl_hook] Subprocess failed: init\n[  15.204][e][ytdl_hook] Subprocess failed: init\n[  15.205][e][ytdl_hook] Subprocess failed: init\n[  15.205][e][ytdl_hook] \n[  15.205][e][ytdl_hook] youtube-dl failed: not found or not enough permissions",
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": null,
+     "first_play": null,
+     "played": 0.0,
+     "max_stall": 0.0,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [],
+      "audio": []
+     },
+     "start": null,
+     "_len": 20,
+     "ok": false
+    }
+   ],
+   "mpv_ok": false,
+   "vlc_ok": false
+  },
+  {
+   "id": "R21",
+   "group": "generated",
+   "case": "P21",
+   "url": "rtmp://127.0.0.1:19350/live/test",
+   "note": "RTMP (خادم ffmpeg محلي)",
+   "expect": "ok",
+   "rtmp": true,
+   "mpv": [
+    {
+     "first_frame": 1.099,
+     "video": true,
+     "played": 19.96,
+     "max_stall": 0.0,
+     "exit": "End of file",
+     "wall": 21.2,
+     "vcodec": "h264",
+     "acodecs": [
+      "aac"
+     ],
+     "resolution": "1280x720",
+     "audio_tracks": 1,
+     "sub_tracks": 0,
+     "err_class": null,
+     "err_tail": "",
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "vlc": [
+    {
+     "first_frame": 1.2082888999721035,
+     "first_play": 1.5020706000505015,
+     "played": 20.03,
+     "max_stall": 0.5,
+     "error": false,
+     "ended": false,
+     "tracks": {
+      "video": [
+       "H264 - MPEG-4 AVC (part 10)"
+      ],
+      "audio": [
+       "MPEG AAC Audio"
+      ]
+     },
+     "start": 1.2082888999721035,
+     "_len": 20,
+     "ok": true
+    }
+   ],
+   "mpv_ok": true,
+   "vlc_ok": true
+  }
+ ]
+}

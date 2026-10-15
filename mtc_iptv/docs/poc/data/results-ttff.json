@@ -1,0 +1,3311 @@
+{
+ "run_at": "2026-10-15 02:52",
+ "profiles": {
+  "default": [],
+  "fast": [
+   "--demuxer-lavf-analyzeduration=0.5",
+   "--demuxer-lavf-probesize=500000",
+   "--demuxer-lavf-o-add=fflags=+nobuffer",
+   "--cache-pause-initial=no",
+   "--demuxer-readahead-secs=2"
+  ],
+  "fast+lowfirst": [
+   "--demuxer-lavf-analyzeduration=0.5",
+   "--demuxer-lavf-probesize=500000",
+   "--demuxer-lavf-o-add=fflags=+nobuffer",
+   "--cache-pause-initial=no",
+   "--demuxer-readahead-secs=2",
+   "--hls-bitrate=min"
+  ],
+  "variant-first": [
+   "(app resolves HLS master → single variant ≤1080p)"
+  ]
+ },
+ "n": 117,
+ "results": {
+  "fast": {
+   "C001": {
+    "ff": 7.127,
+    "played": 28.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C002": {
+    "ff": 10.108,
+    "played": 25.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C003": {
+    "ff": 7.542,
+    "played": 27.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C004": {
+    "ff": 7.06,
+    "played": 28.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C005": {
+    "ff": 6.972,
+    "played": 28.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0.926376
+   },
+   "C006": {
+    "ff": 7.09,
+    "played": 28.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C007": {
+    "ff": 1.822,
+    "played": 33.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C009": {
+    "ff": 1.704,
+    "played": 33.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C011": {
+    "ff": 3.995,
+    "played": 31.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C012": {
+    "ff": 3.278,
+    "played": 31.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C013": {
+    "ff": 3.398,
+    "played": 31.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C015": {
+    "ff": 3.406,
+    "played": 31.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C016": {
+    "ff": 2.114,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C018": {
+    "ff": 4.805,
+    "played": 30.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C020": {
+    "ff": 5.113,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C021": {
+    "ff": 3.444,
+    "played": 31.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C022": {
+    "ff": 3.917,
+    "played": 31.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C023": {
+    "ff": 5.59,
+    "played": 29.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C024": {
+    "ff": 3.949,
+    "played": 31.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C025": {
+    "ff": 7.622,
+    "played": 27.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C026": {
+    "ff": 2.25,
+    "played": 32.8,
+    "killed": true,
+    "ok": false,
+    "stall": 8.198013
+   },
+   "C028": {
+    "ff": 2.037,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C029": {
+    "ff": 2.96,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C030": {
+    "ff": 1.951,
+    "played": 33.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C031": {
+    "ff": 8.355,
+    "played": 26.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C032": {
+    "ff": 24.169,
+    "played": 10.9,
+    "killed": true,
+    "ok": false,
+    "stall": 0
+   },
+   "C033": {
+    "ff": 2.394,
+    "played": 32.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C034": {
+    "ff": 2.256,
+    "played": 32.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C035": {
+    "ff": 2.266,
+    "played": 32.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C036": {
+    "ff": 8.705,
+    "played": 26.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C037": {
+    "ff": 4.938,
+    "played": 30.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C038": {
+    "ff": 3.461,
+    "played": 31.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C039": {
+    "ff": 4.507,
+    "played": 30.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C040": {
+    "ff": 3.411,
+    "played": 31.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C041": {
+    "ff": 1.385,
+    "played": 33.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C042": {
+    "ff": 4.453,
+    "played": 30.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C043": {
+    "ff": 2.422,
+    "played": 32.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C044": {
+    "ff": 9.024,
+    "played": 26.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C045": {
+    "ff": 1.97,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C046": {
+    "ff": 2.083,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C047": {
+    "ff": 2.084,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C048": {
+    "ff": 4.282,
+    "played": 30.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C049": {
+    "ff": 4.295,
+    "played": 30.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C050": {
+    "ff": 3.755,
+    "played": 31.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C051": {
+    "ff": 2.603,
+    "played": 32.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C052": {
+    "ff": 8.419,
+    "played": 26.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C053": {
+    "ff": 2.296,
+    "played": 32.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C054": {
+    "ff": 2.838,
+    "played": 32.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C055": {
+    "ff": 5.176,
+    "played": 29.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0.922972
+   },
+   "C056": {
+    "ff": 4.532,
+    "played": 30.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C057": {
+    "ff": 14.261,
+    "played": 20.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C058": {
+    "ff": 5.353,
+    "played": 29.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C059": {
+    "ff": 1.849,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C060": {
+    "ff": 5.87,
+    "played": 29.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C061": {
+    "ff": 5.665,
+    "played": 29.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C062": {
+    "ff": 5.841,
+    "played": 29.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C063": {
+    "ff": 13.636,
+    "played": 21.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0.487535
+   },
+   "C064": {
+    "ff": 3.304,
+    "played": 31.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C065": {
+    "ff": 4.217,
+    "played": 30.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C066": {
+    "ff": 3.503,
+    "played": 31.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C067": {
+    "ff": 12.778,
+    "played": 22.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C068": {
+    "ff": 2.043,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C069": {
+    "ff": 8.648,
+    "played": 26.4,
+    "killed": true,
+    "ok": true,
+    "stall": 1.938971
+   },
+   "C070": {
+    "ff": 1.708,
+    "played": 33.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C071": {
+    "ff": 1.111,
+    "played": 34.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C072": {
+    "ff": 5.995,
+    "played": 29.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C074": {
+    "ff": 1.453,
+    "played": 33.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C076": {
+    "ff": 1.847,
+    "played": 33.2,
+    "killed": true,
+    "ok": true,
+    "stall": 2.568091
+   },
+   "C077": {
+    "ff": 6.397,
+    "played": 28.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C078": {
+    "ff": 6.981,
+    "played": 28.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C079": {
+    "ff": 8.439,
+    "played": 26.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C080": {
+    "ff": 6.608,
+    "played": 28.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C081": {
+    "ff": 7.734,
+    "played": 27.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C082": {
+    "ff": 6.849,
+    "played": 28.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C083": {
+    "ff": 5.421,
+    "played": 29.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C084": {
+    "ff": 7.156,
+    "played": 27.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C085": {
+    "ff": 4.998,
+    "played": 30.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0.902187
+   },
+   "C086": {
+    "ff": 8.434,
+    "played": 26.7,
+    "killed": true,
+    "ok": false,
+    "stall": 6.986873
+   },
+   "C087": {
+    "ff": 4.154,
+    "played": 30.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C088": {
+    "ff": 8.115,
+    "played": 27.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C089": {
+    "ff": 6.537,
+    "played": 28.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C091": {
+    "ff": 4.587,
+    "played": 30.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C093": {
+    "ff": 6.199,
+    "played": 28.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C094": {
+    "ff": 3.192,
+    "played": 31.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C095": {
+    "ff": 5.229,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C096": {
+    "ff": 3.206,
+    "played": 31.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0.920681
+   },
+   "C097": {
+    "ff": 2.691,
+    "played": 32.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C098": {
+    "ff": 14.648,
+    "played": 20.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C099": {
+    "ff": 8.668,
+    "played": 26.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C100": {
+    "ff": 14.578,
+    "played": 20.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O001": {
+    "ff": 7.472,
+    "played": 27.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O002": {
+    "ff": 0.948,
+    "played": 34.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O003": {
+    "ff": 6.466,
+    "played": 28.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O004": {
+    "ff": 2.096,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O005": {
+    "ff": 5.986,
+    "played": 29.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O006": {
+    "ff": 2.893,
+    "played": 32.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O007": {
+    "ff": 5.285,
+    "played": 29.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O008": {
+    "ff": 7.229,
+    "played": 27.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O009": {
+    "ff": 2.946,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O010": {
+    "ff": 3.661,
+    "played": 31.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O012": {
+    "ff": 0.905,
+    "played": 34.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O013": {
+    "ff": 2.869,
+    "played": 32.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O014": {
+    "ff": 5.162,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O015": {
+    "ff": 6.359,
+    "played": 28.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0.176157
+   },
+   "O016": {
+    "ff": 1.812,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O017": {
+    "ff": 5.929,
+    "played": 29.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O018": {
+    "ff": 0.768,
+    "played": 34.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O019": {
+    "ff": 1.819,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O020": {
+    "ff": 3.943,
+    "played": 31.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O021": {
+    "ff": 4.559,
+    "played": 30.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O022": {
+    "ff": 1.068,
+    "played": 34.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O023": {
+    "ff": 6.735,
+    "played": 28.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0.415926
+   },
+   "O024": {
+    "ff": 5.497,
+    "played": 29.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O025": {
+    "ff": 4.078,
+    "played": 31.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O027": {
+    "ff": 12.583,
+    "played": 22.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O029": {
+    "ff": 1.498,
+    "played": 33.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O030": {
+    "ff": 15.007,
+    "played": 20.1,
+    "killed": true,
+    "ok": false,
+    "stall": 0
+   }
+  },
+  "fast+lowfirst": {
+   "C001": {
+    "ff": 5.733,
+    "played": 29.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C002": {
+    "ff": 8.986,
+    "played": 26.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C003": {
+    "ff": 5.483,
+    "played": 29.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C004": {
+    "ff": 4.144,
+    "played": 30.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C005": {
+    "ff": 3.193,
+    "played": 31.9,
+    "killed": true,
+    "ok": true,
+    "stall": 1.392585
+   },
+   "C006": {
+    "ff": 4.224,
+    "played": 30.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C007": {
+    "ff": 1.516,
+    "played": 33.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C009": {
+    "ff": 1.412,
+    "played": 33.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C011": {
+    "ff": 3.257,
+    "played": 31.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C012": {
+    "ff": 3.078,
+    "played": 32.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C013": {
+    "ff": 2.748,
+    "played": 32.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C015": {
+    "ff": 3.326,
+    "played": 31.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C016": {
+    "ff": 2.094,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C018": {
+    "ff": 4.144,
+    "played": 30.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C020": {
+    "ff": 5.101,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C021": {
+    "ff": 3.489,
+    "played": 31.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C022": {
+    "ff": 3.887,
+    "played": 31.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C023": {
+    "ff": 4.969,
+    "played": 30.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C024": {
+    "ff": 3.567,
+    "played": 31.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C025": {
+    "ff": 7.022,
+    "played": 28.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C026": {
+    "ff": 2.152,
+    "played": 32.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C028": {
+    "ff": 1.971,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C029": {
+    "ff": 2.942,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C030": {
+    "ff": 1.834,
+    "played": 33.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C031": {
+    "ff": 5.838,
+    "played": 29.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C032": {
+    "ff": 22.874,
+    "played": 12.2,
+    "killed": true,
+    "ok": false,
+    "stall": 0
+   },
+   "C033": {
+    "ff": 2.011,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C034": {
+    "ff": 2.276,
+    "played": 32.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C035": {
+    "ff": 2.223,
+    "played": 32.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C036": {
+    "ff": 8.173,
+    "played": 26.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C037": {
+    "ff": 4.831,
+    "played": 30.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C038": {
+    "ff": 3.138,
+    "played": 31.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0.334468
+   },
+   "C039": {
+    "ff": 4.362,
+    "played": 30.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C040": {
+    "ff": 2.949,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C041": {
+    "ff": 1.456,
+    "played": 33.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C042": {
+    "ff": 4.293,
+    "played": 30.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C043": {
+    "ff": 2.585,
+    "played": 32.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C044": {
+    "ff": 7.431,
+    "played": 27.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C045": {
+    "ff": 1.795,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C046": {
+    "ff": 1.944,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C047": {
+    "ff": 3.609,
+    "played": 31.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C048": {
+    "ff": 4.218,
+    "played": 30.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C049": {
+    "ff": 3.442,
+    "played": 31.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C050": {
+    "ff": 3.428,
+    "played": 31.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C051": {
+    "ff": 1.893,
+    "played": 33.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C052": {
+    "ff": 6.753,
+    "played": 28.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C053": {
+    "ff": 2.04,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C054": {
+    "ff": 2.886,
+    "played": 32.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C055": {
+    "ff": 5.229,
+    "played": 29.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C056": {
+    "ff": 4.184,
+    "played": 30.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C057": {
+    "ff": 6.879,
+    "played": 28.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C058": {
+    "ff": 5.704,
+    "played": 29.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C059": {
+    "ff": 1.936,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C060": {
+    "ff": 5.228,
+    "played": 29.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C061": {
+    "ff": 7.646,
+    "played": 27.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C062": {
+    "ff": 5.716,
+    "played": 29.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C063": {
+    "ff": 13.216,
+    "played": 21.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C064": {
+    "ff": 1.749,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C065": {
+    "ff": 4.836,
+    "played": 30.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C066": {
+    "ff": 3.091,
+    "played": 32.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C067": {
+    "ff": 9.182,
+    "played": 25.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C068": {
+    "ff": 2.079,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C069": {
+    "ff": 9.051,
+    "played": 26.0,
+    "killed": true,
+    "ok": true,
+    "stall": 2.005907
+   },
+   "C070": {
+    "ff": 1.578,
+    "played": 33.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C071": {
+    "ff": 0.833,
+    "played": 34.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C072": {
+    "ff": 5.65,
+    "played": 29.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C074": {
+    "ff": 1.381,
+    "played": 33.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C076": {
+    "ff": 1.737,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 2.646528
+   },
+   "C077": {
+    "ff": 6.252,
+    "played": 28.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C078": {
+    "ff": 6.64,
+    "played": 28.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C079": {
+    "ff": 7.366,
+    "played": 27.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0.416316
+   },
+   "C080": {
+    "ff": 7.051,
+    "played": 28.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C081": {
+    "ff": 7.627,
+    "played": 27.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C082": {
+    "ff": 7.028,
+    "played": 28.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C083": {
+    "ff": 5.408,
+    "played": 29.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C084": {
+    "ff": 7.314,
+    "played": 27.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C085": {
+    "ff": 5.873,
+    "played": 29.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C086": {
+    "ff": 8.113,
+    "played": 27.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0.66362
+   },
+   "C087": {
+    "ff": 4.173,
+    "played": 30.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C088": {
+    "ff": 7.97,
+    "played": 27.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C089": {
+    "ff": 6.534,
+    "played": 28.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C091": {
+    "ff": 5.656,
+    "played": 29.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C093": {
+    "ff": 6.233,
+    "played": 28.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C094": {
+    "ff": 3.192,
+    "played": 31.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C095": {
+    "ff": 5.061,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C096": {
+    "ff": 6.196,
+    "played": 28.9,
+    "killed": true,
+    "ok": true,
+    "stall": 2.374896
+   },
+   "C097": {
+    "ff": 2.403,
+    "played": 32.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C098": {
+    "ff": 16.212,
+    "played": 18.9,
+    "killed": true,
+    "ok": false,
+    "stall": 0
+   },
+   "C099": {
+    "ff": 8.369,
+    "played": 26.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C100": {
+    "ff": 14.916,
+    "played": 20.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O001": {
+    "ff": 7.957,
+    "played": 27.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O002": {
+    "ff": 0.924,
+    "played": 34.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O003": {
+    "ff": 6.631,
+    "played": 28.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O004": {
+    "ff": 2.085,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O005": {
+    "ff": 5.037,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O006": {
+    "ff": 1.466,
+    "played": 33.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O007": {
+    "ff": 4.916,
+    "played": 31.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O008": {
+    "ff": 7.605,
+    "played": 28.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O009": {
+    "ff": 2.906,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O010": {
+    "ff": 3.707,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O012": {
+    "ff": 1.167,
+    "played": 34.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O013": {
+    "ff": 2.798,
+    "played": 32.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O014": {
+    "ff": 5.16,
+    "played": 29.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0.149914
+   },
+   "O015": {
+    "ff": 6.499,
+    "played": 28.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0.459041
+   },
+   "O016": {
+    "ff": 1.701,
+    "played": 33.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O017": {
+    "ff": 5.759,
+    "played": 29.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O018": {
+    "ff": 0.547,
+    "played": 34.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O019": {
+    "ff": 1.874,
+    "played": 33.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O020": {
+    "ff": 3.54,
+    "played": 31.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O021": {
+    "ff": 4.131,
+    "played": 30.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O022": {
+    "ff": 0.963,
+    "played": 34.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O023": {
+    "ff": 6.801,
+    "played": 28.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O024": {
+    "ff": 5.411,
+    "played": 29.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O025": {
+    "ff": 3.602,
+    "played": 31.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O027": {
+    "ff": 10.827,
+    "played": 24.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O029": {
+    "ff": 1.439,
+    "played": 33.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O030": {
+    "ff": 13.752,
+    "played": 21.3,
+    "killed": true,
+    "ok": true,
+    "stall": 1.813141
+   }
+  },
+  "default": {
+   "C001": {
+    "ff": 5.006,
+    "played": 30.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C002": {
+    "ff": 9.144,
+    "played": 25.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C003": {
+    "ff": 5.676,
+    "played": 29.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C004": {
+    "ff": 5.418,
+    "played": 29.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C005": {
+    "ff": 2.981,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C006": {
+    "ff": 5.383,
+    "played": 29.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C007": {
+    "ff": 1.281,
+    "played": 33.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C009": {
+    "ff": 1.753,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C011": {
+    "ff": 3.3,
+    "played": 31.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C012": {
+    "ff": 3.019,
+    "played": 32.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C013": {
+    "ff": 2.791,
+    "played": 32.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C015": {
+    "ff": 3.236,
+    "played": 31.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C016": {
+    "ff": 2.041,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C018": {
+    "ff": 4.181,
+    "played": 30.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C020": {
+    "ff": 5.751,
+    "played": 29.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C021": {
+    "ff": 3.274,
+    "played": 31.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C022": {
+    "ff": 4.097,
+    "played": 31.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C023": {
+    "ff": 5.116,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C024": {
+    "ff": 4.437,
+    "played": 30.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C025": {
+    "ff": 7.458,
+    "played": 27.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C026": {
+    "ff": null,
+    "played": 0,
+    "killed": false,
+    "ok": false,
+    "stall": 0
+   },
+   "C028": {
+    "ff": 1.93,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C029": {
+    "ff": 2.951,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C030": {
+    "ff": 1.693,
+    "played": 33.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C031": {
+    "ff": 11.915,
+    "played": 23.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C032": {
+    "ff": 23.293,
+    "played": 11.8,
+    "killed": true,
+    "ok": false,
+    "stall": 0
+   },
+   "C033": {
+    "ff": 2.049,
+    "played": 33.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C034": {
+    "ff": 2.003,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C035": {
+    "ff": 2.247,
+    "played": 32.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C036": {
+    "ff": 8.201,
+    "played": 26.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C037": {
+    "ff": 4.621,
+    "played": 30.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C038": {
+    "ff": 3.021,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C039": {
+    "ff": 4.601,
+    "played": 30.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C040": {
+    "ff": 3.05,
+    "played": 32.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C041": {
+    "ff": 1.355,
+    "played": 33.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C042": {
+    "ff": 4.252,
+    "played": 30.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C043": {
+    "ff": 2.449,
+    "played": 32.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C044": {
+    "ff": 8.313,
+    "played": 26.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C045": {
+    "ff": 1.806,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C046": {
+    "ff": 1.895,
+    "played": 33.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C047": {
+    "ff": 1.74,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C048": {
+    "ff": 4.425,
+    "played": 30.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C049": {
+    "ff": 3.653,
+    "played": 31.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C050": {
+    "ff": 3.82,
+    "played": 31.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C051": {
+    "ff": 2.001,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C052": {
+    "ff": 7.256,
+    "played": 27.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C053": {
+    "ff": 2.8,
+    "played": 32.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C054": {
+    "ff": 4.067,
+    "played": 31.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C055": {
+    "ff": 4.782,
+    "played": 30.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C056": {
+    "ff": 4.244,
+    "played": 30.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C057": {
+    "ff": 6.679,
+    "played": 28.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C058": {
+    "ff": 5.169,
+    "played": 29.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C059": {
+    "ff": 1.774,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C060": {
+    "ff": 5.114,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C061": {
+    "ff": 4.033,
+    "played": 31.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0.72055
+   },
+   "C062": {
+    "ff": 5.584,
+    "played": 29.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C063": {
+    "ff": 11.367,
+    "played": 23.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0.77074
+   },
+   "C064": {
+    "ff": 1.876,
+    "played": 33.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C065": {
+    "ff": 3.004,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C066": {
+    "ff": 3.281,
+    "played": 31.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C067": {
+    "ff": 10.549,
+    "played": 24.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C068": {
+    "ff": 1.927,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C069": {
+    "ff": 6.693,
+    "played": 28.4,
+    "killed": true,
+    "ok": true,
+    "stall": 1.61793
+   },
+   "C070": {
+    "ff": 1.395,
+    "played": 33.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C071": {
+    "ff": 0.783,
+    "played": 34.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C072": {
+    "ff": 5.875,
+    "played": 29.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C074": {
+    "ff": 1.386,
+    "played": 33.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C076": {
+    "ff": 1.482,
+    "played": 33.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C077": {
+    "ff": 7.341,
+    "played": 27.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C078": {
+    "ff": 6.565,
+    "played": 28.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C079": {
+    "ff": 6.667,
+    "played": 28.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C080": {
+    "ff": 6.592,
+    "played": 28.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C081": {
+    "ff": 7.19,
+    "played": 27.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C082": {
+    "ff": 7.143,
+    "played": 27.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C083": {
+    "ff": 5.774,
+    "played": 29.3,
+    "killed": true,
+    "ok": true,
+    "stall": 2.190826
+   },
+   "C084": {
+    "ff": 7.063,
+    "played": 28.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C085": {
+    "ff": 3.755,
+    "played": 31.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0.712169
+   },
+   "C086": {
+    "ff": 6.799,
+    "played": 28.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C087": {
+    "ff": 3.355,
+    "played": 31.7,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C088": {
+    "ff": 7.575,
+    "played": 27.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C089": {
+    "ff": 6.056,
+    "played": 29.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C091": {
+    "ff": 5.116,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0.638448
+   },
+   "C093": {
+    "ff": 5.856,
+    "played": 29.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C094": {
+    "ff": 2.94,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C095": {
+    "ff": 4.53,
+    "played": 30.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C096": {
+    "ff": 2.133,
+    "played": 32.9,
+    "killed": true,
+    "ok": true,
+    "stall": 1.818849
+   },
+   "C097": {
+    "ff": 1.929,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C098": {
+    "ff": 14.996,
+    "played": 20.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C099": {
+    "ff": 8.443,
+    "played": 26.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "C100": {
+    "ff": 14.455,
+    "played": 20.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O001": {
+    "ff": 7.084,
+    "played": 28.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0.103705
+   },
+   "O002": {
+    "ff": 0.946,
+    "played": 34.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O003": {
+    "ff": 6.518,
+    "played": 28.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O004": {
+    "ff": 1.956,
+    "played": 33.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O005": {
+    "ff": 5.071,
+    "played": 30.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O006": {
+    "ff": 2.961,
+    "played": 32.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O007": {
+    "ff": 4.968,
+    "played": 30.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O008": {
+    "ff": 7.456,
+    "played": 27.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O009": {
+    "ff": 2.754,
+    "played": 32.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O010": {
+    "ff": 3.49,
+    "played": 31.6,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O012": {
+    "ff": 0.972,
+    "played": 34.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O013": {
+    "ff": 2.769,
+    "played": 32.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O014": {
+    "ff": 4.572,
+    "played": 30.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O015": {
+    "ff": 5.953,
+    "played": 29.1,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O016": {
+    "ff": 1.696,
+    "played": 33.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O017": {
+    "ff": 5.545,
+    "played": 29.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O018": {
+    "ff": 0.602,
+    "played": 34.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O019": {
+    "ff": 1.807,
+    "played": 33.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O020": {
+    "ff": 3.772,
+    "played": 31.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O021": {
+    "ff": 4.614,
+    "played": 30.5,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O022": {
+    "ff": 0.879,
+    "played": 34.2,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O023": {
+    "ff": 5.818,
+    "played": 29.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O024": {
+    "ff": 5.658,
+    "played": 29.4,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O025": {
+    "ff": 4.814,
+    "played": 30.3,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O027": {
+    "ff": 11.111,
+    "played": 24.0,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O029": {
+    "ff": 1.281,
+    "played": 33.8,
+    "killed": true,
+    "ok": true,
+    "stall": 0
+   },
+   "O030": {
+    "ff": 14.17,
+    "played": 20.9,
+    "killed": true,
+    "ok": true,
+    "stall": 0.929767
+   }
+  },
+  "variant-first": {
+   "C001": {
+    "id": "C001",
+    "variants": 5,
+    "ff": 1.132,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C002": {
+    "id": "C002",
+    "variants": 4,
+    "ff": 2.923,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C003": {
+    "id": "C003",
+    "variants": 4,
+    "ff": 1.655,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C004": {
+    "id": "C004",
+    "variants": 1,
+    "ff": 3.205,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C005": {
+    "id": "C005",
+    "variants": 1,
+    "ff": 1.765,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C006": {
+    "id": "C006",
+    "variants": 1,
+    "ff": 3.164,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C007": {
+    "id": "C007",
+    "variants": 0,
+    "ff": 1.286,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C009": {
+    "id": "C009",
+    "variants": 0,
+    "ff": 1.891,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C011": {
+    "id": "C011",
+    "variants": 3,
+    "ff": 1.003,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C012": {
+    "id": "C012",
+    "variants": 3,
+    "ff": 0.94,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C013": {
+    "id": "C013",
+    "variants": 4,
+    "ff": 1.29,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C015": {
+    "id": "C015",
+    "variants": 6,
+    "ff": 0.915,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C016": {
+    "id": "C016",
+    "variants": 1,
+    "ff": 1.63,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C018": {
+    "id": "C018",
+    "variants": 4,
+    "ff": 1.687,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C020": {
+    "id": "C020",
+    "variants": 4,
+    "ff": 1.535,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C021": {
+    "id": "C021",
+    "variants": 3,
+    "ff": 0.895,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C022": {
+    "id": "C022",
+    "variants": 5,
+    "ff": 1.153,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C023": {
+    "id": "C023",
+    "variants": 5,
+    "ff": 1.758,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C024": {
+    "id": "C024",
+    "variants": 5,
+    "ff": 0.958,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C025": {
+    "id": "C025",
+    "variants": 8,
+    "ff": 1.501,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C026": {
+    "id": "C026",
+    "variants": -1,
+    "ff": null,
+    "ok": false,
+    "resolve_s": null
+   },
+   "C028": {
+    "id": "C028",
+    "variants": 1,
+    "ff": 1.499,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C029": {
+    "id": "C029",
+    "variants": 4,
+    "ff": 1.083,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C030": {
+    "id": "C030",
+    "variants": 1,
+    "ff": 1.505,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C031": {
+    "id": "C031",
+    "variants": 2,
+    "ff": 3.211,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C032": {
+    "id": "C032",
+    "variants": 8,
+    "ff": 4.248,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C033": {
+    "id": "C033",
+    "variants": 2,
+    "ff": 1.068,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C034": {
+    "id": "C034",
+    "variants": 1,
+    "ff": 1.753,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C035": {
+    "id": "C035",
+    "variants": 0,
+    "ff": 2.233,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C036": {
+    "id": "C036",
+    "variants": 5,
+    "ff": 2.528,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C037": {
+    "id": "C037",
+    "variants": 1,
+    "ff": 3.509,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C038": {
+    "id": "C038",
+    "variants": 4,
+    "ff": 1.217,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C039": {
+    "id": "C039",
+    "variants": 5,
+    "ff": 0.687,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C040": {
+    "id": "C040",
+    "variants": 4,
+    "ff": 0.326,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C041": {
+    "id": "C041",
+    "variants": 0,
+    "ff": 1.251,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C042": {
+    "id": "C042",
+    "variants": 4,
+    "ff": 1.867,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C043": {
+    "id": "C043",
+    "variants": 3,
+    "ff": 0.812,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C044": {
+    "id": "C044",
+    "variants": 4,
+    "ff": 2.069,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C045": {
+    "id": "C045",
+    "variants": 1,
+    "ff": 1.49,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C046": {
+    "id": "C046",
+    "variants": 1,
+    "ff": 1.542,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C047": {
+    "id": "C047",
+    "variants": 0,
+    "ff": 1.74,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C048": {
+    "id": "C048",
+    "variants": 4,
+    "ff": 1.787,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C049": {
+    "id": "C049",
+    "variants": 5,
+    "ff": 0.566,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C050": {
+    "id": "C050",
+    "variants": 5,
+    "ff": 0.548,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C051": {
+    "id": "C051",
+    "variants": 2,
+    "ff": 0.676,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C052": {
+    "id": "C052",
+    "variants": 2,
+    "ff": 4.12,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C053": {
+    "id": "C053",
+    "variants": 3,
+    "ff": 0.641,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C054": {
+    "id": "C054",
+    "variants": 0,
+    "ff": 2.617,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C055": {
+    "id": "C055",
+    "variants": 1,
+    "ff": 3.945,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C056": {
+    "id": "C056",
+    "variants": 2,
+    "ff": 1.4,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C057": {
+    "id": "C057",
+    "variants": 5,
+    "ff": 1.717,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C058": {
+    "id": "C058",
+    "variants": 3,
+    "ff": 1.932,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C059": {
+    "id": "C059",
+    "variants": 1,
+    "ff": 1.293,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C060": {
+    "id": "C060",
+    "variants": 0,
+    "ff": 2.993,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C061": {
+    "id": "C061",
+    "variants": -1,
+    "ff": 5.174,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C062": {
+    "id": "C062",
+    "variants": 5,
+    "ff": 0.369,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C063": {
+    "id": "C063",
+    "variants": 3,
+    "ff": 4.798,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C064": {
+    "id": "C064",
+    "variants": 1,
+    "ff": 0.8,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C065": {
+    "id": "C065",
+    "variants": 1,
+    "ff": 3.432,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C066": {
+    "id": "C066",
+    "variants": 3,
+    "ff": 1.471,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C067": {
+    "id": "C067",
+    "variants": 3,
+    "ff": 3.713,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C068": {
+    "id": "C068",
+    "variants": 0,
+    "ff": 1.967,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C069": {
+    "id": "C069",
+    "variants": 1,
+    "ff": 5.176,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C070": {
+    "id": "C070",
+    "variants": 0,
+    "ff": 1.403,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C071": {
+    "id": "C071",
+    "variants": 1,
+    "ff": 0.546,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C072": {
+    "id": "C072",
+    "variants": 1,
+    "ff": 1.413,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C074": {
+    "id": "C074",
+    "variants": 0,
+    "ff": 1.328,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C076": {
+    "id": "C076",
+    "variants": 0,
+    "ff": 1.388,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C077": {
+    "id": "C077",
+    "variants": 4,
+    "ff": 0.74,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C078": {
+    "id": "C078",
+    "variants": 6,
+    "ff": 0.792,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C079": {
+    "id": "C079",
+    "variants": 2,
+    "ff": 3.766,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C080": {
+    "id": "C080",
+    "variants": 5,
+    "ff": 0.455,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C081": {
+    "id": "C081",
+    "variants": 1,
+    "ff": 4.097,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C082": {
+    "id": "C082",
+    "variants": 4,
+    "ff": 1.862,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C083": {
+    "id": "C083",
+    "variants": 0,
+    "ff": 4.625,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C084": {
+    "id": "C084",
+    "variants": 4,
+    "ff": 2.214,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C085": {
+    "id": "C085",
+    "variants": 1,
+    "ff": 3.637,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C086": {
+    "id": "C086",
+    "variants": 1,
+    "ff": 5.877,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C087": {
+    "id": "C087",
+    "variants": 1,
+    "ff": 2.815,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C088": {
+    "id": "C088",
+    "variants": 4,
+    "ff": 1.003,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C089": {
+    "id": "C089",
+    "variants": 1,
+    "ff": 4.78,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C091": {
+    "id": "C091",
+    "variants": 4,
+    "ff": 0.773,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C093": {
+    "id": "C093",
+    "variants": 1,
+    "ff": 4.725,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C094": {
+    "id": "C094",
+    "variants": 0,
+    "ff": 2.931,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C095": {
+    "id": "C095",
+    "variants": 1,
+    "ff": 3.664,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C096": {
+    "id": "C096",
+    "variants": 1,
+    "ff": 1.803,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C097": {
+    "id": "C097",
+    "variants": 0,
+    "ff": 1.282,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C098": {
+    "id": "C098",
+    "variants": 6,
+    "ff": 1.216,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C099": {
+    "id": "C099",
+    "variants": 1,
+    "ff": 6.307,
+    "ok": true,
+    "resolve_s": null
+   },
+   "C100": {
+    "id": "C100",
+    "variants": 6,
+    "ff": 2.383,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O001": {
+    "id": "O001",
+    "variants": 3,
+    "ff": 0.573,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O002": {
+    "id": "O002",
+    "variants": 0,
+    "ff": 0.398,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O003": {
+    "id": "O003",
+    "variants": 6,
+    "ff": 0.883,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O004": {
+    "id": "O004",
+    "variants": 0,
+    "ff": 1.939,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O005": {
+    "id": "O005",
+    "variants": 3,
+    "ff": 2.25,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O006": {
+    "id": "O006",
+    "variants": 1,
+    "ff": 2.506,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O007": {
+    "id": "O007",
+    "variants": 3,
+    "ff": 2.352,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O008": {
+    "id": "O008",
+    "variants": 5,
+    "ff": 1.348,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O009": {
+    "id": "O009",
+    "variants": 4,
+    "ff": 1.115,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O010": {
+    "id": "O010",
+    "variants": 4,
+    "ff": 0.391,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O012": {
+    "id": "O012",
+    "variants": 0,
+    "ff": 0.573,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O013": {
+    "id": "O013",
+    "variants": 4,
+    "ff": 1.189,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O014": {
+    "id": "O014",
+    "variants": 4,
+    "ff": 1.586,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O015": {
+    "id": "O015",
+    "variants": 5,
+    "ff": 0.381,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O016": {
+    "id": "O016",
+    "variants": 0,
+    "ff": 0.755,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O017": {
+    "id": "O017",
+    "variants": 5,
+    "ff": 0.298,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O018": {
+    "id": "O018",
+    "variants": 0,
+    "ff": 0.392,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O019": {
+    "id": "O019",
+    "variants": 1,
+    "ff": 1.356,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O020": {
+    "id": "O020",
+    "variants": 4,
+    "ff": 0.436,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O021": {
+    "id": "O021",
+    "variants": 4,
+    "ff": 1.919,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O022": {
+    "id": "O022",
+    "variants": 0,
+    "ff": 0.572,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O023": {
+    "id": "O023",
+    "variants": 1,
+    "ff": 4.739,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O024": {
+    "id": "O024",
+    "variants": 5,
+    "ff": 0.287,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O025": {
+    "id": "O025",
+    "variants": 6,
+    "ff": 0.54,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O027": {
+    "id": "O027",
+    "variants": 3,
+    "ff": 2.905,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O029": {
+    "id": "O029",
+    "variants": 0,
+    "ff": 1.282,
+    "ok": true,
+    "resolve_s": null
+   },
+   "O030": {
+    "id": "O030",
+    "variants": 4,
+    "ff": 3.903,
+    "ok": false,
+    "resolve_s": null
+   }
+  }
+ }
+}

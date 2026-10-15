@@ -1,0 +1,20 @@
+# Dart / Flutter
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+
+# المرحلة 0 — ملفات مولّدة أو محلية
+tools/test-streams/out/
+tools/player-poc/self.crt
+tools/player-poc/self.key
+tools/player-poc/__pycache__/
+
+# update signing private keys - NEVER commit
+*priv*.pem
+tools/desktop-poc/dist/
+
+# release artifacts (scripts/release.ps1)
+dist/
