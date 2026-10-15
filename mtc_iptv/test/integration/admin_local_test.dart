@@ -99,4 +99,54 @@ void main() {
     expect(await repo.channel(id), isNull);
     expect(await repo.streamsOf(id), isEmpty);
   }, skip: skip);
+
+  test('batch 4b: review queue, renumbering, taxonomy, streams, task runs', () async {
+    // قناة معلّقة (مسار الاستيراد القديم) برابط لم يُفحص ← دلو «لم تُفحص»
+    final r = await admin('POST', '/rest/v1/channels', {'uid': 'review:$stamp', 'name': 'Review $stamp', 'is_published': false, 'hidden_reason': 'pending', 'country_code': null});
+    final id = ((jsonDecode(r.body) as List).single as Map)['id'] as String;
+    addTearDown(() => admin('DELETE', '/rest/v1/channels?id=eq.$id'));
+    await admin('POST', '/rest/v1/streams', {'channel_id': id, 'url': 'https://example.com/review/$stamp.m3u8'});
+    expect((await repo.reviewCounts())['unchecked'], greaterThanOrEqualTo(1));
+    expect((await repo.reviewIds('unchecked')), contains(id));
+    final (items, total) = await repo.reviewItems('unchecked');
+    expect(total, greaterThanOrEqualTo(1));
+    expect(items.map((x) => x['id']), contains(id));
+
+    // بعد فحص ناجح ينتقل إلى «ناقصة» (بلا دولة) ثم الموافقة تنشره
+    final s = (await repo.streamsOf(id)).single;
+    await repo.recordHealth(s.id, state: 'playable', reason: 'test');
+    expect(await repo.reviewIds('incomplete'), contains(id));
+    expect(await repo.reviewApply('approve', [id]), 1);
+    expect((await repo.channel(id))!.publishState, 'published');
+
+    // الترقيم: معاينة ثم تطبيق ذري (الأرقام تبقى فريدة)
+    final p = await repo.renumberPreview(['name'], start: 1);
+    expect((p['total'] as num).toInt(), greaterThan(0));
+    final n = await repo.renumberApply(['name'], start: 1);
+    expect(n, (p['total'] as num).toInt());
+    final nums = (jsonDecode((await admin('GET', '/rest/v1/channels?select=number&number=not.is.null')).body) as List).map((e) => e['number']).toList();
+    expect(nums.toSet().length, nums.length, reason: 'numbers stay unique');
+
+    // التقسيمات: إضافة، عدّ الاستخدام، حذف
+    await repo.upsertTaxonomy('categories', {'slug': 'test-$stamp', 'name_ar': 'اختبار', 'name_en': 'Test', 'sort_order': 999, 'is_visible': false});
+    expect((await repo.taxonomy('categories')).map((x) => x['slug']), contains('test-$stamp'));
+    await repo.updateChannel(id, {'category_slug': 'test-$stamp'});
+    expect((await repo.taxonomyUsage('categories'))['test-$stamp'], 1);
+    await repo.updateChannel(id, {'category_slug': null});
+    await repo.deleteTaxonomy('categories', 'test-$stamp');
+    expect((await repo.taxonomy('categories')).map((x) => x['slug']), isNot(contains('test-$stamp')));
+
+    // الروابط عبر القنوات + ملخّص النطاقات
+    final (streams, count) = await repo.streams(host: 'example.com');
+    expect(count, greaterThanOrEqualTo(1));
+    expect(streams.map((x) => x.$1.id), contains(s.id));
+    expect((await repo.hosts()).map((h) => h.$1), contains('example.com'));
+
+    // سجل التشغيل (يتطلب is_admin = تحقق بخطوتين)
+    final run = await repo.startRun('health_all', 'test-$stamp');
+    await repo.finishRun(run!, status: 'ok', summary: {'checked': 1});
+    final runs = await repo.taskRuns();
+    expect(runs.firstWhere((x) => x['id'] == run)['status'], 'ok');
+    expect(await repo.scheduledTasks(), isNotEmpty);
+  }, skip: skip);
 }

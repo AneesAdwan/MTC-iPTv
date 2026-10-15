@@ -9,6 +9,7 @@ import '../../data/admin/admin_repository.dart';
 import '../../data/admin/health_service.dart';
 import '../viewer/guide_screen.dart' show textDirOf;
 import '../viewer/widgets/channel_card.dart' show EmptyState;
+import 'channels/stream_preview.dart';
 import 'dashboard_screen.dart';
 import 'widgets/admin_widgets.dart';
 
@@ -61,7 +62,7 @@ class ReportsAdminScreen extends ConsumerWidget {
                 ),
               const SizedBox(height: Space.sm),
               Wrap(spacing: Space.sm, runSpacing: Space.sm, children: [
-                OutlinedButton.icon(onPressed: () => context.push('/watch/${g.channelId}'), icon: const Icon(Icons.play_arrow_rounded, size: 18), label: Text(t.aTry)),
+                OutlinedButton.icon(onPressed: () => previewChannel(context, ref, g.channelId, g.channelName), icon: const Icon(Icons.play_arrow_rounded, size: 18), label: Text(t.aTry)),
                 OutlinedButton.icon(
                   onPressed: job.running || repo == null ? null : () async => ref.read(healthJobProvider.notifier).run(await repo.streamsOf(g.channelId)),
                   icon: const Icon(Icons.monitor_heart_rounded, size: 18),

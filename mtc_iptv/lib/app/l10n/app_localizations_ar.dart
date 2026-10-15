@@ -1043,4 +1043,257 @@ class L10nAr extends L10n {
   String reasonLabel(String r) {
     return 'السبب: $r';
   }
+
+  @override
+  String get bkUnchecked => 'لم تُفحص';
+
+  @override
+  String get bkReady => 'جاهزة للنشر';
+
+  @override
+  String get bkDuplicate => 'مكررة';
+
+  @override
+  String get bkOffline => 'لا تعمل';
+
+  @override
+  String get bkLogo => 'شعار معطّل';
+
+  @override
+  String get bkIncomplete => 'ناقصة';
+
+  @override
+  String get bkUncheckedHint =>
+      'روابطها لم تُفحص بعد: افحص الدلو فتُصنَّف تلقائيًا.';
+
+  @override
+  String get bkReadyHint => 'روابطها تعمل وغير مكررة. راجعها ثم وافق عليها.';
+
+  @override
+  String get bkDuplicateHint =>
+      'نفس قناة موجودة في الكتالوج: ادمجها (تصبح روابطها سيرفرات إضافية) أو علّمها «ليست مكررة».';
+
+  @override
+  String get bkOfflineHint => 'لا رابط يعمل. ارفضها، أو انتظر فحصًا جديدًا.';
+
+  @override
+  String get bkLogoHint => 'الشعار لا يظهر. أصلحه قبل النشر.';
+
+  @override
+  String get bkIncompleteHint => 'قنوات تعمل لكن بلا دولة. عدّلها قبل النشر.';
+
+  @override
+  String get reviewEmpty => 'لا شيء بانتظار المراجعة.';
+
+  @override
+  String get aApprove => 'موافقة ونشر';
+
+  @override
+  String get aReject => 'رفض (حذف)';
+
+  @override
+  String get aMerge => 'دمج في الأصلية';
+
+  @override
+  String get aNotDuplicate => 'ليست مكررة';
+
+  @override
+  String aAllInBucket(int n) {
+    return 'كل الدلو ($n)';
+  }
+
+  @override
+  String originalOf(String name) {
+    return 'الأصلية: $name';
+  }
+
+  @override
+  String streamsWorking(int ok, int n) {
+    return '$ok/$n تعمل';
+  }
+
+  @override
+  String confirmReject(int n) {
+    return 'حذف $n قناة معلّقة مع روابطها؟';
+  }
+
+  @override
+  String doneCount(int n) {
+    return 'تم: $n.';
+  }
+
+  @override
+  String get numOrderBy => 'الترتيب حسب';
+
+  @override
+  String get nkArab => 'الدول العربية أولًا';
+
+  @override
+  String get nkCountry => 'الدولة';
+
+  @override
+  String get nkCategory => 'الفئة';
+
+  @override
+  String get nkLanguage => 'اللغة';
+
+  @override
+  String get nkFeatured => 'المميزة أولًا';
+
+  @override
+  String get nkQuality => 'الجودة';
+
+  @override
+  String get nkOnline => 'الروابط العاملة';
+
+  @override
+  String get nkName => 'الاسم';
+
+  @override
+  String get nkCurrent => 'الرقم الحالي';
+
+  @override
+  String get nkNewest => 'الأحدث';
+
+  @override
+  String get nkSortOrder => 'ترتيب الظهور';
+
+  @override
+  String get numStart => 'أول رقم';
+
+  @override
+  String get numBlock => 'حجم الكتلة لكل مجموعة (0 = متتالٍ)';
+
+  @override
+  String get numPublishedFirst => 'المنشورة أولًا';
+
+  @override
+  String get numPreview => 'معاينة';
+
+  @override
+  String get numApply => 'تطبيق';
+
+  @override
+  String numSummary(int changed, int total, int max) {
+    return '$changed من $total قناة يتغير رقمها · آخر رقم $max';
+  }
+
+  @override
+  String numConfirm(int n) {
+    return 'إعادة ترقيم $n قناة؟ يرى المشاهدون الأرقام الجديدة بعد مزامنتهم التالية.';
+  }
+
+  @override
+  String numApplied(int n) {
+    return 'أُعيد ترقيم $n قناة.';
+  }
+
+  @override
+  String get numHint =>
+      'اختر الترتيب، عاين، ثم طبّق. التغيير كله يتم دفعة واحدة على الخادم، ويبقى الرقم القديم لكل قناة في سجلها.';
+
+  @override
+  String get tabCategories => 'الفئات';
+
+  @override
+  String get tabCountries => 'الدول';
+
+  @override
+  String get tabLanguages => 'اللغات';
+
+  @override
+  String get fSlug => 'المعرّف';
+
+  @override
+  String get fIcon => 'الأيقونة';
+
+  @override
+  String get fHue => 'اللون (0–360)';
+
+  @override
+  String get fSort => 'الترتيب';
+
+  @override
+  String get fVisible => 'ظاهرة';
+
+  @override
+  String get fFlag => 'العلم';
+
+  @override
+  String get fContinent => 'القارة';
+
+  @override
+  String get fArab => 'دولة عربية';
+
+  @override
+  String usedBy(int n) {
+    return '$n قناة';
+  }
+
+  @override
+  String cannotDeleteUsed(int n) {
+    return 'مستخدمة في $n قناة — انقلها أولًا.';
+  }
+
+  @override
+  String get addItem => 'إضافة';
+
+  @override
+  String get hostFilter => 'النطاق…';
+
+  @override
+  String get allProtocols => 'كل البروتوكولات';
+
+  @override
+  String get fCredentials => 'فيها بيانات اعتماد';
+
+  @override
+  String get hostsTitle => 'النطاقات';
+
+  @override
+  String get jobsRunning => 'يعمل الآن';
+
+  @override
+  String get jobsHistory => 'آخر التشغيلات';
+
+  @override
+  String get jobsScheduled => 'المهام المجدولة';
+
+  @override
+  String get noRuns => 'لا تشغيلات مسجّلة بعد.';
+
+  @override
+  String taskEvery(int m) {
+    return 'كل $m دقيقة';
+  }
+
+  @override
+  String taskLast(String t) {
+    return 'آخر تشغيل $t';
+  }
+
+  @override
+  String get tkHealthPublished => 'فحص روابط المنشورة';
+
+  @override
+  String get tkHealthAll => 'فحص كل الروابط';
+
+  @override
+  String get tkPlaybackSample => 'عيّنة تشغيل';
+
+  @override
+  String get tkLogos => 'فحص الشعارات';
+
+  @override
+  String get tkEpg => 'مزامنة دليل البرامج';
+
+  @override
+  String get tkSources => 'تحديث المصادر';
+
+  @override
+  String get tkBackup => 'النسخ الاحتياطي';
+
+  @override
+  String get schedulerNote =>
+      'المُجدوِل الذي يشغّلها تلقائيًا يأتي مع المرحلة 6 (ADM-H2). الفحوص اليدوية تُسجَّل هنا.';
 }

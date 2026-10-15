@@ -2052,6 +2052,456 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'السبب: {r}'**
   String reasonLabel(String r);
+
+  /// No description provided for @bkUnchecked.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تُفحص'**
+  String get bkUnchecked;
+
+  /// No description provided for @bkReady.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاهزة للنشر'**
+  String get bkReady;
+
+  /// No description provided for @bkDuplicate.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكررة'**
+  String get bkDuplicate;
+
+  /// No description provided for @bkOffline.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تعمل'**
+  String get bkOffline;
+
+  /// No description provided for @bkLogo.
+  ///
+  /// In ar, this message translates to:
+  /// **'شعار معطّل'**
+  String get bkLogo;
+
+  /// No description provided for @bkIncomplete.
+  ///
+  /// In ar, this message translates to:
+  /// **'ناقصة'**
+  String get bkIncomplete;
+
+  /// No description provided for @bkUncheckedHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'روابطها لم تُفحص بعد: افحص الدلو فتُصنَّف تلقائيًا.'**
+  String get bkUncheckedHint;
+
+  /// No description provided for @bkReadyHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'روابطها تعمل وغير مكررة. راجعها ثم وافق عليها.'**
+  String get bkReadyHint;
+
+  /// No description provided for @bkDuplicateHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'نفس قناة موجودة في الكتالوج: ادمجها (تصبح روابطها سيرفرات إضافية) أو علّمها «ليست مكررة».'**
+  String get bkDuplicateHint;
+
+  /// No description provided for @bkOfflineHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا رابط يعمل. ارفضها، أو انتظر فحصًا جديدًا.'**
+  String get bkOfflineHint;
+
+  /// No description provided for @bkLogoHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشعار لا يظهر. أصلحه قبل النشر.'**
+  String get bkLogoHint;
+
+  /// No description provided for @bkIncompleteHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'قنوات تعمل لكن بلا دولة. عدّلها قبل النشر.'**
+  String get bkIncompleteHint;
+
+  /// No description provided for @reviewEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا شيء بانتظار المراجعة.'**
+  String get reviewEmpty;
+
+  /// No description provided for @aApprove.
+  ///
+  /// In ar, this message translates to:
+  /// **'موافقة ونشر'**
+  String get aApprove;
+
+  /// No description provided for @aReject.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفض (حذف)'**
+  String get aReject;
+
+  /// No description provided for @aMerge.
+  ///
+  /// In ar, this message translates to:
+  /// **'دمج في الأصلية'**
+  String get aMerge;
+
+  /// No description provided for @aNotDuplicate.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليست مكررة'**
+  String get aNotDuplicate;
+
+  /// No description provided for @aAllInBucket.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل الدلو ({n})'**
+  String aAllInBucket(int n);
+
+  /// No description provided for @originalOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأصلية: {name}'**
+  String originalOf(String name);
+
+  /// No description provided for @streamsWorking.
+  ///
+  /// In ar, this message translates to:
+  /// **'{ok}/{n} تعمل'**
+  String streamsWorking(int ok, int n);
+
+  /// No description provided for @confirmReject.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف {n} قناة معلّقة مع روابطها؟'**
+  String confirmReject(int n);
+
+  /// No description provided for @doneCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم: {n}.'**
+  String doneCount(int n);
+
+  /// No description provided for @numOrderBy.
+  ///
+  /// In ar, this message translates to:
+  /// **'الترتيب حسب'**
+  String get numOrderBy;
+
+  /// No description provided for @nkArab.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدول العربية أولًا'**
+  String get nkArab;
+
+  /// No description provided for @nkCountry.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدولة'**
+  String get nkCountry;
+
+  /// No description provided for @nkCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئة'**
+  String get nkCategory;
+
+  /// No description provided for @nkLanguage.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللغة'**
+  String get nkLanguage;
+
+  /// No description provided for @nkFeatured.
+  ///
+  /// In ar, this message translates to:
+  /// **'المميزة أولًا'**
+  String get nkFeatured;
+
+  /// No description provided for @nkQuality.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجودة'**
+  String get nkQuality;
+
+  /// No description provided for @nkOnline.
+  ///
+  /// In ar, this message translates to:
+  /// **'الروابط العاملة'**
+  String get nkOnline;
+
+  /// No description provided for @nkName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم'**
+  String get nkName;
+
+  /// No description provided for @nkCurrent.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرقم الحالي'**
+  String get nkCurrent;
+
+  /// No description provided for @nkNewest.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأحدث'**
+  String get nkNewest;
+
+  /// No description provided for @nkSortOrder.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترتيب الظهور'**
+  String get nkSortOrder;
+
+  /// No description provided for @numStart.
+  ///
+  /// In ar, this message translates to:
+  /// **'أول رقم'**
+  String get numStart;
+
+  /// No description provided for @numBlock.
+  ///
+  /// In ar, this message translates to:
+  /// **'حجم الكتلة لكل مجموعة (0 = متتالٍ)'**
+  String get numBlock;
+
+  /// No description provided for @numPublishedFirst.
+  ///
+  /// In ar, this message translates to:
+  /// **'المنشورة أولًا'**
+  String get numPublishedFirst;
+
+  /// No description provided for @numPreview.
+  ///
+  /// In ar, this message translates to:
+  /// **'معاينة'**
+  String get numPreview;
+
+  /// No description provided for @numApply.
+  ///
+  /// In ar, this message translates to:
+  /// **'تطبيق'**
+  String get numApply;
+
+  /// No description provided for @numSummary.
+  ///
+  /// In ar, this message translates to:
+  /// **'{changed} من {total} قناة يتغير رقمها · آخر رقم {max}'**
+  String numSummary(int changed, int total, int max);
+
+  /// No description provided for @numConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة ترقيم {n} قناة؟ يرى المشاهدون الأرقام الجديدة بعد مزامنتهم التالية.'**
+  String numConfirm(int n);
+
+  /// No description provided for @numApplied.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُعيد ترقيم {n} قناة.'**
+  String numApplied(int n);
+
+  /// No description provided for @numHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر الترتيب، عاين، ثم طبّق. التغيير كله يتم دفعة واحدة على الخادم، ويبقى الرقم القديم لكل قناة في سجلها.'**
+  String get numHint;
+
+  /// No description provided for @tabCategories.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئات'**
+  String get tabCategories;
+
+  /// No description provided for @tabCountries.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدول'**
+  String get tabCountries;
+
+  /// No description provided for @tabLanguages.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللغات'**
+  String get tabLanguages;
+
+  /// No description provided for @fSlug.
+  ///
+  /// In ar, this message translates to:
+  /// **'المعرّف'**
+  String get fSlug;
+
+  /// No description provided for @fIcon.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأيقونة'**
+  String get fIcon;
+
+  /// No description provided for @fHue.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللون (0–360)'**
+  String get fHue;
+
+  /// No description provided for @fSort.
+  ///
+  /// In ar, this message translates to:
+  /// **'الترتيب'**
+  String get fSort;
+
+  /// No description provided for @fVisible.
+  ///
+  /// In ar, this message translates to:
+  /// **'ظاهرة'**
+  String get fVisible;
+
+  /// No description provided for @fFlag.
+  ///
+  /// In ar, this message translates to:
+  /// **'العلم'**
+  String get fFlag;
+
+  /// No description provided for @fContinent.
+  ///
+  /// In ar, this message translates to:
+  /// **'القارة'**
+  String get fContinent;
+
+  /// No description provided for @fArab.
+  ///
+  /// In ar, this message translates to:
+  /// **'دولة عربية'**
+  String get fArab;
+
+  /// No description provided for @usedBy.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} قناة'**
+  String usedBy(int n);
+
+  /// No description provided for @cannotDeleteUsed.
+  ///
+  /// In ar, this message translates to:
+  /// **'مستخدمة في {n} قناة — انقلها أولًا.'**
+  String cannotDeleteUsed(int n);
+
+  /// No description provided for @addItem.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة'**
+  String get addItem;
+
+  /// No description provided for @hostFilter.
+  ///
+  /// In ar, this message translates to:
+  /// **'النطاق…'**
+  String get hostFilter;
+
+  /// No description provided for @allProtocols.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل البروتوكولات'**
+  String get allProtocols;
+
+  /// No description provided for @fCredentials.
+  ///
+  /// In ar, this message translates to:
+  /// **'فيها بيانات اعتماد'**
+  String get fCredentials;
+
+  /// No description provided for @hostsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'النطاقات'**
+  String get hostsTitle;
+
+  /// No description provided for @jobsRunning.
+  ///
+  /// In ar, this message translates to:
+  /// **'يعمل الآن'**
+  String get jobsRunning;
+
+  /// No description provided for @jobsHistory.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر التشغيلات'**
+  String get jobsHistory;
+
+  /// No description provided for @jobsScheduled.
+  ///
+  /// In ar, this message translates to:
+  /// **'المهام المجدولة'**
+  String get jobsScheduled;
+
+  /// No description provided for @noRuns.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تشغيلات مسجّلة بعد.'**
+  String get noRuns;
+
+  /// No description provided for @taskEvery.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل {m} دقيقة'**
+  String taskEvery(int m);
+
+  /// No description provided for @taskLast.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر تشغيل {t}'**
+  String taskLast(String t);
+
+  /// No description provided for @tkHealthPublished.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص روابط المنشورة'**
+  String get tkHealthPublished;
+
+  /// No description provided for @tkHealthAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص كل الروابط'**
+  String get tkHealthAll;
+
+  /// No description provided for @tkPlaybackSample.
+  ///
+  /// In ar, this message translates to:
+  /// **'عيّنة تشغيل'**
+  String get tkPlaybackSample;
+
+  /// No description provided for @tkLogos.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص الشعارات'**
+  String get tkLogos;
+
+  /// No description provided for @tkEpg.
+  ///
+  /// In ar, this message translates to:
+  /// **'مزامنة دليل البرامج'**
+  String get tkEpg;
+
+  /// No description provided for @tkSources.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديث المصادر'**
+  String get tkSources;
+
+  /// No description provided for @tkBackup.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسخ الاحتياطي'**
+  String get tkBackup;
+
+  /// No description provided for @schedulerNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'المُجدوِل الذي يشغّلها تلقائيًا يأتي مع المرحلة 6 (ADM-H2). الفحوص اليدوية تُسجَّل هنا.'**
+  String get schedulerNote;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

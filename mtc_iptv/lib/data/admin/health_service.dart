@@ -4,6 +4,7 @@
 //  • الروابط المعطّلة يدويًا لا تُفحص ولا تتغير (D-14).
 //  • النتيجة تُكتب على الرابط فقط؛ لا إخفاء ولا حذف تلقائي — القرار للمدير.
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mtc_core/mtc_core.dart';
@@ -56,6 +57,14 @@ class HealthService extends Notifier<HealthJob> {
     } catch (e) {
       state = HealthJob(total: todo.length, error: 'offline: $e');
       return;
+    }
+
+    // سجل التشغيل في ADM-A2 (اختياري: يفشل بصمت دون جلسة تحقق بخطوتين)
+    int? runId;
+    try {
+      runId = await repo.startRun('health_all', Platform.localHostname);
+    } catch (e) {
+      log.fine('task_runs unavailable: $e');
     }
 
     final probe = StreamProbe();
@@ -112,6 +121,14 @@ class HealthService extends Notifier<HealthJob> {
 
     await Future.wait([for (var i = 0; i < 8; i++) worker()]);
     log.info('health check done $done/${todo.length} $results${_cancel ? ' (cancelled)' : ''}');
+    if (runId != null) {
+      try {
+        await repo.finishRun(runId,
+            status: 'ok', summary: {'manual': true, 'checked': done, 'total': todo.length, 'play_check': playCheck, 'cancelled': _cancel, 'results': results});
+      } catch (e) {
+        log.fine('task_runs finish failed: $e');
+      }
+    }
     state = HealthJob(total: todo.length, done: done, results: results);
   }
 }

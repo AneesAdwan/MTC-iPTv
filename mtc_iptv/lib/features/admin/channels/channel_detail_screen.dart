@@ -53,7 +53,7 @@ class ChannelDetailScreen extends ConsumerWidget {
             ),
             StatePill(v.publishState),
             const SizedBox(width: Space.sm),
-            OutlinedButton.icon(onPressed: () => context.push('/watch/${v.id}'), icon: const Icon(Icons.play_arrow_rounded), label: Text(t.watchNow)),
+            OutlinedButton.icon(onPressed: () => previewChannel(context, ref, v.id, v.displayName(lang)), icon: const Icon(Icons.play_arrow_rounded), label: Text(t.aTry)),
           ]),
         ),
         TabBar(isScrollable: true, tabAlignment: TabAlignment.start, tabs: [Tab(text: t.tabInfo), Tab(text: t.tabStreams), Tab(text: t.tabGuide), Tab(text: t.tabHistory)]),

@@ -1050,4 +1050,260 @@ class L10nEn extends L10n {
   String reasonLabel(String r) {
     return 'Reason: $r';
   }
+
+  @override
+  String get bkUnchecked => 'Not checked';
+
+  @override
+  String get bkReady => 'Ready to publish';
+
+  @override
+  String get bkDuplicate => 'Duplicates';
+
+  @override
+  String get bkOffline => 'Not working';
+
+  @override
+  String get bkLogo => 'Broken logo';
+
+  @override
+  String get bkIncomplete => 'Incomplete';
+
+  @override
+  String get bkUncheckedHint =>
+      'Their streams were not checked yet: check the bucket and they sort themselves.';
+
+  @override
+  String get bkReadyHint =>
+      'Streams work and they are not duplicates. Review, then approve.';
+
+  @override
+  String get bkDuplicateHint =>
+      'Same channel as one already in the catalog: merge (its streams become extra servers) or mark as not a duplicate.';
+
+  @override
+  String get bkOfflineHint =>
+      'No working stream. Reject, or keep waiting for a re-check.';
+
+  @override
+  String get bkLogoHint => 'The logo does not load. Fix it before publishing.';
+
+  @override
+  String get bkIncompleteHint =>
+      'Working channels without a country. Edit them before publishing.';
+
+  @override
+  String get reviewEmpty => 'Nothing is waiting for review.';
+
+  @override
+  String get aApprove => 'Approve & publish';
+
+  @override
+  String get aReject => 'Reject (delete)';
+
+  @override
+  String get aMerge => 'Merge into original';
+
+  @override
+  String get aNotDuplicate => 'Not a duplicate';
+
+  @override
+  String aAllInBucket(int n) {
+    return 'All in this bucket ($n)';
+  }
+
+  @override
+  String originalOf(String name) {
+    return 'Original: $name';
+  }
+
+  @override
+  String streamsWorking(int ok, int n) {
+    return '$ok/$n working';
+  }
+
+  @override
+  String confirmReject(int n) {
+    return 'Delete $n pending channel(s) and their streams?';
+  }
+
+  @override
+  String doneCount(int n) {
+    return 'Done: $n.';
+  }
+
+  @override
+  String get numOrderBy => 'Order by';
+
+  @override
+  String get nkArab => 'Arab countries first';
+
+  @override
+  String get nkCountry => 'Country';
+
+  @override
+  String get nkCategory => 'Category';
+
+  @override
+  String get nkLanguage => 'Language';
+
+  @override
+  String get nkFeatured => 'Featured first';
+
+  @override
+  String get nkQuality => 'Quality';
+
+  @override
+  String get nkOnline => 'Working streams';
+
+  @override
+  String get nkName => 'Name';
+
+  @override
+  String get nkCurrent => 'Current number';
+
+  @override
+  String get nkNewest => 'Newest';
+
+  @override
+  String get nkSortOrder => 'Display order';
+
+  @override
+  String get numStart => 'First number';
+
+  @override
+  String get numBlock => 'Block per group (0 = continuous)';
+
+  @override
+  String get numPublishedFirst => 'Published channels first';
+
+  @override
+  String get numPreview => 'Preview';
+
+  @override
+  String get numApply => 'Apply';
+
+  @override
+  String numSummary(int changed, int total, int max) {
+    return '$changed of $total channels change number · last number $max';
+  }
+
+  @override
+  String numConfirm(int n) {
+    return 'Renumber $n channels? Viewers will see the new numbers after their next sync.';
+  }
+
+  @override
+  String numApplied(int n) {
+    return 'Renumbered $n channels.';
+  }
+
+  @override
+  String get numHint =>
+      'Choose the order, preview, then apply. The whole change happens at once on the server, and every channel\'s old number stays in its history.';
+
+  @override
+  String get tabCategories => 'Categories';
+
+  @override
+  String get tabCountries => 'Countries';
+
+  @override
+  String get tabLanguages => 'Languages';
+
+  @override
+  String get fSlug => 'Id';
+
+  @override
+  String get fIcon => 'Icon';
+
+  @override
+  String get fHue => 'Colour (0–360)';
+
+  @override
+  String get fSort => 'Order';
+
+  @override
+  String get fVisible => 'Visible';
+
+  @override
+  String get fFlag => 'Flag';
+
+  @override
+  String get fContinent => 'Continent';
+
+  @override
+  String get fArab => 'Arab country';
+
+  @override
+  String usedBy(int n) {
+    return '$n channels';
+  }
+
+  @override
+  String cannotDeleteUsed(int n) {
+    return 'Used by $n channels — move them first.';
+  }
+
+  @override
+  String get addItem => 'Add';
+
+  @override
+  String get hostFilter => 'Host…';
+
+  @override
+  String get allProtocols => 'All protocols';
+
+  @override
+  String get fCredentials => 'With credentials';
+
+  @override
+  String get hostsTitle => 'Hosts';
+
+  @override
+  String get jobsRunning => 'Running now';
+
+  @override
+  String get jobsHistory => 'Recent runs';
+
+  @override
+  String get jobsScheduled => 'Scheduled tasks';
+
+  @override
+  String get noRuns => 'No runs recorded yet.';
+
+  @override
+  String taskEvery(int m) {
+    return 'every $m min';
+  }
+
+  @override
+  String taskLast(String t) {
+    return 'last run $t';
+  }
+
+  @override
+  String get tkHealthPublished => 'Check published streams';
+
+  @override
+  String get tkHealthAll => 'Check all streams';
+
+  @override
+  String get tkPlaybackSample => 'Playback sample';
+
+  @override
+  String get tkLogos => 'Check logos';
+
+  @override
+  String get tkEpg => 'Programme guide sync';
+
+  @override
+  String get tkSources => 'Refresh sources';
+
+  @override
+  String get tkBackup => 'Backup';
+
+  @override
+  String get schedulerNote =>
+      'The scheduler that runs these automatically arrives with phase 6 (ADM-H2). Manual checks are recorded here.';
 }

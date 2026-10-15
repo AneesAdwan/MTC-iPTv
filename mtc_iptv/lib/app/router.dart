@@ -9,6 +9,11 @@ import '../features/admin/channels/channel_detail_screen.dart';
 import '../features/admin/channels/channels_admin_screen.dart';
 import '../features/admin/dashboard_screen.dart';
 import '../features/admin/health_screen.dart';
+import '../features/admin/jobs_screen.dart';
+import '../features/admin/numbering_screen.dart';
+import '../features/admin/review_screen.dart';
+import '../features/admin/streams_screen.dart';
+import '../features/admin/taxonomy_screen.dart';
 import '../features/admin/login/admin_login_screen.dart';
 import '../features/admin/reports_screen.dart';
 import '../features/placeholder/placeholder_screen.dart';
@@ -81,7 +86,13 @@ Widget _screenFor(ScreenDef s, GoRouterState state) {
     'V-11' => const AboutScreen(),
     'V-12' => ReportScreen(key: ValueKey(state.uri.toString()), channelId: q['channel']),
     'ADM-A1' => const DashboardScreen(),
-    'ADM-B1' => ChannelsAdminScreen(key: ValueKey(state.uri.toString()), initialState: q['state'], openAdd: q['add'] == '1'),
+    'ADM-A2' => const JobsScreen(),
+    'ADM-B1' => ChannelsAdminScreen(
+        key: ValueKey(state.uri.toString()), initialState: q['state'], initialCountry: q['country'], initialCategory: q['category'], openAdd: q['add'] == '1'),
+    'ADM-B3' => const StreamsScreen(),
+    'ADM-B5' => const TaxonomyScreen(),
+    'ADM-B7' => const NumberingScreen(),
+    'ADM-D1' => const ReviewScreen(),
     'ADM-D4' => HealthScreen(key: ValueKey(state.uri.toString()), initialState: q['state']),
     'ADM-D6' => const ReportsAdminScreen(),
     _ => PlaceholderScreen(def: s),

@@ -1,5 +1,6 @@
 // «جرّب الآن» (ADM-B2/D4): معاينة رابط محدد بمشغّل مستقل في حوار (لا يمس مشغّل المشاهدة).
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
@@ -8,6 +9,13 @@ import '../../../data/admin/admin_repository.dart';
 import '../../../player/playback_controller.dart' show classifyPlayerError;
 import '../../../player/tls_bundle.dart';
 import '../widgets/admin_widgets.dart';
+
+/// معاينة أول رابط غير معطّل لقناة (تعمل للقنوات غير المنشورة أيضًا، بخلاف شاشة المشاهدة).
+Future<void> previewChannel(BuildContext context, WidgetRef ref, String channelId, String title) async {
+  final streams = await ref.read(adminRepoProvider)?.streamsOf(channelId) ?? const <AdminStream>[];
+  final s = streams.where((x) => x.healthState != 'disabled').firstOrNull ?? streams.firstOrNull;
+  if (s != null && context.mounted) await showStreamPreview(context, s, title);
+}
 
 Future<void> showStreamPreview(BuildContext context, AdminStream s, String title) =>
     showDialog(context: context, builder: (_) => Dialog(clipBehavior: Clip.antiAlias, child: _Preview(stream: s, title: title)));

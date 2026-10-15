@@ -399,6 +399,118 @@ class AdminRepository {
   // ── المرجع ───────────────────────────────────────────────────────────────
   Future<List<Map<String, dynamic>>> countries() => db.from('countries').select('code,name_ar,name_en,flag_emoji').order('sort_order', ascending: true);
   Future<List<Map<String, dynamic>>> categories() => db.from('categories').select('slug,name_ar,name_en').order('sort_order', ascending: true);
+
+  // ── قيد المراجعة (ADM-D1): العرض review_queue والدوال الموجودة في الإنتاج ──
+  Future<Map<String, int>> reviewCounts() async {
+    final rows = await db.from('review_queue').select('bucket').limit(20000);
+    final m = <String, int>{};
+    for (final r in rows) {
+      m['${r['bucket']}'] = (m['${r['bucket']}'] ?? 0) + 1;
+    }
+    return m;
+  }
+
+  Future<(List<Map<String, dynamic>>, int)> reviewItems(String bucket, {int page = 0, int size = 50}) async {
+    final res = await db
+        .from('review_queue')
+        .select('id,number,name,uid,logo_url,logo_status,quality,country_code,category_slug,total,online,unchecked,duplicate_of,created_at')
+        .eq('bucket', bucket)
+        .order('created_at', ascending: true)
+        .order('id', ascending: true)
+        .range(page * size, page * size + size - 1)
+        .count(CountOption.exact);
+    return (res.data, res.count);
+  }
+
+  Future<List<String>> reviewIds(String bucket) async => [for (final r in await db.from('review_queue').select('id').eq('bucket', bucket).limit(20000)) r['id'] as String];
+
+  /// approve نشر · reject حذف نهائي · merge دمج المكررة في أصلها.
+  Future<int> reviewApply(String action, List<String> ids) async => ((await db.rpc('admin_review_apply', params: {'p_action': action, 'p_ids': ids})) as num).toInt();
+
+  /// «ليست مكررة»: مفتاح تكرار خاص بكل قناة.
+  Future<int> markDistinct(List<String> ids) async => ((await db.rpc('admin_mark_distinct', params: {'p_ids': ids})) as num).toInt();
+
+  Future<Map<String, String>> channelNames(List<String> ids) async {
+    if (ids.isEmpty) return const {};
+    final rows = await db.from('channels').select('id,name,name_ar,number').inFilter('id', ids);
+    return {for (final r in rows) r['id'] as String: '${r['number'] ?? '—'} · ${r['name_ar'] ?? r['name']}'};
+  }
+
+  // ── الترقيم (ADM-B7): admin_renumber_* (ذري على الخادم) ───────────────────
+  Map<String, dynamic> _renumberParams(List<String> keys, int start, int block, bool publishedFirst) =>
+      {'p_keys': keys, 'p_start': start, 'p_block': block, 'p_published_first': publishedFirst};
+
+  Future<Map<String, dynamic>> renumberPreview(List<String> keys, {int start = 1, int block = 0, bool publishedFirst = true, int limit = 200}) async =>
+      Map<String, dynamic>.from(await db.rpc('admin_renumber_preview', params: {..._renumberParams(keys, start, block, publishedFirst), 'p_limit': limit}) as Map);
+
+  Future<int> renumberApply(List<String> keys, {int start = 1, int block = 0, bool publishedFirst = true}) async =>
+      ((await db.rpc('admin_renumber_apply', params: _renumberParams(keys, start, block, publishedFirst))) as num).toInt();
+
+  // ── التقسيمات (ADM-B5) ───────────────────────────────────────────────────
+  static const taxonomyKey = {'categories': 'slug', 'countries': 'code', 'languages': 'code'};
+  static const _channelColumn = {'categories': 'category_slug', 'countries': 'country_code', 'languages': 'language_code'};
+
+  Future<List<Map<String, dynamic>>> taxonomy(String table) => db.from(table).select().order('sort_order', ascending: true).order(taxonomyKey[table]!, ascending: true);
+
+  /// عدد القنوات لكل عنصر (لعرضه ولمنع حذف المستخدم).
+  Future<Map<String, int>> taxonomyUsage(String table) async {
+    final col = _channelColumn[table]!;
+    final rows = await db.from('channels').select(col).not(col, 'is', null).limit(50000);
+    final m = <String, int>{};
+    for (final r in rows) {
+      m['${r[col]}'] = (m['${r[col]}'] ?? 0) + 1;
+    }
+    return m;
+  }
+
+  Future<void> upsertTaxonomy(String table, Map<String, dynamic> row) => db.from(table).upsert(row, onConflict: taxonomyKey[table]);
+  Future<void> deleteTaxonomy(String table, String key) => db.from(table).delete().eq(taxonomyKey[table]!, key);
+
+  // ── الروابط والسيرفرات (ADM-B3) ──────────────────────────────────────────
+  Future<(List<(AdminStream, String, int?)>, int)> streams({String host = '', String? state, String? protocol, bool credentialsOnly = false, int page = 0, int size = 100}) async {
+    var f = db.from('streams').select('$_streamCols,channels(name,name_ar,number)');
+    if (host.trim().isNotEmpty) f = f.ilike('host', '%${host.trim().replaceAll(RegExp(r'[%*,()]'), '')}%');
+    if (state != null) f = f.eq('health_state', state);
+    if (protocol != null) f = f.eq('protocol', protocol);
+    if (credentialsOnly) f = f.eq('has_credentials', true);
+    final res = await f.order('host', ascending: true).order('priority', ascending: true).range(page * size, page * size + size - 1).count(CountOption.exact);
+    return (
+      [
+        for (final r in res.data)
+          (AdminStream.fromJson(r), '${(r['channels'] as Map?)?['name_ar'] ?? (r['channels'] as Map?)?['name'] ?? ''}', ((r['channels'] as Map?)?['number'] as num?)?.toInt()),
+      ],
+      res.count,
+    );
+  }
+
+  /// ملخّص النطاقات: عدد الروابط والعاملة لكل نطاق.
+  Future<List<(String, int, int)>> hosts() async {
+    final rows = await db.from('streams').select('host,health_state').limit(50000);
+    final total = <String, int>{}, ok = <String, int>{};
+    for (final r in rows) {
+      final h = '${r['host'] ?? '?'}';
+      total[h] = (total[h] ?? 0) + 1;
+      if (workingStates.contains(r['health_state'])) ok[h] = (ok[h] ?? 0) + 1;
+    }
+    return [for (final e in total.entries) (e.key, e.value, ok[e.key] ?? 0)]..sort((a, b) => b.$2.compareTo(a.$2));
+  }
+
+  // ── المهام (ADM-A2) ──────────────────────────────────────────────────────
+  Future<List<Map<String, dynamic>>> taskRuns({int limit = 100}) =>
+      db.from('task_runs').select('id,task_key,device,started_at,finished_at,status,summary,error').order('started_at', ascending: false).limit(limit);
+
+  Future<List<Map<String, dynamic>>> scheduledTasks() => db.from('scheduled_tasks').select().order('key', ascending: true);
+
+  /// تسجيل تشغيل يدوي (يظهر في ADM-A2). يتطلب جلسة مدير بتحقق بخطوتين.
+  Future<int?> startRun(String taskKey, String device) async {
+    final r = await db.from('task_runs').insert({'task_key': taskKey, 'device': device}).select('id').single();
+    return (r['id'] as num).toInt();
+  }
+
+  Future<void> finishRun(int id, {required String status, Map<String, dynamic> summary = const {}, String? error}) => db
+      .from('task_runs')
+      .update({'status': status, 'finished_at': DateTime.now().toUtc().toIso8601String(), 'summary': summary, 'error': error})
+      .eq('id', id);
 }
 
 final adminRepoProvider = Provider<AdminRepository?>((ref) {

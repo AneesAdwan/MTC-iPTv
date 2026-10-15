@@ -24,15 +24,15 @@ final adminRefProvider = FutureProvider<(List<Map<String, dynamic>>, List<Map<St
 });
 
 class ChannelsAdminScreen extends ConsumerStatefulWidget {
-  final String? initialState;
+  final String? initialState, initialCountry, initialCategory;
   final bool openAdd;
-  const ChannelsAdminScreen({super.key, this.initialState, this.openAdd = false});
+  const ChannelsAdminScreen({super.key, this.initialState, this.initialCountry, this.initialCategory, this.openAdd = false});
   @override
   ConsumerState<ChannelsAdminScreen> createState() => _ChannelsAdminScreenState();
 }
 
 class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
-  late ChannelQuery q = ChannelQuery(state: widget.initialState);
+  late ChannelQuery q = ChannelQuery(state: widget.initialState, country: widget.initialCountry, category: widget.initialCategory);
   final selected = <String>{};
   final search = TextEditingController();
   bool busy = false;
