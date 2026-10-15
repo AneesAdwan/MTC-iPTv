@@ -486,4 +486,215 @@ class L10nAr extends L10n {
   String channelNumber(int n) {
     return 'القناة $n';
   }
+
+  @override
+  String get nowLabel => 'الآن';
+
+  @override
+  String get nextLabel => 'التالي';
+
+  @override
+  String get jumpToNow => 'الآن';
+
+  @override
+  String get today => 'اليوم';
+
+  @override
+  String get tomorrow => 'غدًا';
+
+  @override
+  String get yesterday => 'أمس';
+
+  @override
+  String get guideEmpty => 'لا يوجد دليل برامج بعد.';
+
+  @override
+  String get guideEmptyHint => 'يُجلب الدليل تلقائيًا عند الاتصال بالإنترنت.';
+
+  @override
+  String get remindMe => 'ذكّرني';
+
+  @override
+  String get cancelReminder => 'إلغاء التذكير';
+
+  @override
+  String get reminderSet => 'سنذكّرك قبل بدايته بـ 5 دقائق.';
+
+  @override
+  String get reminderRemoved => 'أُلغي التذكير.';
+
+  @override
+  String reminderFired(String title) {
+    return 'يبدأ قريبًا: $title';
+  }
+
+  @override
+  String get watchNow => 'شاهد';
+
+  @override
+  String get inboxEmpty => 'لا توجد إشعارات.';
+
+  @override
+  String get markAllRead => 'تعليم الكل كمقروء';
+
+  @override
+  String get clearAll => 'مسح الكل';
+
+  @override
+  String get kindReminder => 'تذكير';
+
+  @override
+  String get sectionGeneral => 'عام';
+
+  @override
+  String get sectionPlayer => 'المشغّل';
+
+  @override
+  String get sectionParental => 'الرقابة الأبوية';
+
+  @override
+  String get sectionStorage => 'التخزين والمزامنة';
+
+  @override
+  String get sectionPrivacy => 'الخصوصية';
+
+  @override
+  String get showNumbers => 'إظهار أرقام القنوات';
+
+  @override
+  String get maxQuality => 'أعلى جودة تلقائية';
+
+  @override
+  String get qualityNoLimit => 'بلا حد، حتى 1080p';
+
+  @override
+  String get parentalHint =>
+      'رمز من 4 أرقام يقفل الفئات التي تختارها والقنوات المخصّصة للكبار.';
+
+  @override
+  String get setPin => 'تعيين رمز';
+
+  @override
+  String get removePin => 'إيقاف';
+
+  @override
+  String get enterPin => 'أدخل الرمز';
+
+  @override
+  String get newPin => 'رمز جديد من 4 أرقام';
+
+  @override
+  String get pinWrong => 'الرمز غير صحيح';
+
+  @override
+  String get lockedCategories => 'الفئات المقفلة';
+
+  @override
+  String get channelLocked => 'هذه القناة مقفلة بالرقابة الأبوية.';
+
+  @override
+  String get unlock => 'فتح';
+
+  @override
+  String lastSync(String t) {
+    return 'آخر مزامنة: $t';
+  }
+
+  @override
+  String get never => 'لم تتم بعد';
+
+  @override
+  String get syncNow => 'زامن الآن';
+
+  @override
+  String get syncDone => 'اكتملت المزامنة.';
+
+  @override
+  String get clearHistory => 'مسح سجل المشاهدة';
+
+  @override
+  String get historyCleared => 'مُسح سجل المشاهدة.';
+
+  @override
+  String get telemetry => 'إرسال إحصاءات تشغيل مجهولة';
+
+  @override
+  String get telemetryHint =>
+      'تساعد في تحسين القنوات. لا تتضمن أي روابط أو حسابات أو بيانات شخصية.';
+
+  @override
+  String get cancel => 'إلغاء';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get checkUpdates => 'التحقق من التحديثات';
+
+  @override
+  String get upToDate => 'لديك أحدث إصدار.';
+
+  @override
+  String updateAvailable(String v) {
+    return 'الإصدار $v متوفر.';
+  }
+
+  @override
+  String get download => 'تنزيل';
+
+  @override
+  String get updateCheckFailed => 'تعذّر التحقق من التحديثات.';
+
+  @override
+  String get privacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get privacyText =>
+      'لا يحتاج MTC-iPTv إلى حساب ولا يجمع بيانات شخصية. المفضلة والسجل والتذكيرات والإعدادات تبقى على جهازك. عند تفعيلها، تُرسل إحصاءات تشغيل مجهولة (نجاح أو فشل، زمن البدء، نوع الخطأ) دون روابط أو معرّفات لتحسين القنوات. بلاغات المشاكل تحتوي ما تكتبه فقط، مع التفاصيل التقنية إن اخترت إرفاقها.';
+
+  @override
+  String get reportTitle => 'الإبلاغ عن مشكلة';
+
+  @override
+  String get reportChannelHint =>
+      'افتح القناة ثم اضغط زر العلم في المشغّل للإبلاغ عن مشكلة فيها.';
+
+  @override
+  String get reasonNotWorking => 'لا تعمل';
+
+  @override
+  String get reasonWrongInfo => 'معلومات خاطئة';
+
+  @override
+  String get reasonBadQuality => 'جودة سيئة';
+
+  @override
+  String get reasonOther => 'أخرى';
+
+  @override
+  String get noteHint => 'التفاصيل (اختياري)';
+
+  @override
+  String get attachDiag =>
+      'إرفاق تفاصيل تقنية (الإصدار، النظام، نوع الخطأ — دون روابط)';
+
+  @override
+  String get send => 'إرسال';
+
+  @override
+  String get reportSent => 'شكرًا لك! أُرسل البلاغ.';
+
+  @override
+  String get reportFailed => 'تعذّر الإرسال. تحقّق من اتصالك وأعد المحاولة.';
+
+  @override
+  String noChannelNumber(int n) {
+    return 'لا توجد قناة بالرقم $n';
+  }
+
+  @override
+  String get openPlayer => 'فتح المشغّل';
+
+  @override
+  String get closePlayer => 'إغلاق المشغّل';
 }

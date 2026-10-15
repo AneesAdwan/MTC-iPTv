@@ -1,8 +1,10 @@
 // الشريط العلوي (§6.6): البحث العام (يفتح لوحة الأوامر)، حالة الاتصال، التنبيهات، الحساب.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/settings/local_settings.dart';
+import '../../data/reminders/reminders.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/tokens.dart';
 import 'command_palette.dart';
@@ -31,7 +33,7 @@ class TopBar extends ConsumerWidget {
           ),
           Expanded(child: Text(title, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: c.text))),
           IconButton(tooltip: t.searchHint, onPressed: () => showCommandPalette(context, ref), icon: Icon(Icons.search_rounded, color: c.textMuted)),
-          IconButton(tooltip: t.sV09, onPressed: () {}, icon: Icon(Icons.notifications_none_rounded, color: c.textMuted)),
+          const InboxBell(),
         ]),
       );
     }
@@ -78,7 +80,7 @@ class TopBar extends ConsumerWidget {
           onPressed: () => ref.read(settingsProvider.notifier).toggleTheme(),
           icon: Icon(s.themeMode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded, color: c.textMuted),
         ),
-        IconButton(tooltip: t.sV09, onPressed: () {}, icon: Icon(Icons.notifications_none_rounded, color: c.textMuted)),
+        const InboxBell(),
         const SizedBox(width: Space.xs),
         CircleAvatar(
           radius: 16,
@@ -120,5 +122,25 @@ class _StatusDot extends StatelessWidget {
       const SizedBox(width: 6),
       Text(label, style: TextStyle(fontSize: 12, color: c.textMuted)),
     ]);
+  }
+}
+
+/// جرس الإشعارات مع عدد غير المقروء (V-09).
+class InboxBell extends ConsumerWidget {
+  const InboxBell({super.key});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.colors, t = L10n.of(context);
+    final n = ref.watch(unreadProvider).value ?? 0;
+    return IconButton(
+      tooltip: t.sV09,
+      onPressed: () => context.go('/inbox'),
+      icon: Badge(
+        isLabelVisible: n > 0,
+        label: Text('$n'),
+        backgroundColor: c.accent,
+        child: Icon(n > 0 ? Icons.notifications_active_rounded : Icons.notifications_none_rounded, color: n > 0 ? c.accent : c.textMuted),
+      ),
+    );
   }
 }

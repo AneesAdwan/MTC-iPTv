@@ -15,10 +15,17 @@ import '../../app/l10n/app_localizations.dart';
 import '../../app/layout/form_factor.dart';
 import '../../app/shell/title_bar.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/storage/catalog_db.dart';
 import '../../core/text/bidi.dart';
 import '../../data/catalog/catalog_repository.dart';
+import '../../data/epg/epg_repository.dart';
 import '../../player/playback_controller.dart';
+import 'guide_screen.dart' show fmtRange, showProgrammeSheet;
+import 'parental.dart';
+import 'report_screen.dart';
 import 'widgets/channel_card.dart';
+import 'widgets/mini_player.dart';
+import 'widgets/number_entry.dart';
 
 final _isFavProvider = StreamProvider.family<bool, String>((ref, id) => ref.watch(catalogRepoProvider).watchIsFavorite(id));
 
@@ -34,26 +41,42 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
   final _focus = FocusNode();
   // يُحفظ مسبقًا: استخدام ref داخل dispose غير مسموح في Riverpod 3
   late final PlaybackController _playback;
+  late final WatchOpen _open;
 
   @override
   void initState() {
     super.initState();
     _playback = ref.read(playbackProvider.notifier);
-    Future.microtask(() => _playback.playChannel(widget.channelId));
+    _open = ref.read(watchOpenProvider.notifier);
+    Future.microtask(() {
+      _open.enter();
+      _start(widget.channelId);
+    });
   }
 
   @override
   void didUpdateWidget(WatchScreen old) {
     super.didUpdateWidget(old);
-    if (old.channelId != widget.channelId) _playback.playChannel(widget.channelId);
+    if (old.channelId != widget.channelId) _start(widget.channelId);
+  }
+
+  /// الرقابة الأبوية أولًا (§8.4)، ثم التشغيل (أو متابعة البث نفسه إن جاء من المشغّل المصغّر).
+  Future<void> _start(String id) async {
+    final ch = await ref.read(catalogRepoProvider).channel(id);
+    if (!mounted || ch == null) return;
+    if (!await ensureUnlocked(context, ref, ch)) {
+      if (mounted) _back();
+      return;
+    }
+    await _playback.playChannel(id);
   }
 
   @override
   void dispose() {
     _focus.dispose();
     if (fullscreen && _desktop) windowManager.setFullScreen(false);
-    // المشغّل المصغّر (يبقى بعد المغادرة) في الدفعة 3b؛ الآن نوقف عند الخروج
-    _playback.stop();
+    // لا نوقف البث: يستمر في المشغّل المصغّر حتى يغلقه المستخدم
+    Future.microtask(_open.leave);
     super.dispose();
   }
 
@@ -104,7 +127,9 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
                 : ListView(children: [player0, info]);
           });
 
-    return CallbackShortcuts(
+    return NumberEntry(
+      onChannel: (ch) => context.replace('/watch/${ch.id}'),
+      child: CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.space): player.playOrPause,
         const SingleActivator(LogicalKeyboardKey.keyF): _toggleFullscreen,
@@ -140,6 +165,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
           ]),
         ),
       ),
+    ),
     );
   }
 
@@ -272,6 +298,7 @@ class _ControlBar extends ConsumerWidget {
           btn(fav ? Icons.favorite_rounded : Icons.favorite_border_rounded, fav ? t.removeFavorite : t.addFavorite,
               () => ref.read(catalogRepoProvider).toggleFavorite(id),
               color: fav ? c.accent : fg),
+        if (id != null && !fullscreen) btn(Icons.flag_outlined, t.reportTitle, () => showReportDialog(context, id)),
         btn(fullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded, fullscreen ? t.exitFullscreen : t.fullscreen, onFullscreen),
       ]),
     );
@@ -312,6 +339,49 @@ class _ChannelInfo extends StatelessWidget {
           for (final x in [ch.country, ch.category, ch.language, ch.quality, ch.network].whereType<String>())
             Chip(label: Text(x), visualDensity: VisualDensity.compact),
         ]),
+        const SizedBox(height: Space.lg),
+        _NowNextCard(ch: ch),
+      ]),
+    );
+  }
+}
+
+/// الحالي والتالي مع التقدّم (V-06، §8.2).
+class _NowNextCard extends ConsumerWidget {
+  final ChannelRow ch;
+  const _NowNextCard({required this.ch});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final nn = ref.watch(nowNextProvider(ch.uid)).value;
+    if (nn == null || (nn.now == null && nn.next == null)) return const SizedBox.shrink();
+    final c = context.colors, t = L10n.of(context);
+    Widget line(String label, ProgrammeRow p, {double? progress}) => InkWell(
+          onTap: () => showProgrammeSheet(context, ch, p),
+          borderRadius: BorderRadius.circular(Radii.sm),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: Space.xs),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Text(label, style: TextStyle(color: c.accent, fontSize: 12, fontWeight: FontWeight.w700)),
+                const SizedBox(width: Space.sm),
+                Text(fmtRange(context, p.startAt, p.endAt), style: TextStyle(color: c.textMuted, fontSize: 12)),
+              ]),
+              Text(p.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: c.text, fontWeight: FontWeight.w600)),
+              if (progress != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: LinearProgressIndicator(value: progress, minHeight: 3, color: c.accent, backgroundColor: c.line, borderRadius: BorderRadius.circular(2)),
+                ),
+            ]),
+          ),
+        );
+    return Container(
+      decoration: BoxDecoration(color: c.surface, borderRadius: BorderRadius.circular(Radii.md), border: Border.all(color: c.line)),
+      padding: const EdgeInsets.all(Space.md),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (nn.now != null) line(t.nowLabel, nn.now!, progress: nn.progress(DateTime.now())),
+        if (nn.now != null && nn.next != null) Divider(color: c.line, height: Space.lg),
+        if (nn.next != null) line(t.nextLabel, nn.next!),
       ]),
     );
   }

@@ -10,6 +10,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/settings/local_settings.dart';
+import '../../data/reminders/reminders.dart';
+import '../../features/viewer/widgets/mini_player.dart';
+import '../../features/viewer/widgets/number_entry.dart';
 import '../l10n/app_localizations.dart';
 import '../layout/form_factor.dart';
 import '../screens.dart';
@@ -38,7 +41,8 @@ class AppShell extends ConsumerWidget {
 
     final content = Column(children: [
       TopBar(title: def?.title(t) ?? t.appTitle, compact: phone),
-      Expanded(child: ColoredBox(color: c.bg, child: child)),
+      // Material (لا ColoredBox): عناصر ListTile تحتاج سطح Material مباشرًا لتظهر ألوانها وتموّجها
+      Expanded(child: Material(color: c.bg, child: child)),
     ]);
 
     final Widget body = switch (ff) {
@@ -47,22 +51,37 @@ class AppShell extends ConsumerWidget {
       FormFactor.phone => content,
     };
 
-    return CallbackShortcuts(
-      bindings: {
-        const SingleActivator(LogicalKeyboardKey.keyK, control: true): () => showCommandPalette(context, ref),
-        const SingleActivator(LogicalKeyboardKey.keyB, control: true): () => ref.read(settingsProvider.notifier).toggleSidebar(),
-      },
-      child: Focus(
-        autofocus: true,
-        child: Scaffold(
-          backgroundColor: c.bg,
-          drawer: phone ? Drawer(backgroundColor: c.bg2, child: Sidebar(location: location, inDrawer: true)) : null,
-          bottomNavigationBar: phone ? _PhoneTabs(current: def) : null,
-          body: Column(children: [
-            if (ff.isDesktop) const TitleBar(),
-            Expanded(child: body),
-            if (ff.isDesktop) const StatusBar(),
-          ]),
+    // تنبيه التذكير داخل البرنامج (§8.5) مع زر «شاهد»
+    ref.listen(firedRemindersProvider, (_, next) {
+      final r = next.value;
+      if (r == null) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: const Duration(seconds: 12),
+        content: Text(t.reminderFired(r.title)),
+        action: SnackBarAction(label: t.watchNow, onPressed: () => context.push('/watch/${r.channelId}')),
+      ));
+    });
+
+    // الأرقام من الريموت/لوحة المفاتيح تفتح القناة مباشرة (§8.2)
+    return NumberEntry(
+      onChannel: (ch) => context.push('/watch/${ch.id}'),
+      child: CallbackShortcuts(
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.keyK, control: true): () => showCommandPalette(context, ref),
+          const SingleActivator(LogicalKeyboardKey.keyB, control: true): () => ref.read(settingsProvider.notifier).toggleSidebar(),
+        },
+        child: Focus(
+          autofocus: true,
+          child: Scaffold(
+            backgroundColor: c.bg,
+            drawer: phone ? Drawer(backgroundColor: c.bg2, child: Sidebar(location: location, inDrawer: true)) : null,
+            bottomNavigationBar: phone ? _PhoneTabs(current: def) : null,
+            body: Column(children: [
+              if (ff.isDesktop) const TitleBar(),
+              Expanded(child: Stack(fit: StackFit.expand, children: [body, const MiniPlayer()])),
+              if (ff.isDesktop) const StatusBar(),
+            ]),
+          ),
         ),
       ),
     );

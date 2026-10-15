@@ -117,12 +117,48 @@ class SyncState extends Table {
   Set<Column> get primaryKey => {key};
 }
 
-@DriftDatabase(tables: [Channels, Streams, SyncState, Countries, Categories, Languages, Favorites, History])
+/// دليل البرامج محليًا (V-07): نافذة من الأمس حتى ما يتوفر، تُستبدل كاملة عند كل مزامنة.
+@DataClassName('ProgrammeRow')
+class Programmes extends Table {
+  TextColumn get channelUid => text()();
+  DateTimeColumn get startAt => dateTime()();
+  DateTimeColumn get endAt => dateTime()();
+  TextColumn get title => text()();
+  TextColumn get description => text().nullable()();
+  TextColumn get category => text().nullable()();
+  @override
+  Set<Column> get primaryKey => {channelUid, startAt};
+}
+
+/// «ذكّرني» (§8.5): إشعار قبل 5 دقائق من بداية البرنامج.
+@DataClassName('ReminderRow')
+class Reminders extends Table {
+  TextColumn get channelId => text()();
+  DateTimeColumn get startAt => dateTime()();
+  TextColumn get title => text()();
+  BoolColumn get fired => boolean().withDefault(const Constant(false))();
+  @override
+  Set<Column> get primaryKey => {channelId, startAt};
+}
+
+/// صندوق الوارد (V-09): التذكيرات المنطلقة الآن، وإعلانات الإدارة لاحقًا (ADM-F1/F2).
+@DataClassName('InboxRow')
+class Inbox extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get kind => text()(); // reminder | announcement
+  TextColumn get title => text()();
+  TextColumn get body => text().nullable()();
+  TextColumn get channelId => text().nullable()();
+  DateTimeColumn get at => dateTime()();
+  BoolColumn get read => boolean().withDefault(const Constant(false))();
+}
+
+@DriftDatabase(tables: [Channels, Streams, SyncState, Countries, Categories, Languages, Favorites, History, Programmes, Reminders, Inbox])
 class CatalogDb extends _$CatalogDb {
   CatalogDb([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'mtc_catalog'));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -140,6 +176,12 @@ class CatalogDb extends _$CatalogDb {
             await (delete(syncState)..where((s) => s.key.equals('catalog_rev'))).go();
             await _indexes();
           }
+          if (from < 3) {
+            for (final TableInfo t in [programmes, reminders, inbox]) {
+              await m.createTable(t);
+            }
+            await _indexes();
+          }
         },
       );
 
@@ -148,6 +190,7 @@ class CatalogDb extends _$CatalogDb {
     await customStatement('CREATE INDEX IF NOT EXISTS channels_number_idx ON channels (number)');
     await customStatement('CREATE INDEX IF NOT EXISTS channels_country_idx ON channels (country)');
     await customStatement('CREATE INDEX IF NOT EXISTS channels_category_idx ON channels (category)');
+    await customStatement('CREATE INDEX IF NOT EXISTS programmes_time_idx ON programmes (start_at, end_at)');
   }
 
   Future<int> catalogRev() async {

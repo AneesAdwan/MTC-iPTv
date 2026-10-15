@@ -144,6 +144,13 @@ class CatalogRepository {
   // ── السجل ────────────────────────────────────────────────────────────────
   Future<void> recordWatch(String id) => db.into(db.history).insertOnConflictUpdate(HistoryCompanion.insert(channelId: id, watchedAt: DateTime.now()));
 
+  Future<void> clearHistory() => db.delete(db.history).go();
+
+  /// وقت آخر مزامنة ناجحة للكتالوج (V-10).
+  Stream<DateTime?> watchLastSync() => (db.select(db.syncState)..where((s) => s.key.equals('synced_at')))
+      .watchSingleOrNull()
+      .map((r) => r == null ? null : DateTime.tryParse(r.value)?.toLocal());
+
   Stream<List<ChannelRow>> watchHistory({int limit = 12}) {
     final q = db.select(db.channels).join([innerJoin(db.history, db.history.channelId.equalsExp(db.channels.id))])
       ..orderBy([OrderingTerm.desc(db.history.watchedAt)])

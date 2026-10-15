@@ -7,8 +7,13 @@ import 'package:flutter/material.dart';
 
 import '../features/admin/login/admin_login_screen.dart';
 import '../features/placeholder/placeholder_screen.dart';
+import '../features/viewer/about_screen.dart';
 import '../features/viewer/channels_screen.dart';
+import '../features/viewer/guide_screen.dart';
 import '../features/viewer/home_screen.dart';
+import '../features/viewer/inbox_screen.dart';
+import '../features/viewer/report_screen.dart';
+import '../features/viewer/settings_screen.dart';
 import '../features/viewer/watch_screen.dart';
 import 'screens.dart';
 import 'shell/app_shell.dart';
@@ -60,7 +65,12 @@ Widget _screenFor(ScreenDef s, GoRouterState state) {
     'V-03' => ChannelsScreen(key: ValueKey(state.uri.toString()), country: q['country'], category: q['category']),
     'V-04' => const CountriesScreen(),
     'V-05' => const SearchScreen(),
+    'V-07' => const GuideScreen(),
     'V-08' => const FavoritesScreen(),
+    'V-09' => const InboxScreen(),
+    'V-10' => const SettingsScreen(),
+    'V-11' => const AboutScreen(),
+    'V-12' => ReportScreen(key: ValueKey(state.uri.toString()), channelId: q['channel']),
     _ => PlaceholderScreen(def: s),
   };
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/backend/backend.dart';
 import '../core/settings/local_settings.dart';
+import '../data/epg/epg_repository.dart';
 import '../features/splash/splash_gate.dart';
 import 'l10n/app_localizations.dart';
 import 'router.dart';
@@ -16,6 +17,7 @@ class MtcApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(settingsProvider);
     ref.watch(startupSyncProvider); // مزامنة الكتالوج في الخلفية عند البدء
+    ref.watch(epgSyncProvider); // ثم دليل البرامج
     return MaterialApp.router(
       title: 'MTC-iPTv',
       debugShowCheckedModeBanner: false,

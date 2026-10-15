@@ -10,6 +10,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 import '../core/logging/log.dart';
+import '../core/settings/local_settings.dart';
 import '../core/storage/catalog_db.dart';
 import '../data/catalog/catalog_repository.dart';
 import 'hls_resolver.dart';
@@ -95,6 +96,8 @@ class PlaybackController extends Notifier<PlaybackState> {
   static const firstFrameTimeout = Duration(seconds: 15); // تعريف النجاح في G1 و§12 (بعض الخوادم تحتاج ~9 ث)
   static const stallTimeout = Duration(seconds: 6);
 
+  static const maxRounds = 1; // جولات إعادة إضافية بعد فشل كل السيرفرات
+  int _rounds = 0;
   final _subs = <StreamSubscription>[];
   Timer? _watchdog;
   int _token = 0; // يُبطل الأحداث القادمة من محاولة سابقة
@@ -110,7 +113,13 @@ class PlaybackController extends Notifier<PlaybackState> {
         s.cancel();
       }
     });
-    final p = ref.watch(playerProvider);
+    return const PlaybackState();
+  }
+
+  /// المشغّل (libmpv) يُنشأ عند أول تشغيل فقط، لا عند قراءة الحالة (المشغّل المصغّر يقرأها دائمًا).
+  void _listen() {
+    if (_subs.isNotEmpty) return;
+    final p = _p;
     _subs
       ..add(p.stream.width.listen((w) {
         if (w != null && w > 0) _onFirstFrame();
@@ -125,10 +134,16 @@ class PlaybackController extends Notifier<PlaybackState> {
       }))
       ..add(p.stream.error.listen((e) => _onFailure(classifyPlayerError(e), e)))
       ..add(p.stream.buffering.listen(_onBuffering));
-    return const PlaybackState();
   }
 
+  /// يعمل الآن (أو يحمّل) هذه القناة؟ — للعودة من المشغّل المصغّر دون إعادة فتح البث.
+  bool isActive(String channelId) =>
+      state.channel?.id == channelId && (state.phase == PlayPhase.playing || state.phase == PlayPhase.loading || state.phase == PlayPhase.switching);
+
   Future<void> playChannel(String channelId) async {
+    if (isActive(channelId)) return;
+    _listen();
+    _rounds = 0;
     final ch = await _repo.channel(channelId);
     if (ch == null) return;
     final streams = await _repo.streamsFor(channelId);
@@ -144,6 +159,7 @@ class PlaybackController extends Notifier<PlaybackState> {
   }
 
   Future<void> retry() async {
+    _rounds = 0;
     state = state.copyWith(index: 0, phase: PlayPhase.loading, clearError: true);
     await _openCurrent();
   }
@@ -157,7 +173,7 @@ class PlaybackController extends Notifier<PlaybackState> {
   Future<void> stop() async {
     _token++;
     _watchdog?.cancel();
-    await _p.stop();
+    if (_subs.isNotEmpty) await _p.stop();
     state = const PlaybackState();
   }
 
@@ -176,7 +192,8 @@ class PlaybackController extends Notifier<PlaybackState> {
     if (s == null) return;
     final token = ++_token;
     final headers = _headers(s);
-    final src = await const HlsResolver().resolve(s.url, headers: headers, prefer: state.preferHeight);
+    final maxQ = ref.read(settingsProvider).maxQuality ?? 1080; // V-10: حد الجودة التلقائية
+    final src = await HlsResolver(maxHeight: maxQ).resolve(s.url, headers: headers, prefer: state.preferHeight);
     if (token != _token) return; // أُلغيت بمحاولة أحدث
     state = state.copyWith(source: src, phase: state.phase == PlayPhase.switching ? PlayPhase.switching : PlayPhase.loading);
     log.info('play ch=${state.channel?.number} server=${state.index + 1}/${state.streams.length} local=${src.viaLocalServer} variants=${src.variants.length}');
@@ -209,7 +226,14 @@ class PlaybackController extends Notifier<PlaybackState> {
   Future<void> _onFailure(String code, String? detail) async {
     if (state.channel == null || state.phase == PlayPhase.failed) return;
     log.warning('play failed ch=${state.channel?.number} server=${state.index + 1}: $code ${detail ?? ''}');
-    // آخر رابط فشل: نتوقف ونعرض رسالة مفهومة بدل الدوران بلا نهاية
+    // آخر رابط فشل: جولة إعادة واحدة على كل السيرفرات (تجمّد مؤقت في البث المباشر شائع)،
+    // ثم نتوقف ونعرض رسالة مفهومة بدل الدوران بلا نهاية
+    if (state.index + 1 >= state.streams.length && _rounds < maxRounds) {
+      _rounds++;
+      state = state.copyWith(index: 0, phase: PlayPhase.switching, errorCode: code, clearPrefer: true);
+      await _openCurrent();
+      return;
+    }
     if (state.index + 1 >= state.streams.length) {
       _token++;
       _watchdog?.cancel();

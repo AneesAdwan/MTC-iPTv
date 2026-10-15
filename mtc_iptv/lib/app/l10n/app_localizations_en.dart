@@ -490,4 +490,217 @@ class L10nEn extends L10n {
   String channelNumber(int n) {
     return 'Channel $n';
   }
+
+  @override
+  String get nowLabel => 'Now';
+
+  @override
+  String get nextLabel => 'Next';
+
+  @override
+  String get jumpToNow => 'Now';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get tomorrow => 'Tomorrow';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get guideEmpty => 'No programme guide yet.';
+
+  @override
+  String get guideEmptyHint =>
+      'The guide is fetched automatically when you are online.';
+
+  @override
+  String get remindMe => 'Remind me';
+
+  @override
+  String get cancelReminder => 'Cancel reminder';
+
+  @override
+  String get reminderSet => 'You will be reminded 5 minutes before it starts.';
+
+  @override
+  String get reminderRemoved => 'Reminder cancelled.';
+
+  @override
+  String reminderFired(String title) {
+    return '$title starts soon';
+  }
+
+  @override
+  String get watchNow => 'Watch';
+
+  @override
+  String get inboxEmpty => 'No notifications.';
+
+  @override
+  String get markAllRead => 'Mark all as read';
+
+  @override
+  String get clearAll => 'Clear all';
+
+  @override
+  String get kindReminder => 'Reminder';
+
+  @override
+  String get sectionGeneral => 'General';
+
+  @override
+  String get sectionPlayer => 'Player';
+
+  @override
+  String get sectionParental => 'Parental control';
+
+  @override
+  String get sectionStorage => 'Storage & sync';
+
+  @override
+  String get sectionPrivacy => 'Privacy';
+
+  @override
+  String get showNumbers => 'Show channel numbers';
+
+  @override
+  String get maxQuality => 'Highest automatic quality';
+
+  @override
+  String get qualityNoLimit => 'No limit (up to 1080p)';
+
+  @override
+  String get parentalHint =>
+      'A 4-digit PIN locks the categories you choose and channels marked for adults.';
+
+  @override
+  String get setPin => 'Set a PIN';
+
+  @override
+  String get removePin => 'Turn off';
+
+  @override
+  String get enterPin => 'Enter the PIN';
+
+  @override
+  String get newPin => 'New 4-digit PIN';
+
+  @override
+  String get pinWrong => 'Wrong PIN';
+
+  @override
+  String get lockedCategories => 'Locked categories';
+
+  @override
+  String get channelLocked => 'This channel is locked by parental control.';
+
+  @override
+  String get unlock => 'Unlock';
+
+  @override
+  String lastSync(String t) {
+    return 'Last sync: $t';
+  }
+
+  @override
+  String get never => 'never';
+
+  @override
+  String get syncNow => 'Sync now';
+
+  @override
+  String get syncDone => 'Sync complete.';
+
+  @override
+  String get clearHistory => 'Clear watch history';
+
+  @override
+  String get historyCleared => 'Watch history cleared.';
+
+  @override
+  String get telemetry => 'Send anonymous playback statistics';
+
+  @override
+  String get telemetryHint =>
+      'Helps improve the channels. Never includes links, accounts or personal data.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get checkUpdates => 'Check for updates';
+
+  @override
+  String get upToDate => 'You have the latest version.';
+
+  @override
+  String updateAvailable(String v) {
+    return 'Version $v is available.';
+  }
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get updateCheckFailed => 'Could not check for updates.';
+
+  @override
+  String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get privacyText =>
+      'MTC-iPTv does not require an account and does not collect personal data. Favorites, history, reminders and settings stay on your device. If enabled, anonymous playback statistics (success or failure, start time, error type) are sent without links or identifiers to help improve the channels. Problem reports contain only what you write, plus technical details if you choose to attach them.';
+
+  @override
+  String get reportTitle => 'Report a problem';
+
+  @override
+  String get reportChannelHint =>
+      'Open a channel, then press the flag button in the player to report a problem with it.';
+
+  @override
+  String get reasonNotWorking => 'Not working';
+
+  @override
+  String get reasonWrongInfo => 'Wrong information';
+
+  @override
+  String get reasonBadQuality => 'Poor quality';
+
+  @override
+  String get reasonOther => 'Other';
+
+  @override
+  String get noteHint => 'Details (optional)';
+
+  @override
+  String get attachDiag =>
+      'Attach technical details (app version, system, error type — no links)';
+
+  @override
+  String get send => 'Send';
+
+  @override
+  String get reportSent => 'Thank you! Your report was sent.';
+
+  @override
+  String get reportFailed =>
+      'Sending failed. Check your connection and try again.';
+
+  @override
+  String noChannelNumber(int n) {
+    return 'No channel with number $n';
+  }
+
+  @override
+  String get openPlayer => 'Open player';
+
+  @override
+  String get closePlayer => 'Close player';
 }

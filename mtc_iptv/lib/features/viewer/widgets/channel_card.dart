@@ -1,10 +1,12 @@
 // بطاقة القناة وشبكة القنوات (V-02/V-03/V-05/V-08): الشعار، الاسم، الرقم، الجودة.
 // قابلة للتركيز بلوحة المفاتيح والريموت بإطار واضح (§6.5).
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/l10n/app_localizations.dart';
 import '../../../app/theme/tokens.dart';
+import '../../../core/settings/local_settings.dart';
 import '../../../core/storage/catalog_db.dart';
 import '../../../data/catalog/catalog_repository.dart';
 
@@ -35,15 +37,15 @@ class ChannelLogo extends StatelessWidget {
   }
 }
 
-class ChannelCard extends StatefulWidget {
+class ChannelCard extends ConsumerStatefulWidget {
   final ChannelRow ch;
   final double width;
   const ChannelCard({super.key, required this.ch, this.width = 156});
   @override
-  State<ChannelCard> createState() => _ChannelCardState();
+  ConsumerState<ChannelCard> createState() => _ChannelCardState();
 }
 
-class _ChannelCardState extends State<ChannelCard> {
+class _ChannelCardState extends ConsumerState<ChannelCard> {
   bool focused = false;
 
   @override
@@ -73,7 +75,7 @@ class _ChannelCardState extends State<ChannelCard> {
                   decoration: BoxDecoration(color: c.bg2, borderRadius: BorderRadius.circular(Radii.sm)),
                   child: Center(child: ChannelLogo(ch: ch, size: 60)),
                 ),
-                if (ch.number != null)
+                if (ch.number != null && ref.watch(settingsProvider.select((s) => s.showNumbers)))
                   PositionedDirectional(
                     top: 4,
                     start: 4,

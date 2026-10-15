@@ -1014,6 +1014,402 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'القناة {n}'**
   String channelNumber(int n);
+
+  /// No description provided for @nowLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآن'**
+  String get nowLabel;
+
+  /// No description provided for @nextLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي'**
+  String get nextLabel;
+
+  /// No description provided for @jumpToNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآن'**
+  String get jumpToNow;
+
+  /// No description provided for @today.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليوم'**
+  String get today;
+
+  /// No description provided for @tomorrow.
+  ///
+  /// In ar, this message translates to:
+  /// **'غدًا'**
+  String get tomorrow;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In ar, this message translates to:
+  /// **'أمس'**
+  String get yesterday;
+
+  /// No description provided for @guideEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد دليل برامج بعد.'**
+  String get guideEmpty;
+
+  /// No description provided for @guideEmptyHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُجلب الدليل تلقائيًا عند الاتصال بالإنترنت.'**
+  String get guideEmptyHint;
+
+  /// No description provided for @remindMe.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذكّرني'**
+  String get remindMe;
+
+  /// No description provided for @cancelReminder.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء التذكير'**
+  String get cancelReminder;
+
+  /// No description provided for @reminderSet.
+  ///
+  /// In ar, this message translates to:
+  /// **'سنذكّرك قبل بدايته بـ 5 دقائق.'**
+  String get reminderSet;
+
+  /// No description provided for @reminderRemoved.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُلغي التذكير.'**
+  String get reminderRemoved;
+
+  /// No description provided for @reminderFired.
+  ///
+  /// In ar, this message translates to:
+  /// **'يبدأ قريبًا: {title}'**
+  String reminderFired(String title);
+
+  /// No description provided for @watchNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'شاهد'**
+  String get watchNow;
+
+  /// No description provided for @inboxEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد إشعارات.'**
+  String get inboxEmpty;
+
+  /// No description provided for @markAllRead.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعليم الكل كمقروء'**
+  String get markAllRead;
+
+  /// No description provided for @clearAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسح الكل'**
+  String get clearAll;
+
+  /// No description provided for @kindReminder.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير'**
+  String get kindReminder;
+
+  /// No description provided for @sectionGeneral.
+  ///
+  /// In ar, this message translates to:
+  /// **'عام'**
+  String get sectionGeneral;
+
+  /// No description provided for @sectionPlayer.
+  ///
+  /// In ar, this message translates to:
+  /// **'المشغّل'**
+  String get sectionPlayer;
+
+  /// No description provided for @sectionParental.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرقابة الأبوية'**
+  String get sectionParental;
+
+  /// No description provided for @sectionStorage.
+  ///
+  /// In ar, this message translates to:
+  /// **'التخزين والمزامنة'**
+  String get sectionStorage;
+
+  /// No description provided for @sectionPrivacy.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخصوصية'**
+  String get sectionPrivacy;
+
+  /// No description provided for @showNumbers.
+  ///
+  /// In ar, this message translates to:
+  /// **'إظهار أرقام القنوات'**
+  String get showNumbers;
+
+  /// No description provided for @maxQuality.
+  ///
+  /// In ar, this message translates to:
+  /// **'أعلى جودة تلقائية'**
+  String get maxQuality;
+
+  /// No description provided for @qualityNoLimit.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا حد، حتى 1080p'**
+  String get qualityNoLimit;
+
+  /// No description provided for @parentalHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز من 4 أرقام يقفل الفئات التي تختارها والقنوات المخصّصة للكبار.'**
+  String get parentalHint;
+
+  /// No description provided for @setPin.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعيين رمز'**
+  String get setPin;
+
+  /// No description provided for @removePin.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف'**
+  String get removePin;
+
+  /// No description provided for @enterPin.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل الرمز'**
+  String get enterPin;
+
+  /// No description provided for @newPin.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز جديد من 4 أرقام'**
+  String get newPin;
+
+  /// No description provided for @pinWrong.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرمز غير صحيح'**
+  String get pinWrong;
+
+  /// No description provided for @lockedCategories.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفئات المقفلة'**
+  String get lockedCategories;
+
+  /// No description provided for @channelLocked.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه القناة مقفلة بالرقابة الأبوية.'**
+  String get channelLocked;
+
+  /// No description provided for @unlock.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح'**
+  String get unlock;
+
+  /// No description provided for @lastSync.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر مزامنة: {t}'**
+  String lastSync(String t);
+
+  /// No description provided for @never.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تتم بعد'**
+  String get never;
+
+  /// No description provided for @syncNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'زامن الآن'**
+  String get syncNow;
+
+  /// No description provided for @syncDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتملت المزامنة.'**
+  String get syncDone;
+
+  /// No description provided for @clearHistory.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسح سجل المشاهدة'**
+  String get clearHistory;
+
+  /// No description provided for @historyCleared.
+  ///
+  /// In ar, this message translates to:
+  /// **'مُسح سجل المشاهدة.'**
+  String get historyCleared;
+
+  /// No description provided for @telemetry.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال إحصاءات تشغيل مجهولة'**
+  String get telemetry;
+
+  /// No description provided for @telemetryHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تساعد في تحسين القنوات. لا تتضمن أي روابط أو حسابات أو بيانات شخصية.'**
+  String get telemetryHint;
+
+  /// No description provided for @cancel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء'**
+  String get cancel;
+
+  /// No description provided for @save.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ'**
+  String get save;
+
+  /// No description provided for @checkUpdates.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحقق من التحديثات'**
+  String get checkUpdates;
+
+  /// No description provided for @upToDate.
+  ///
+  /// In ar, this message translates to:
+  /// **'لديك أحدث إصدار.'**
+  String get upToDate;
+
+  /// No description provided for @updateAvailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإصدار {v} متوفر.'**
+  String updateAvailable(String v);
+
+  /// No description provided for @download.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل'**
+  String get download;
+
+  /// No description provided for @updateCheckFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر التحقق من التحديثات.'**
+  String get updateCheckFailed;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In ar, this message translates to:
+  /// **'سياسة الخصوصية'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyText.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يحتاج MTC-iPTv إلى حساب ولا يجمع بيانات شخصية. المفضلة والسجل والتذكيرات والإعدادات تبقى على جهازك. عند تفعيلها، تُرسل إحصاءات تشغيل مجهولة (نجاح أو فشل، زمن البدء، نوع الخطأ) دون روابط أو معرّفات لتحسين القنوات. بلاغات المشاكل تحتوي ما تكتبه فقط، مع التفاصيل التقنية إن اخترت إرفاقها.'**
+  String get privacyText;
+
+  /// No description provided for @reportTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإبلاغ عن مشكلة'**
+  String get reportTitle;
+
+  /// No description provided for @reportChannelHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتح القناة ثم اضغط زر العلم في المشغّل للإبلاغ عن مشكلة فيها.'**
+  String get reportChannelHint;
+
+  /// No description provided for @reasonNotWorking.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تعمل'**
+  String get reasonNotWorking;
+
+  /// No description provided for @reasonWrongInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'معلومات خاطئة'**
+  String get reasonWrongInfo;
+
+  /// No description provided for @reasonBadQuality.
+  ///
+  /// In ar, this message translates to:
+  /// **'جودة سيئة'**
+  String get reasonBadQuality;
+
+  /// No description provided for @reasonOther.
+  ///
+  /// In ar, this message translates to:
+  /// **'أخرى'**
+  String get reasonOther;
+
+  /// No description provided for @noteHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'التفاصيل (اختياري)'**
+  String get noteHint;
+
+  /// No description provided for @attachDiag.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرفاق تفاصيل تقنية (الإصدار، النظام، نوع الخطأ — دون روابط)'**
+  String get attachDiag;
+
+  /// No description provided for @send.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال'**
+  String get send;
+
+  /// No description provided for @reportSent.
+  ///
+  /// In ar, this message translates to:
+  /// **'شكرًا لك! أُرسل البلاغ.'**
+  String get reportSent;
+
+  /// No description provided for @reportFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر الإرسال. تحقّق من اتصالك وأعد المحاولة.'**
+  String get reportFailed;
+
+  /// No description provided for @noChannelNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد قناة بالرقم {n}'**
+  String noChannelNumber(int n);
+
+  /// No description provided for @openPlayer.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح المشغّل'**
+  String get openPlayer;
+
+  /// No description provided for @closePlayer.
+  ///
+  /// In ar, this message translates to:
+  /// **'إغلاق المشغّل'**
+  String get closePlayer;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

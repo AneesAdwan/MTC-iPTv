@@ -184,6 +184,100 @@
   "noServers": "لا توجد روابط لهذه القناة.",
   "back": "رجوع",
   "channelNumber": "القناة {n}",
+  "nowLabel": "الآن",
+  "nextLabel": "التالي",
+  "jumpToNow": "الآن",
+  "today": "اليوم",
+  "tomorrow": "غدًا",
+  "yesterday": "أمس",
+  "guideEmpty": "لا يوجد دليل برامج بعد.",
+  "guideEmptyHint": "يُجلب الدليل تلقائيًا عند الاتصال بالإنترنت.",
+  "remindMe": "ذكّرني",
+  "cancelReminder": "إلغاء التذكير",
+  "reminderSet": "سنذكّرك قبل بدايته بـ 5 دقائق.",
+  "reminderRemoved": "أُلغي التذكير.",
+  "reminderFired": "يبدأ قريبًا: {title}",
+  "watchNow": "شاهد",
+  "inboxEmpty": "لا توجد إشعارات.",
+  "markAllRead": "تعليم الكل كمقروء",
+  "clearAll": "مسح الكل",
+  "kindReminder": "تذكير",
+  "sectionGeneral": "عام",
+  "sectionPlayer": "المشغّل",
+  "sectionParental": "الرقابة الأبوية",
+  "sectionStorage": "التخزين والمزامنة",
+  "sectionPrivacy": "الخصوصية",
+  "showNumbers": "إظهار أرقام القنوات",
+  "maxQuality": "أعلى جودة تلقائية",
+  "qualityNoLimit": "بلا حد، حتى 1080p",
+  "parentalHint": "رمز من 4 أرقام يقفل الفئات التي تختارها والقنوات المخصّصة للكبار.",
+  "setPin": "تعيين رمز",
+  "removePin": "إيقاف",
+  "enterPin": "أدخل الرمز",
+  "newPin": "رمز جديد من 4 أرقام",
+  "pinWrong": "الرمز غير صحيح",
+  "lockedCategories": "الفئات المقفلة",
+  "channelLocked": "هذه القناة مقفلة بالرقابة الأبوية.",
+  "unlock": "فتح",
+  "lastSync": "آخر مزامنة: {t}",
+  "never": "لم تتم بعد",
+  "syncNow": "زامن الآن",
+  "syncDone": "اكتملت المزامنة.",
+  "clearHistory": "مسح سجل المشاهدة",
+  "historyCleared": "مُسح سجل المشاهدة.",
+  "telemetry": "إرسال إحصاءات تشغيل مجهولة",
+  "telemetryHint": "تساعد في تحسين القنوات. لا تتضمن أي روابط أو حسابات أو بيانات شخصية.",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "checkUpdates": "التحقق من التحديثات",
+  "upToDate": "لديك أحدث إصدار.",
+  "updateAvailable": "الإصدار {v} متوفر.",
+  "download": "تنزيل",
+  "updateCheckFailed": "تعذّر التحقق من التحديثات.",
+  "privacyPolicy": "سياسة الخصوصية",
+  "privacyText": "لا يحتاج MTC-iPTv إلى حساب ولا يجمع بيانات شخصية. المفضلة والسجل والتذكيرات والإعدادات تبقى على جهازك. عند تفعيلها، تُرسل إحصاءات تشغيل مجهولة (نجاح أو فشل، زمن البدء، نوع الخطأ) دون روابط أو معرّفات لتحسين القنوات. بلاغات المشاكل تحتوي ما تكتبه فقط، مع التفاصيل التقنية إن اخترت إرفاقها.",
+  "reportTitle": "الإبلاغ عن مشكلة",
+  "reportChannelHint": "افتح القناة ثم اضغط زر العلم في المشغّل للإبلاغ عن مشكلة فيها.",
+  "reasonNotWorking": "لا تعمل",
+  "reasonWrongInfo": "معلومات خاطئة",
+  "reasonBadQuality": "جودة سيئة",
+  "reasonOther": "أخرى",
+  "noteHint": "التفاصيل (اختياري)",
+  "attachDiag": "إرفاق تفاصيل تقنية (الإصدار، النظام، نوع الخطأ — دون روابط)",
+  "send": "إرسال",
+  "reportSent": "شكرًا لك! أُرسل البلاغ.",
+  "reportFailed": "تعذّر الإرسال. تحقّق من اتصالك وأعد المحاولة.",
+  "noChannelNumber": "لا توجد قناة بالرقم {n}",
+  "openPlayer": "فتح المشغّل",
+  "closePlayer": "إغلاق المشغّل",
+  "@noChannelNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@reminderFired": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@lastSync": {
+    "placeholders": {
+      "t": {
+        "type": "String"
+      }
+    }
+  },
+  "@updateAvailable": {
+    "placeholders": {
+      "v": {
+        "type": "String"
+      }
+    }
+  },
   "@channelsCount": {
     "placeholders": {
       "n": {
