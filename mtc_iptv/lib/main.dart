@@ -14,6 +14,7 @@ import 'core/backend/backend.dart';
 import 'core/config/env.dart';
 import 'core/logging/log.dart';
 import 'core/settings/local_settings.dart';
+import 'player/tls_bundle.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,7 @@ Future<void> main() async {
   };
 
   final settings = await loadSettings();
+  await TlsBundle.prepare();
   // بلا اتصال أو بلا خادم مُعدّ: يعمل التطبيق من الكتالوج المحلي (§22)
   final hasBackend = await initBackend().catchError((Object e) {
     log.warning('backend init failed', e);

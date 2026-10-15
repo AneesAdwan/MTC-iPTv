@@ -12,6 +12,8 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../app/l10n/app_localizations.dart';
+import '../../app/layout/form_factor.dart';
+import '../../app/shell/title_bar.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/text/bidi.dart';
 import '../../data/catalog/catalog_repository.dart';
@@ -30,17 +32,20 @@ class WatchScreen extends ConsumerStatefulWidget {
 class _WatchScreenState extends ConsumerState<WatchScreen> {
   bool fullscreen = false;
   final _focus = FocusNode();
+  // يُحفظ مسبقًا: استخدام ref داخل dispose غير مسموح في Riverpod 3
+  late final PlaybackController _playback;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(playbackProvider.notifier).playChannel(widget.channelId));
+    _playback = ref.read(playbackProvider.notifier);
+    Future.microtask(() => _playback.playChannel(widget.channelId));
   }
 
   @override
   void didUpdateWidget(WatchScreen old) {
     super.didUpdateWidget(old);
-    if (old.channelId != widget.channelId) ref.read(playbackProvider.notifier).playChannel(widget.channelId);
+    if (old.channelId != widget.channelId) _playback.playChannel(widget.channelId);
   }
 
   @override
@@ -48,7 +53,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
     _focus.dispose();
     if (fullscreen && _desktop) windowManager.setFullScreen(false);
     // المشغّل المصغّر (يبقى بعد المغادرة) في الدفعة 3b؛ الآن نوقف عند الخروج
-    ref.read(playbackProvider.notifier).stop();
+    _playback.stop();
     super.dispose();
   }
 
@@ -109,25 +114,36 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
         const SingleActivator(LogicalKeyboardKey.pageUp): () => _step(-1),
         const SingleActivator(LogicalKeyboardKey.arrowDown): () => _step(1),
         const SingleActivator(LogicalKeyboardKey.pageDown): () => _step(1),
-        const SingleActivator(LogicalKeyboardKey.escape): () => fullscreen ? _toggleFullscreen() : context.pop(),
+        const SingleActivator(LogicalKeyboardKey.escape): () => fullscreen ? _toggleFullscreen() : _back(),
       },
       child: Focus(
         focusNode: _focus,
         autofocus: true,
-        child: Scaffold(
-          backgroundColor: fullscreen ? Colors.black : c.bg,
-          appBar: fullscreen
-              ? null
-              : AppBar(
-                  backgroundColor: c.bg2,
-                  title: Text(s.channel?.displayName(Localizations.localeOf(context)) ?? ''),
-                  leading: BackButton(onPressed: () => context.canPop() ? context.pop() : context.go('/home')),
-                ),
-          body: body,
+        child: Material(
+          color: fullscreen ? Colors.black : c.bg,
+          // شريط العنوان المخصص (أزرار النافذة والسحب): المشاهدة خارج الهيكل العام فلا ترثه
+          child: Column(children: [
+            if (!fullscreen && formFactorOf(context).isDesktop) const TitleBar(),
+            Expanded(
+              child: Scaffold(
+                backgroundColor: fullscreen ? Colors.black : c.bg,
+                appBar: fullscreen
+                    ? null
+                    : AppBar(
+                        backgroundColor: c.bg2,
+                        title: Text(s.channel?.displayName(Localizations.localeOf(context)) ?? ''),
+                        leading: BackButton(onPressed: _back),
+                      ),
+                body: body,
+              ),
+            ),
+          ]),
         ),
       ),
     );
   }
+
+  void _back() => context.canPop() ? context.pop() : context.go('/home');
 }
 
 class _StatusOverlay extends StatelessWidget {

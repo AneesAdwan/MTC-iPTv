@@ -1,6 +1,6 @@
 // المشغّل (ADR-02 media_kit/libmpv، §7): مشغّل واحد للتطبيق + سلسلة السيرفرات والتبديل التلقائي.
 //  • الروابط بأولوية المدير ثم الصحة (CatalogRepository.streamsFor).
-//  • فشل/لا إطار خلال 12 ث/تجمّد > 6 ث ← الرابط التالي تلقائيًا (§7.4، G3 ≤ 6 ث).
+//  • فشل/لا إطار خلال 15 ث/تجمّد > 6 ث ← الرابط التالي تلقائيًا (§7.4، G3 ≤ 6 ث).
 //  • الترويسات لكل رابط (User-Agent/Referer/Headers، §7.3)، و tls-verify=yes (تقرير PoC §6).
 import 'dart:async';
 import 'dart:convert';
@@ -13,6 +13,7 @@ import '../core/logging/log.dart';
 import '../core/storage/catalog_db.dart';
 import '../data/catalog/catalog_repository.dart';
 import 'hls_resolver.dart';
+import 'tls_bundle.dart';
 
 enum PlayPhase { idle, loading, playing, switching, failed }
 
@@ -76,7 +77,10 @@ final playerProvider = Provider<Player>((ref) {
   final p = Player(configuration: const PlayerConfiguration(title: 'MTC-iPTv', logLevel: MPVLogLevel.warn));
   final native = p.platform;
   if (native is NativePlayer) {
-    native.setProperty('tls-verify', 'yes'); // mpv لا يتحقق من TLS افتراضيًا
+    // mpv لا يتحقق من TLS افتراضيًا؛ والتحقق يحتاج حزمة شهادات صريحة (انظر tls_bundle.dart)
+    final ca = TlsBundle.path;
+    if (ca != null) native.setProperty('tls-ca-file', ca);
+    native.setProperty('tls-verify', ca != null ? 'yes' : 'no');
     native.setProperty('network-timeout', '15');
   }
   ref.onDispose(p.dispose);
@@ -88,7 +92,7 @@ final videoControllerProvider = Provider<VideoController>((ref) => VideoControll
 final playbackProvider = NotifierProvider<PlaybackController, PlaybackState>(PlaybackController.new);
 
 class PlaybackController extends Notifier<PlaybackState> {
-  static const firstFrameTimeout = Duration(seconds: 12);
+  static const firstFrameTimeout = Duration(seconds: 15); // تعريف النجاح في G1 و§12 (بعض الخوادم تحتاج ~9 ث)
   static const stallTimeout = Duration(seconds: 6);
 
   final _subs = <StreamSubscription>[];
