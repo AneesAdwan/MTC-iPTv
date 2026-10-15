@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/settings/local_settings.dart';
 import '../../data/auth/admin_auth.dart';
 import '../l10n/app_localizations.dart';
+import '../../data/settings/remote_config.dart';
 import '../screens.dart';
 import '../theme/tokens.dart';
 
@@ -33,7 +34,10 @@ class Sidebar extends ConsumerWidget {
 
     final items = <Widget>[];
     ScreenGroup? lastGroup;
-    for (final s in screens.where((s) => s.inSidebar && (isAdmin || !s.group.isAdmin))) {
+    // G5: الدليل يمكن إيقافه مركزيًا (يبقى للمدير)
+    final rc = ref.watch(remoteConfigProvider).value;
+    bool enabled(ScreenDef s) => isAdmin || s.id != 'V-07' || (rc?.feature('guide') ?? true);
+    for (final s in screens.where((s) => s.inSidebar && (isAdmin || !s.group.isAdmin) && enabled(s))) {
       if (s.group != lastGroup) {
         if (s.group == ScreenGroup.a) items.add(_SectionDivider(label: t.groupAdmin, collapsed: collapsed, strong: true));
         items.add(_SectionDivider(label: s.group.title(t), collapsed: collapsed));

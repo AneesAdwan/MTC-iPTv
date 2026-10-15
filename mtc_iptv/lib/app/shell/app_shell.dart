@@ -15,6 +15,7 @@ import '../../features/viewer/widgets/mini_player.dart';
 import '../../features/viewer/widgets/number_entry.dart';
 import '../l10n/app_localizations.dart';
 import '../layout/form_factor.dart';
+import '../remote/remote_gates.dart';
 import '../screens.dart';
 import '../theme/tokens.dart';
 import 'command_palette.dart';
@@ -41,6 +42,7 @@ class AppShell extends ConsumerWidget {
 
     final content = Column(children: [
       TopBar(title: def?.title(t) ?? t.appTitle, compact: phone),
+      const AnnouncementBar(), // F2 + تنبيه التحديث (G6)
       // Material (لا ColoredBox): عناصر ListTile تحتاج سطح Material مباشرًا لتظهر ألوانها وتموّجها
       Expanded(child: Material(color: c.bg, child: child)),
     ]);

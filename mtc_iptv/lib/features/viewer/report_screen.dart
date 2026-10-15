@@ -12,8 +12,10 @@ import '../../core/backend/backend.dart';
 import '../../core/config/env.dart';
 import '../../core/storage/catalog_db.dart';
 import '../../data/catalog/catalog_repository.dart';
+import '../../data/settings/remote_config.dart';
 import '../../player/playback_controller.dart';
 import 'widgets/channel_card.dart';
+import 'widgets/social_links.dart';
 
 final _reportChannelProvider = FutureProvider.family<ChannelRow?, String>((ref, id) => ref.watch(catalogRepoProvider).channel(id));
 
@@ -100,6 +102,7 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
     final ch = id == null ? null : ref.watch(_reportChannelProvider(id)).value;
     if (ch == null) return EmptyState(icon: Icons.flag_rounded, title: t.reportTitle, hint: t.reportChannelHint);
 
+    final support = (ref.watch(remoteConfigProvider).value ?? RemoteConfig.empty).support;
     final reasons = {'not_working': t.reasonNotWorking, 'wrong_info': t.reasonWrongInfo, 'bad_quality': t.reasonBadQuality, 'other': t.reasonOther};
     return Align(
       alignment: AlignmentDirectional.topStart,
@@ -134,6 +137,13 @@ class _ReportScreenState extends ConsumerState<ReportScreen> {
               label: Text(t.send),
             ),
           ),
+          // G2: قنوات الدعم المباشر (واتساب/تيليجرام) إن حدّدها المدير
+          if (support.isNotEmpty) ...[
+            const Divider(height: Space.xl * 2),
+            Text(t.contactSupport, style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
+            const SizedBox(height: Space.sm),
+            Align(alignment: AlignmentDirectional.centerStart, child: SocialLinks(links: [for (final e in support.entries) (e.key, e.value, null)])),
+          ],
         ]),
       ),
     );

@@ -1968,4 +1968,301 @@ class L10nEn extends L10n {
 
   @override
   String get mtDeletePending => 'Delete channels pending review';
+
+  @override
+  String get g1Identity => 'App';
+
+  @override
+  String get g1AppNameAr => 'App name (Arabic)';
+
+  @override
+  String get g1AppNameEn => 'App name (English)';
+
+  @override
+  String get g1AboutAr => 'About text (Arabic)';
+
+  @override
+  String get g1AboutEn => 'About text (English)';
+
+  @override
+  String get g1CreditsAr => 'Credits (Arabic)';
+
+  @override
+  String get g1CreditsEn => 'Credits (English)';
+
+  @override
+  String get g1CompanyAr => 'Company name (Arabic)';
+
+  @override
+  String get g1CompanyEn => 'Company name (English)';
+
+  @override
+  String get g1Website => 'Website';
+
+  @override
+  String get g1Email => 'Email';
+
+  @override
+  String get g1Legal => 'Legal pages';
+
+  @override
+  String get g1PrivacyAr => 'Privacy policy (Arabic)';
+
+  @override
+  String get g1PrivacyEn => 'Privacy policy (English)';
+
+  @override
+  String get g1PrivacyHint =>
+      'Empty = the built-in policy that matches what the app actually collects (spec §20).';
+
+  @override
+  String get g1TermsAr => 'Terms of use (Arabic)';
+
+  @override
+  String get g1TermsEn => 'Terms of use (English)';
+
+  @override
+  String get g3Defaults => 'Defaults for new devices';
+
+  @override
+  String get g3DefaultLang => 'Default language';
+
+  @override
+  String get g3DefaultTheme => 'Default theme';
+
+  @override
+  String get g3ParentalCats =>
+      'Categories locked by default (parental control)';
+
+  @override
+  String get g3Catalog => 'Catalog';
+
+  @override
+  String get g3RecentDays => '\"Recently added\" covers (days)';
+
+  @override
+  String get g3AttentionDays =>
+      '\"Needs your attention\" after (days of continuous failure)';
+
+  @override
+  String get g3AttentionHint =>
+      'Only raises an alert for you. Nothing is hidden or deleted automatically (D-14).';
+
+  @override
+  String get g3EpgTz => 'Guide reference time zone';
+
+  @override
+  String get g4Player => 'Player';
+
+  @override
+  String get g4ConnectTimeout => 'Network timeout (seconds)';
+
+  @override
+  String get g4FirstFrame =>
+      'Wait for the first picture (seconds) before switching server';
+
+  @override
+  String get g4Stall => 'Freeze before switching server (seconds)';
+
+  @override
+  String get g4Retries => 'Extra rounds over all servers';
+
+  @override
+  String get g4Buffer => 'Buffer (seconds)';
+
+  @override
+  String get g4UserAgent => 'Default User-Agent (empty = player default)';
+
+  @override
+  String get g4Hwdec => 'Hardware decoding';
+
+  @override
+  String get g4Probe => 'Stream checks (spec §12.3)';
+
+  @override
+  String get g4ProbeConnect => 'Connect timeout (seconds)';
+
+  @override
+  String get g4ProbePlaylist => 'Playlist timeout (seconds)';
+
+  @override
+  String get g4ProbeFrame => 'First frame timeout (seconds)';
+
+  @override
+  String get g4PerHost => 'Parallel checks per host';
+
+  @override
+  String get g4Total => 'Parallel checks in total';
+
+  @override
+  String get g4Ports => 'Allowed ports for fetching (comma separated)';
+
+  @override
+  String get g5Maintenance => 'Maintenance';
+
+  @override
+  String get g5MaintOn => 'Maintenance mode';
+
+  @override
+  String get g5MaintHint =>
+      'Viewers see the message instead of the app; the admin can still sign in.';
+
+  @override
+  String get g5MsgAr => 'Message (Arabic)';
+
+  @override
+  String get g5MsgEn => 'Message (English)';
+
+  @override
+  String get g5Features => 'Features';
+
+  @override
+  String get g5FMini => 'Mini player';
+
+  @override
+  String get g5Refresh => 'Check for catalog updates every (minutes)';
+
+  @override
+  String get g5Telemetry => 'Collect anonymous playback statistics';
+
+  @override
+  String get g5KillSwitch => 'Hide a channel immediately on every device';
+
+  @override
+  String get g5KillHint =>
+      'The channel disappears from every device at its next sync, without changing the catalog. Remove it here to bring it back.';
+
+  @override
+  String get g2Handle => 'Username or link';
+
+  @override
+  String get g2OwnDeveloper => 'Developer';
+
+  @override
+  String get g2Footer => 'Footer';
+
+  @override
+  String get g2Splash => 'Start screen';
+
+  @override
+  String get g2Support => 'Support channels';
+
+  @override
+  String get followUs => 'Follow us';
+
+  @override
+  String get termsOfUse => 'Terms of use';
+
+  @override
+  String get contactSupport => 'Contact support directly';
+
+  @override
+  String get g2SupportHint => 'Shown in \"Report a problem\".';
+
+  @override
+  String get g6MinSupported => 'Minimum supported version';
+
+  @override
+  String get g6MinHint => 'Older versions are forced to update.';
+
+  @override
+  String get g6Recommended => 'Recommended version';
+
+  @override
+  String get g6RecHint => 'Older versions see an update reminder.';
+
+  @override
+  String get g6Url => 'Download page';
+
+  @override
+  String get g6NotesAr => 'Release notes (Arabic)';
+
+  @override
+  String get g6NotesEn => 'Release notes (English)';
+
+  @override
+  String get g6Github => 'Latest on GitHub';
+
+  @override
+  String get f2Kind => 'Type';
+
+  @override
+  String get f2Info => 'Information';
+
+  @override
+  String get f2Warning => 'Warning';
+
+  @override
+  String get f2Style => 'Shown as';
+
+  @override
+  String get f2Banner => 'Banner';
+
+  @override
+  String get f2Dialog => 'Welcome window';
+
+  @override
+  String get f2BodyAr => 'Text (Arabic)';
+
+  @override
+  String get f2BodyEn => 'Text (English)';
+
+  @override
+  String get f2MinVersion => 'From version';
+
+  @override
+  String get f2MaxVersion => 'Up to version';
+
+  @override
+  String get f2Dismissible => 'Viewers can close it';
+
+  @override
+  String get f2Empty => 'Nothing yet.';
+
+  @override
+  String get f1Compose => 'New notification';
+
+  @override
+  String get f1Link => 'Open inside the app (optional)';
+
+  @override
+  String get f1Image => 'Image link (optional)';
+
+  @override
+  String get f1SendAt => 'Schedule (optional, YYYY-MM-DD HH:MM)';
+
+  @override
+  String get f1SendAtHint =>
+      'Empty = now. Scheduled notifications reach the inbox at that time on every platform.';
+
+  @override
+  String get f1Push => 'Also send a push to Android now';
+
+  @override
+  String get f1PushHint =>
+      'Through the existing send-push function (Firebase). Windows and macOS receive it in the inbox.';
+
+  @override
+  String get f1Sent => 'Notification published';
+
+  @override
+  String get f1History => 'Sent';
+
+  @override
+  String get f1CheckFcm => 'Check push setup';
+
+  @override
+  String get maintenanceTitle => 'Under maintenance';
+
+  @override
+  String get updateRequired => 'Please update to continue';
+
+  @override
+  String get updateRecommended => 'A newer version is available';
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get later => 'Later';
 }

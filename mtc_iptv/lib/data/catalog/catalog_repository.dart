@@ -6,6 +6,7 @@ import 'package:mtc_core/mtc_core.dart';
 
 import '../../core/backend/backend.dart';
 import '../../core/storage/catalog_db.dart';
+import '../settings/remote_config.dart' show killedChannelsProvider;
 
 class ChannelFilter {
   final String? country, category, language, query;
@@ -32,7 +33,12 @@ class CountWith<T> {
 
 class CatalogRepository {
   final CatalogDb db;
-  CatalogRepository(this.db);
+
+  /// قنوات أخفاها المدير فورًا من كل الأجهزة (G5 kill switch): مستبعدة من كل استعلامات المشاهدة.
+  final Set<String> hidden;
+  CatalogRepository(this.db, {this.hidden = const {}});
+
+  bool _visible(String id) => !hidden.contains(id);
 
   Stream<List<ChannelRow>> watchChannels(ChannelFilter f, {int? limit}) {
     final q = db.select(db.channels);
@@ -52,18 +58,19 @@ class CatalogRepository {
         }
       }
     }
+    if (hidden.isNotEmpty) q.where((c) => c.id.isNotIn(hidden));
     q.orderBy([(c) => OrderingTerm(expression: c.number, nulls: NullsOrder.last), (c) => OrderingTerm(expression: c.nameEn)]);
     if (limit != null) q.limit(limit);
     return q.watch();
   }
 
   Stream<List<ChannelRow>> watchRecent({int limit = 20}) => (db.select(db.channels)
-        ..where((c) => c.publishedAt.isNotNull())
+        ..where((c) => c.publishedAt.isNotNull() & c.id.isNotIn(hidden))
         ..orderBy([(c) => OrderingTerm.desc(c.publishedAt)])
         ..limit(limit))
       .watch();
 
-  Future<ChannelRow?> channel(String id) => (db.select(db.channels)..where((c) => c.id.equals(id))).getSingleOrNull();
+  Future<ChannelRow?> channel(String id) async => _visible(id) ? (db.select(db.channels)..where((c) => c.id.equals(id))).getSingleOrNull() : null;
 
   /// الروابط مرتبة: أولوية المدير، ثم درجة الصحة (§12.5)، والمعطّلة أخيرًا.
   Future<List<StreamRow>> streamsFor(String channelId) async {
@@ -85,7 +92,7 @@ class CatalogRepository {
           ..addColumns([db.channels.id])
           ..orderBy([OrderingTerm(expression: db.channels.number, nulls: NullsOrder.last), OrderingTerm(expression: db.channels.nameEn)]))
         .get();
-    return [for (final r in rows) r.read(db.channels.id)!];
+    return [for (final r in rows) if (_visible(r.read(db.channels.id)!)) r.read(db.channels.id)!];
   }
 
   /// قنوات بمعرّفاتها بنفس ترتيب القائمة (صفوف المدير اليدوية و«يعرض الآن»)؛ غير المنشورة غير موجودة محليًا فتُتجاوز.
@@ -93,11 +100,11 @@ class CatalogRepository {
     if (ids.isEmpty) return Stream.value(const []);
     return (db.select(db.channels)..where((c) => c.id.isIn(ids))).watch().map((rows) {
       final byId = {for (final r in rows) r.id: r};
-      return [for (final id in ids) ?byId[id]];
+      return [for (final id in ids) if (_visible(id)) ?byId[id]];
     });
   }
 
-  Future<ChannelRow?> byNumber(int n) => (db.select(db.channels)..where((c) => c.number.equals(n))).getSingleOrNull();
+  Future<ChannelRow?> byNumber(int n) => (db.select(db.channels)..where((c) => c.number.equals(n) & c.id.isNotIn(hidden))).getSingleOrNull();
 
   Stream<List<CountWith<CountryRow>>> watchCountries() {
     final count = db.channels.id.count();
@@ -124,7 +131,7 @@ class CatalogRepository {
   Stream<List<ChannelRow>> watchFavorites() {
     final q = db.select(db.channels).join([innerJoin(db.favorites, db.favorites.channelId.equalsExp(db.channels.id))])
       ..orderBy([OrderingTerm.asc(db.favorites.position)]);
-    return q.watch().map((rows) => [for (final r in rows) r.readTable(db.channels)]);
+    return q.watch().map((rows) => [for (final r in rows) if (_visible(r.readTable(db.channels).id)) r.readTable(db.channels)]);
   }
 
   Stream<bool> watchIsFavorite(String id) =>
@@ -164,11 +171,11 @@ class CatalogRepository {
     final q = db.select(db.channels).join([innerJoin(db.history, db.history.channelId.equalsExp(db.channels.id))])
       ..orderBy([OrderingTerm.desc(db.history.watchedAt)])
       ..limit(limit);
-    return q.watch().map((rows) => [for (final r in rows) r.readTable(db.channels)]);
+    return q.watch().map((rows) => [for (final r in rows) if (_visible(r.readTable(db.channels).id)) r.readTable(db.channels)]);
   }
 }
 
-final catalogRepoProvider = Provider<CatalogRepository>((ref) => CatalogRepository(ref.watch(catalogDbProvider)));
+final catalogRepoProvider = Provider<CatalogRepository>((ref) => CatalogRepository(ref.watch(catalogDbProvider), hidden: ref.watch(killedChannelsProvider)));
 
 // ── أسماء معروضة حسب اللغة ────────────────────────────────────────────────
 extension ChannelNameX on ChannelRow {

@@ -9,6 +9,7 @@ import '../../../app/l10n/app_localizations.dart';
 import '../../../app/theme/tokens.dart';
 import '../../../data/catalog/catalog_repository.dart';
 import '../../../player/playback_controller.dart';
+import '../../../data/settings/remote_config.dart';
 
 /// عدد شاشات المشاهدة المفتوحة (عادة 0 أو 1).
 final watchOpenProvider = NotifierProvider<WatchOpen, int>(WatchOpen.new);
@@ -28,7 +29,7 @@ class MiniPlayer extends ConsumerWidget {
     final s = ref.watch(playbackProvider);
     final open = ref.watch(watchOpenProvider) > 0;
     final ch = s.channel;
-    if (open || ch == null || s.phase == PlayPhase.idle || s.phase == PlayPhase.failed) return const SizedBox.shrink();
+    if (open || ch == null || !(ref.watch(remoteConfigProvider).value?.feature('mini_player') ?? true) || s.phase == PlayPhase.idle || s.phase == PlayPhase.failed) return const SizedBox.shrink();
     final t = L10n.of(context), c = context.colors;
     final narrow = MediaQuery.sizeOf(context).width < 600;
     final w = narrow ? 220.0 : 320.0;

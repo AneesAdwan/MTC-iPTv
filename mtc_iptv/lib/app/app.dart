@@ -6,7 +6,9 @@ import '../core/backend/backend.dart';
 import '../core/settings/local_settings.dart';
 import '../data/epg/epg_repository.dart';
 import '../features/splash/splash_gate.dart';
+import '../data/settings/remote_config.dart';
 import 'desktop/desktop_host.dart';
+import 'remote/remote_gates.dart';
 import 'l10n/app_localizations.dart';
 import 'router.dart';
 import 'theme/theme.dart';
@@ -19,6 +21,14 @@ class MtcApp extends ConsumerWidget {
     final s = ref.watch(settingsProvider);
     ref.watch(startupSyncProvider); // مزامنة الكتالوج في الخلفية عند البدء
     ref.watch(epgSyncProvider); // ثم دليل البرامج
+    ref.watch(remoteConfigSyncProvider); // والإعدادات المركزية والإشعارات (G، F)
+    ref.watch(periodicRefreshProvider); // إعادة المزامنة الدورية
+    // G3: لغة وثيم افتراضيان لجهاز لم يختر مستخدمه بعد
+    ref.listen(remoteConfigProvider, (_, next) {
+      final g = next.value?.general;
+      if (g == null || g.isEmpty) return;
+      ref.read(settingsProvider.notifier).applyDefaults(language: g['default_language'] as String?, theme: g['default_theme'] as String?);
+    });
     return MaterialApp.router(
       title: 'MTC-iPTv',
       debugShowCheckedModeBanner: false,
@@ -35,7 +45,7 @@ class MtcApp extends ConsumerWidget {
       themeMode: s.themeMode,
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
-      builder: (context, child) => DesktopHost(child: SplashGate(child: child ?? const SizedBox.shrink())),
+      builder: (context, child) => DesktopHost(child: SplashGate(child: RemoteGates(child: child ?? const SizedBox.shrink()))),
     );
   }
 }

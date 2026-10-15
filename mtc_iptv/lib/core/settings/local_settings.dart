@@ -29,6 +29,10 @@ class LocalSettings {
   final String? pinHash;
   final List<String> lockedCategories;
 
+  /// اختار المستخدم اللغة/الثيم بنفسه؟ إن لا، تُطبَّق افتراضيات الإدارة (G3) عند وصولها.
+  /// الملفات القديمة (بلا المفتاح) تُعدّ مخصّصة حتى لا نغيّر واجهة مستخدم قائم.
+  final bool customized;
+
   const LocalSettings({
     this.locale = const Locale('ar'),
     this.themeMode = ThemeMode.dark,
@@ -38,6 +42,7 @@ class LocalSettings {
     this.telemetry = true,
     this.pinHash,
     this.lockedCategories = const [],
+    this.customized = false,
   });
 
   bool get parentalOn => pinHash != null;
@@ -53,8 +58,10 @@ class LocalSettings {
     String? pinHash,
     bool clearPin = false,
     List<String>? lockedCategories,
+    bool? customized,
   }) =>
       LocalSettings(
+        customized: customized ?? this.customized,
         locale: locale ?? this.locale,
         themeMode: themeMode ?? this.themeMode,
         sidebarCollapsed: sidebarCollapsed ?? this.sidebarCollapsed,
@@ -74,6 +81,7 @@ class LocalSettings {
         'telemetry': telemetry,
         'pinHash': pinHash,
         'lockedCategories': lockedCategories,
+        'customized': customized,
       };
 
   factory LocalSettings.fromJson(Map<String, dynamic> j) => LocalSettings(
@@ -85,6 +93,7 @@ class LocalSettings {
         telemetry: j['telemetry'] != false,
         pinHash: j['pinHash'] is String ? j['pinHash'] as String : null,
         lockedCategories: [for (final x in (j['lockedCategories'] as List?) ?? const []) '$x'],
+        customized: j['customized'] != false,
       );
 }
 
@@ -100,15 +109,29 @@ class SettingsController extends Notifier<LocalSettings> {
   @override
   LocalSettings build() => ref.read(initialSettingsProvider);
 
-  void setLocale(Locale l) => _set(state.copyWith(locale: l));
+  void setLocale(Locale l) => _set(state.copyWith(locale: l, customized: true));
   void toggleLocale() => setLocale(Locale(state.locale.languageCode == 'ar' ? 'en' : 'ar'));
-  void setThemeMode(ThemeMode m) => _set(state.copyWith(themeMode: m));
+  void setThemeMode(ThemeMode m) => _set(state.copyWith(themeMode: m, customized: true));
+
+  /// G3: افتراضيات الإدارة للغة والثيم — لجهاز لم يختر مستخدمه بعد (أول تشغيل).
+  void applyDefaults({String? language, String? theme}) {
+    if (state.customized) return;
+    final l = language == 'en' || language == 'ar' ? Locale(language!) : state.locale;
+    final m = ThemeMode.values.where((x) => x.name == theme).firstOrNull ?? state.themeMode;
+    if (l != state.locale || m != state.themeMode) _set(state.copyWith(locale: l, themeMode: m));
+  }
   void toggleTheme() => setThemeMode(state.themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
   void toggleSidebar() => _set(state.copyWith(sidebarCollapsed: !state.sidebarCollapsed));
   void setShowNumbers(bool v) => _set(state.copyWith(showNumbers: v));
   void setMaxQuality(int? h) => _set(h == null ? state.copyWith(clearMaxQuality: true) : state.copyWith(maxQuality: h));
   void setTelemetry(bool v) => _set(state.copyWith(telemetry: v));
-  void setPin(String? pin) => _set(pin == null ? state.copyWith(clearPin: true, lockedCategories: const []) : state.copyWith(pinHash: hashPin(pin)));
+  /// [defaults]: الفئات المقفلة افتراضيًا من الإدارة (G3) — تُحدَّد عند أول تفعيل فقط، ويبقى للمستخدم تعديلها.
+  void setPin(String? pin, {List<String> defaults = const []}) => _set(pin == null
+      ? state.copyWith(clearPin: true, lockedCategories: const [])
+      : state.copyWith(
+          pinHash: hashPin(pin),
+          lockedCategories: state.pinHash == null && state.lockedCategories.isEmpty ? ([...defaults]..sort()) : null,
+        ));
   bool checkPin(String pin) => state.pinHash != null && state.pinHash == hashPin(pin);
   void toggleLockedCategory(String slug) {
     final s = {...state.lockedCategories};

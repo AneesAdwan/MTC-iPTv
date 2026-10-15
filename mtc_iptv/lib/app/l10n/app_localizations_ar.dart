@@ -1957,4 +1957,298 @@ class L10nAr extends L10n {
 
   @override
   String get mtDeletePending => 'حذف القنوات قيد المراجعة';
+
+  @override
+  String get g1Identity => 'التطبيق';
+
+  @override
+  String get g1AppNameAr => 'اسم التطبيق بالعربية';
+
+  @override
+  String get g1AppNameEn => 'اسم التطبيق بالإنجليزية';
+
+  @override
+  String get g1AboutAr => 'نص «حول» بالعربية';
+
+  @override
+  String get g1AboutEn => 'نص «حول» بالإنجليزية';
+
+  @override
+  String get g1CreditsAr => 'الاعتمادات بالعربية';
+
+  @override
+  String get g1CreditsEn => 'الاعتمادات بالإنجليزية';
+
+  @override
+  String get g1CompanyAr => 'اسم الشركة بالعربية';
+
+  @override
+  String get g1CompanyEn => 'اسم الشركة بالإنجليزية';
+
+  @override
+  String get g1Website => 'الموقع';
+
+  @override
+  String get g1Email => 'البريد';
+
+  @override
+  String get g1Legal => 'الصفحات القانونية';
+
+  @override
+  String get g1PrivacyAr => 'سياسة الخصوصية بالعربية';
+
+  @override
+  String get g1PrivacyEn => 'سياسة الخصوصية بالإنجليزية';
+
+  @override
+  String get g1PrivacyHint =>
+      'فارغة = السياسة المدمجة المطابقة لما يجمعه التطبيق فعلًا (§20).';
+
+  @override
+  String get g1TermsAr => 'شروط الاستخدام بالعربية';
+
+  @override
+  String get g1TermsEn => 'شروط الاستخدام بالإنجليزية';
+
+  @override
+  String get g3Defaults => 'الافتراضي للأجهزة الجديدة';
+
+  @override
+  String get g3DefaultLang => 'اللغة الافتراضية';
+
+  @override
+  String get g3DefaultTheme => 'المظهر الافتراضي';
+
+  @override
+  String get g3ParentalCats => 'فئات مقفلة أبويًا افتراضيًا';
+
+  @override
+  String get g3Catalog => 'الكتالوج';
+
+  @override
+  String get g3RecentDays => '«المضافة حديثًا» تشمل (أيام)';
+
+  @override
+  String get g3AttentionDays => '«يحتاج انتباهك» بعد (أيام فشل متواصل)';
+
+  @override
+  String get g3AttentionHint =>
+      'يرفع تنبيهًا لك فقط. لا شيء يُخفى أو يُحذف تلقائيًا (D-14).';
+
+  @override
+  String get g3EpgTz => 'المنطقة الزمنية المرجعية للدليل';
+
+  @override
+  String get g4Player => 'المشغّل';
+
+  @override
+  String get g4ConnectTimeout => 'مهلة الشبكة (ثوانٍ)';
+
+  @override
+  String get g4FirstFrame => 'انتظار أول صورة (ثوانٍ) قبل تبديل السيرفر';
+
+  @override
+  String get g4Stall => 'تجمّد قبل تبديل السيرفر (ثوانٍ)';
+
+  @override
+  String get g4Retries => 'جولات إضافية على كل السيرفرات';
+
+  @override
+  String get g4Buffer => 'التخزين المؤقت (ثوانٍ)';
+
+  @override
+  String get g4UserAgent => 'User-Agent الافتراضي (فارغ = افتراضي المشغّل)';
+
+  @override
+  String get g4Hwdec => 'فك الترميز بالعتاد';
+
+  @override
+  String get g4Probe => 'فحص الروابط (§12.3)';
+
+  @override
+  String get g4ProbeConnect => 'مهلة الاتصال (ثوانٍ)';
+
+  @override
+  String get g4ProbePlaylist => 'مهلة القائمة (ثوانٍ)';
+
+  @override
+  String get g4ProbeFrame => 'مهلة أول إطار (ثوانٍ)';
+
+  @override
+  String get g4PerHost => 'فحوص متزامنة لكل نطاق';
+
+  @override
+  String get g4Total => 'فحوص متزامنة إجمالًا';
+
+  @override
+  String get g4Ports => 'المنافذ المسموحة للجلب (مفصولة بفواصل)';
+
+  @override
+  String get g5Maintenance => 'الصيانة';
+
+  @override
+  String get g5MaintOn => 'وضع الصيانة';
+
+  @override
+  String get g5MaintHint =>
+      'يرى المشاهدون الرسالة بدل التطبيق؛ والمدير يدخل عاديًا.';
+
+  @override
+  String get g5MsgAr => 'الرسالة بالعربية';
+
+  @override
+  String get g5MsgEn => 'الرسالة بالإنجليزية';
+
+  @override
+  String get g5Features => 'المزايا';
+
+  @override
+  String get g5FMini => 'المشغّل المصغّر';
+
+  @override
+  String get g5Refresh => 'فحص تحديثات الكتالوج كل (دقائق)';
+
+  @override
+  String get g5Telemetry => 'جمع إحصاءات تشغيل مجهولة';
+
+  @override
+  String get g5KillSwitch => 'إخفاء قناة فورًا من كل الأجهزة';
+
+  @override
+  String get g5KillHint =>
+      'تختفي القناة من كل جهاز في مزامنته التالية دون تغيير الكتالوج. أزلها من هنا لإعادتها.';
+
+  @override
+  String get g2Handle => 'اسم المستخدم أو الرابط';
+
+  @override
+  String get g2OwnDeveloper => 'المطوّر';
+
+  @override
+  String get g2Footer => 'التذييل';
+
+  @override
+  String get g2Splash => 'شاشة البداية';
+
+  @override
+  String get g2Support => 'قنوات الدعم';
+
+  @override
+  String get followUs => 'تابعنا';
+
+  @override
+  String get termsOfUse => 'شروط الاستخدام';
+
+  @override
+  String get contactSupport => 'تواصل مع الدعم مباشرة';
+
+  @override
+  String get g2SupportHint => 'تظهر في «الإبلاغ عن مشكلة».';
+
+  @override
+  String get g6MinSupported => 'الحد الأدنى المدعوم';
+
+  @override
+  String get g6MinHint => 'الإصدارات الأقدم تُجبر على التحديث.';
+
+  @override
+  String get g6Recommended => 'الإصدار الموصى به';
+
+  @override
+  String get g6RecHint => 'الإصدارات الأقدم ترى تنبيهًا بالتحديث.';
+
+  @override
+  String get g6Url => 'صفحة التنزيل';
+
+  @override
+  String get g6NotesAr => 'ملاحظات الإصدار بالعربية';
+
+  @override
+  String get g6NotesEn => 'ملاحظات الإصدار بالإنجليزية';
+
+  @override
+  String get g6Github => 'الأحدث على GitHub';
+
+  @override
+  String get f2Kind => 'النوع';
+
+  @override
+  String get f2Info => 'معلومة';
+
+  @override
+  String get f2Warning => 'تحذير';
+
+  @override
+  String get f2Style => 'يظهر كـ';
+
+  @override
+  String get f2Banner => 'شريط';
+
+  @override
+  String get f2Dialog => 'نافذة ترحيبية';
+
+  @override
+  String get f2BodyAr => 'النص بالعربية';
+
+  @override
+  String get f2BodyEn => 'النص بالإنجليزية';
+
+  @override
+  String get f2MinVersion => 'من الإصدار';
+
+  @override
+  String get f2MaxVersion => 'حتى الإصدار';
+
+  @override
+  String get f2Dismissible => 'يمكن للمشاهد إغلاقه';
+
+  @override
+  String get f2Empty => 'لا شيء بعد.';
+
+  @override
+  String get f1Compose => 'إشعار جديد';
+
+  @override
+  String get f1Link => 'يفتح داخل التطبيق (اختياري)';
+
+  @override
+  String get f1Image => 'رابط صورة (اختياري)';
+
+  @override
+  String get f1SendAt => 'جدولة (اختياري، YYYY-MM-DD HH:MM)';
+
+  @override
+  String get f1SendAtHint =>
+      'فارغ = الآن. المجدول يصل لصندوق الوارد في موعده على كل المنصّات.';
+
+  @override
+  String get f1Push => 'إرسال Push لأجهزة Android الآن أيضًا';
+
+  @override
+  String get f1PushHint =>
+      'عبر الدالة القائمة send-push (Firebase). ويندوز وماك يستلمونه في صندوق الوارد.';
+
+  @override
+  String get f1Sent => 'نُشر الإشعار';
+
+  @override
+  String get f1History => 'المُرسلة';
+
+  @override
+  String get f1CheckFcm => 'فحص إعداد Push';
+
+  @override
+  String get maintenanceTitle => 'تحت الصيانة';
+
+  @override
+  String get updateRequired => 'يلزم التحديث للمتابعة';
+
+  @override
+  String get updateRecommended => 'يتوفر إصدار أحدث';
+
+  @override
+  String get updateNow => 'حدّث الآن';
+
+  @override
+  String get later => 'لاحقًا';
 }

@@ -17,6 +17,7 @@ import '../../data/epg/epg_repository.dart';
 import '../../data/reminders/reminders.dart';
 import 'home_screen.dart';
 import 'widgets/channel_card.dart';
+import '../../data/settings/remote_config.dart';
 
 const _pxPerMin = 4.0;
 const _rowH = 64.0;
@@ -360,7 +361,7 @@ Future<void> showProgrammeSheet(BuildContext context, ChannelRow ch, ProgrammeRo
                     icon: const Icon(Icons.play_arrow_rounded),
                     label: Text(t.watchNow),
                   ),
-                if (future)
+                if (future && (ref.watch(remoteConfigProvider).value?.feature('reminders') ?? true))
                   FilledButton.tonalIcon(
                     onPressed: () async {
                       final on = await ref.read(remindersProvider).toggle(ch.id, p.startAt, '${p.title} — ${ch.displayName(Localizations.localeOf(context))}');

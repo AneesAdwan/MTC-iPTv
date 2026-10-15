@@ -14,6 +14,7 @@ import '../features/admin/connectors_screen.dart';
 import '../features/admin/epg_screens.dart';
 import '../features/admin/export_screen.dart';
 import '../features/admin/rules_screen.dart';
+import '../features/admin/settings_screens.dart';
 import '../features/admin/system_screens.dart';
 import '../features/admin/health_screen.dart';
 import '../features/admin/import_screen.dart';
@@ -130,6 +131,14 @@ Widget _screenFor(ScreenDef s, GoRouterState state) {
     'ADM-E3' => const EpgPreviewScreen(),
     'ADM-D4' => HealthScreen(key: ValueKey(state.uri.toString()), initialState: q['state']),
     'ADM-D6' => const ReportsAdminScreen(),
+    'ADM-G1' => const BrandScreen(),
+    'ADM-G2' => const SocialScreen(),
+    'ADM-G3' => const GeneralSettingsScreen(),
+    'ADM-G4' => const PlayerSettingsScreen(),
+    'ADM-G5' => const FeaturesScreen(),
+    'ADM-G6' => const ReleasesScreen(),
+    'ADM-F1' => const NotificationsAdminScreen(),
+    'ADM-F2' => const AnnouncementsScreen(),
     _ => PlaceholderScreen(def: s),
   };
 }

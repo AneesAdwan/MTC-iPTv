@@ -10,6 +10,7 @@ import '../../core/settings/local_settings.dart';
 import '../../core/text/bidi.dart';
 import '../../data/catalog/catalog_repository.dart';
 import '../../data/epg/epg_repository.dart';
+import '../../data/settings/remote_config.dart';
 import 'guide_screen.dart' show fmtTime;
 import 'home_screen.dart';
 
@@ -113,7 +114,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               : FilledButton.tonal(
                   onPressed: () async {
                     final pin = await _newPin(context);
-                    if (pin != null) ctrl.setPin(pin);
+                    if (pin != null) ctrl.setPin(pin, defaults: ref.read(remoteConfigProvider).value?.parentalLockedCategories ?? const []);
                   },
                   child: Text(t.setPin)),
         ),

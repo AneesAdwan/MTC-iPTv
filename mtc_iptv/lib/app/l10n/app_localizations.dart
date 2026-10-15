@@ -3648,6 +3648,582 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'حذف القنوات قيد المراجعة'**
   String get mtDeletePending;
+
+  /// No description provided for @g1Identity.
+  ///
+  /// In ar, this message translates to:
+  /// **'التطبيق'**
+  String get g1Identity;
+
+  /// No description provided for @g1AppNameAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم التطبيق بالعربية'**
+  String get g1AppNameAr;
+
+  /// No description provided for @g1AppNameEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم التطبيق بالإنجليزية'**
+  String get g1AppNameEn;
+
+  /// No description provided for @g1AboutAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'نص «حول» بالعربية'**
+  String get g1AboutAr;
+
+  /// No description provided for @g1AboutEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'نص «حول» بالإنجليزية'**
+  String get g1AboutEn;
+
+  /// No description provided for @g1CreditsAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاعتمادات بالعربية'**
+  String get g1CreditsAr;
+
+  /// No description provided for @g1CreditsEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاعتمادات بالإنجليزية'**
+  String get g1CreditsEn;
+
+  /// No description provided for @g1CompanyAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم الشركة بالعربية'**
+  String get g1CompanyAr;
+
+  /// No description provided for @g1CompanyEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم الشركة بالإنجليزية'**
+  String get g1CompanyEn;
+
+  /// No description provided for @g1Website.
+  ///
+  /// In ar, this message translates to:
+  /// **'الموقع'**
+  String get g1Website;
+
+  /// No description provided for @g1Email.
+  ///
+  /// In ar, this message translates to:
+  /// **'البريد'**
+  String get g1Email;
+
+  /// No description provided for @g1Legal.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحات القانونية'**
+  String get g1Legal;
+
+  /// No description provided for @g1PrivacyAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'سياسة الخصوصية بالعربية'**
+  String get g1PrivacyAr;
+
+  /// No description provided for @g1PrivacyEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'سياسة الخصوصية بالإنجليزية'**
+  String get g1PrivacyEn;
+
+  /// No description provided for @g1PrivacyHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'فارغة = السياسة المدمجة المطابقة لما يجمعه التطبيق فعلًا (§20).'**
+  String get g1PrivacyHint;
+
+  /// No description provided for @g1TermsAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'شروط الاستخدام بالعربية'**
+  String get g1TermsAr;
+
+  /// No description provided for @g1TermsEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'شروط الاستخدام بالإنجليزية'**
+  String get g1TermsEn;
+
+  /// No description provided for @g3Defaults.
+  ///
+  /// In ar, this message translates to:
+  /// **'الافتراضي للأجهزة الجديدة'**
+  String get g3Defaults;
+
+  /// No description provided for @g3DefaultLang.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللغة الافتراضية'**
+  String get g3DefaultLang;
+
+  /// No description provided for @g3DefaultTheme.
+  ///
+  /// In ar, this message translates to:
+  /// **'المظهر الافتراضي'**
+  String get g3DefaultTheme;
+
+  /// No description provided for @g3ParentalCats.
+  ///
+  /// In ar, this message translates to:
+  /// **'فئات مقفلة أبويًا افتراضيًا'**
+  String get g3ParentalCats;
+
+  /// No description provided for @g3Catalog.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكتالوج'**
+  String get g3Catalog;
+
+  /// No description provided for @g3RecentDays.
+  ///
+  /// In ar, this message translates to:
+  /// **'«المضافة حديثًا» تشمل (أيام)'**
+  String get g3RecentDays;
+
+  /// No description provided for @g3AttentionDays.
+  ///
+  /// In ar, this message translates to:
+  /// **'«يحتاج انتباهك» بعد (أيام فشل متواصل)'**
+  String get g3AttentionDays;
+
+  /// No description provided for @g3AttentionHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرفع تنبيهًا لك فقط. لا شيء يُخفى أو يُحذف تلقائيًا (D-14).'**
+  String get g3AttentionHint;
+
+  /// No description provided for @g3EpgTz.
+  ///
+  /// In ar, this message translates to:
+  /// **'المنطقة الزمنية المرجعية للدليل'**
+  String get g3EpgTz;
+
+  /// No description provided for @g4Player.
+  ///
+  /// In ar, this message translates to:
+  /// **'المشغّل'**
+  String get g4Player;
+
+  /// No description provided for @g4ConnectTimeout.
+  ///
+  /// In ar, this message translates to:
+  /// **'مهلة الشبكة (ثوانٍ)'**
+  String get g4ConnectTimeout;
+
+  /// No description provided for @g4FirstFrame.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتظار أول صورة (ثوانٍ) قبل تبديل السيرفر'**
+  String get g4FirstFrame;
+
+  /// No description provided for @g4Stall.
+  ///
+  /// In ar, this message translates to:
+  /// **'تجمّد قبل تبديل السيرفر (ثوانٍ)'**
+  String get g4Stall;
+
+  /// No description provided for @g4Retries.
+  ///
+  /// In ar, this message translates to:
+  /// **'جولات إضافية على كل السيرفرات'**
+  String get g4Retries;
+
+  /// No description provided for @g4Buffer.
+  ///
+  /// In ar, this message translates to:
+  /// **'التخزين المؤقت (ثوانٍ)'**
+  String get g4Buffer;
+
+  /// No description provided for @g4UserAgent.
+  ///
+  /// In ar, this message translates to:
+  /// **'User-Agent الافتراضي (فارغ = افتراضي المشغّل)'**
+  String get g4UserAgent;
+
+  /// No description provided for @g4Hwdec.
+  ///
+  /// In ar, this message translates to:
+  /// **'فك الترميز بالعتاد'**
+  String get g4Hwdec;
+
+  /// No description provided for @g4Probe.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص الروابط (§12.3)'**
+  String get g4Probe;
+
+  /// No description provided for @g4ProbeConnect.
+  ///
+  /// In ar, this message translates to:
+  /// **'مهلة الاتصال (ثوانٍ)'**
+  String get g4ProbeConnect;
+
+  /// No description provided for @g4ProbePlaylist.
+  ///
+  /// In ar, this message translates to:
+  /// **'مهلة القائمة (ثوانٍ)'**
+  String get g4ProbePlaylist;
+
+  /// No description provided for @g4ProbeFrame.
+  ///
+  /// In ar, this message translates to:
+  /// **'مهلة أول إطار (ثوانٍ)'**
+  String get g4ProbeFrame;
+
+  /// No description provided for @g4PerHost.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحوص متزامنة لكل نطاق'**
+  String get g4PerHost;
+
+  /// No description provided for @g4Total.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحوص متزامنة إجمالًا'**
+  String get g4Total;
+
+  /// No description provided for @g4Ports.
+  ///
+  /// In ar, this message translates to:
+  /// **'المنافذ المسموحة للجلب (مفصولة بفواصل)'**
+  String get g4Ports;
+
+  /// No description provided for @g5Maintenance.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصيانة'**
+  String get g5Maintenance;
+
+  /// No description provided for @g5MaintOn.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع الصيانة'**
+  String get g5MaintOn;
+
+  /// No description provided for @g5MaintHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرى المشاهدون الرسالة بدل التطبيق؛ والمدير يدخل عاديًا.'**
+  String get g5MaintHint;
+
+  /// No description provided for @g5MsgAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرسالة بالعربية'**
+  String get g5MsgAr;
+
+  /// No description provided for @g5MsgEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرسالة بالإنجليزية'**
+  String get g5MsgEn;
+
+  /// No description provided for @g5Features.
+  ///
+  /// In ar, this message translates to:
+  /// **'المزايا'**
+  String get g5Features;
+
+  /// No description provided for @g5FMini.
+  ///
+  /// In ar, this message translates to:
+  /// **'المشغّل المصغّر'**
+  String get g5FMini;
+
+  /// No description provided for @g5Refresh.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص تحديثات الكتالوج كل (دقائق)'**
+  String get g5Refresh;
+
+  /// No description provided for @g5Telemetry.
+  ///
+  /// In ar, this message translates to:
+  /// **'جمع إحصاءات تشغيل مجهولة'**
+  String get g5Telemetry;
+
+  /// No description provided for @g5KillSwitch.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء قناة فورًا من كل الأجهزة'**
+  String get g5KillSwitch;
+
+  /// No description provided for @g5KillHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تختفي القناة من كل جهاز في مزامنته التالية دون تغيير الكتالوج. أزلها من هنا لإعادتها.'**
+  String get g5KillHint;
+
+  /// No description provided for @g2Handle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم المستخدم أو الرابط'**
+  String get g2Handle;
+
+  /// No description provided for @g2OwnDeveloper.
+  ///
+  /// In ar, this message translates to:
+  /// **'المطوّر'**
+  String get g2OwnDeveloper;
+
+  /// No description provided for @g2Footer.
+  ///
+  /// In ar, this message translates to:
+  /// **'التذييل'**
+  String get g2Footer;
+
+  /// No description provided for @g2Splash.
+  ///
+  /// In ar, this message translates to:
+  /// **'شاشة البداية'**
+  String get g2Splash;
+
+  /// No description provided for @g2Support.
+  ///
+  /// In ar, this message translates to:
+  /// **'قنوات الدعم'**
+  String get g2Support;
+
+  /// No description provided for @followUs.
+  ///
+  /// In ar, this message translates to:
+  /// **'تابعنا'**
+  String get followUs;
+
+  /// No description provided for @termsOfUse.
+  ///
+  /// In ar, this message translates to:
+  /// **'شروط الاستخدام'**
+  String get termsOfUse;
+
+  /// No description provided for @contactSupport.
+  ///
+  /// In ar, this message translates to:
+  /// **'تواصل مع الدعم مباشرة'**
+  String get contactSupport;
+
+  /// No description provided for @g2SupportHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تظهر في «الإبلاغ عن مشكلة».'**
+  String get g2SupportHint;
+
+  /// No description provided for @g6MinSupported.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحد الأدنى المدعوم'**
+  String get g6MinSupported;
+
+  /// No description provided for @g6MinHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإصدارات الأقدم تُجبر على التحديث.'**
+  String get g6MinHint;
+
+  /// No description provided for @g6Recommended.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإصدار الموصى به'**
+  String get g6Recommended;
+
+  /// No description provided for @g6RecHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإصدارات الأقدم ترى تنبيهًا بالتحديث.'**
+  String get g6RecHint;
+
+  /// No description provided for @g6Url.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحة التنزيل'**
+  String get g6Url;
+
+  /// No description provided for @g6NotesAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظات الإصدار بالعربية'**
+  String get g6NotesAr;
+
+  /// No description provided for @g6NotesEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظات الإصدار بالإنجليزية'**
+  String get g6NotesEn;
+
+  /// No description provided for @g6Github.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأحدث على GitHub'**
+  String get g6Github;
+
+  /// No description provided for @f2Kind.
+  ///
+  /// In ar, this message translates to:
+  /// **'النوع'**
+  String get f2Kind;
+
+  /// No description provided for @f2Info.
+  ///
+  /// In ar, this message translates to:
+  /// **'معلومة'**
+  String get f2Info;
+
+  /// No description provided for @f2Warning.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحذير'**
+  String get f2Warning;
+
+  /// No description provided for @f2Style.
+  ///
+  /// In ar, this message translates to:
+  /// **'يظهر كـ'**
+  String get f2Style;
+
+  /// No description provided for @f2Banner.
+  ///
+  /// In ar, this message translates to:
+  /// **'شريط'**
+  String get f2Banner;
+
+  /// No description provided for @f2Dialog.
+  ///
+  /// In ar, this message translates to:
+  /// **'نافذة ترحيبية'**
+  String get f2Dialog;
+
+  /// No description provided for @f2BodyAr.
+  ///
+  /// In ar, this message translates to:
+  /// **'النص بالعربية'**
+  String get f2BodyAr;
+
+  /// No description provided for @f2BodyEn.
+  ///
+  /// In ar, this message translates to:
+  /// **'النص بالإنجليزية'**
+  String get f2BodyEn;
+
+  /// No description provided for @f2MinVersion.
+  ///
+  /// In ar, this message translates to:
+  /// **'من الإصدار'**
+  String get f2MinVersion;
+
+  /// No description provided for @f2MaxVersion.
+  ///
+  /// In ar, this message translates to:
+  /// **'حتى الإصدار'**
+  String get f2MaxVersion;
+
+  /// No description provided for @f2Dismissible.
+  ///
+  /// In ar, this message translates to:
+  /// **'يمكن للمشاهد إغلاقه'**
+  String get f2Dismissible;
+
+  /// No description provided for @f2Empty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا شيء بعد.'**
+  String get f2Empty;
+
+  /// No description provided for @f1Compose.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعار جديد'**
+  String get f1Compose;
+
+  /// No description provided for @f1Link.
+  ///
+  /// In ar, this message translates to:
+  /// **'يفتح داخل التطبيق (اختياري)'**
+  String get f1Link;
+
+  /// No description provided for @f1Image.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابط صورة (اختياري)'**
+  String get f1Image;
+
+  /// No description provided for @f1SendAt.
+  ///
+  /// In ar, this message translates to:
+  /// **'جدولة (اختياري، YYYY-MM-DD HH:MM)'**
+  String get f1SendAt;
+
+  /// No description provided for @f1SendAtHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'فارغ = الآن. المجدول يصل لصندوق الوارد في موعده على كل المنصّات.'**
+  String get f1SendAtHint;
+
+  /// No description provided for @f1Push.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال Push لأجهزة Android الآن أيضًا'**
+  String get f1Push;
+
+  /// No description provided for @f1PushHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'عبر الدالة القائمة send-push (Firebase). ويندوز وماك يستلمونه في صندوق الوارد.'**
+  String get f1PushHint;
+
+  /// No description provided for @f1Sent.
+  ///
+  /// In ar, this message translates to:
+  /// **'نُشر الإشعار'**
+  String get f1Sent;
+
+  /// No description provided for @f1History.
+  ///
+  /// In ar, this message translates to:
+  /// **'المُرسلة'**
+  String get f1History;
+
+  /// No description provided for @f1CheckFcm.
+  ///
+  /// In ar, this message translates to:
+  /// **'فحص إعداد Push'**
+  String get f1CheckFcm;
+
+  /// No description provided for @maintenanceTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحت الصيانة'**
+  String get maintenanceTitle;
+
+  /// No description provided for @updateRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'يلزم التحديث للمتابعة'**
+  String get updateRequired;
+
+  /// No description provided for @updateRecommended.
+  ///
+  /// In ar, this message translates to:
+  /// **'يتوفر إصدار أحدث'**
+  String get updateRecommended;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدّث الآن'**
+  String get updateNow;
+
+  /// No description provided for @later.
+  ///
+  /// In ar, this message translates to:
+  /// **'لاحقًا'**
+  String get later;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

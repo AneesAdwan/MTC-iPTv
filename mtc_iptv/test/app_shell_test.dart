@@ -119,12 +119,12 @@ void main() {
     appTest('tapping a sidebar item opens its placeholder with the screen id', (tester) async {
       await pumpApp(tester, const LocalSettings());
       // القائمة كسولة: نمرّرها حتى يظهر العنصر
-      await tester.scrollUntilVisible(find.text('الهوية'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(find.text('التحليلات'), 200, scrollable: find.byType(Scrollable).first);
       await tester.drag(find.byType(Scrollable).first, const Offset(0, -120)); // لا يغطيه زر طي القائمة
       await tester.pumpAndSettle();
-      await tester.tap(find.text('الهوية'));
+      await tester.tap(find.text('التحليلات'));
       await tester.pumpAndSettle();
-      expect(find.text('ADM-G1'), findsOneWidget);
+      expect(find.text('ADM-I1'), findsOneWidget);
     });
   });
 

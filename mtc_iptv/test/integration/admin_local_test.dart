@@ -11,6 +11,8 @@ import 'package:mtc_core/mtc_core.dart';
 import 'package:mtc_iptv/data/admin/admin_repository.dart';
 import 'package:mtc_iptv/data/admin/backup_service.dart';
 import 'package:mtc_iptv/data/admin/import_service.dart';
+import 'package:mtc_iptv/data/admin/settings_repository.dart';
+import 'package:mtc_iptv/data/settings/remote_config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'local_backend_test.dart' show admin, anonKey, serviceKey, totp, url;
@@ -354,5 +356,37 @@ void main() {
     expect(((pub['value'] as Map)['hero'] as List).single, ids[0]);
     final hero = await anon.from('site_settings').select('value').eq('key', 'hero').single();
     expect((hero['value'] as Map)['channel_id'], ids[0]);
+  }, skip: skip);
+
+  test('phase 6b: central settings are written by the admin and readable by viewers', () async {
+    final s = SettingsRepository(c);
+    final anon = SupabaseClient(url, anonKey);
+    final before = {for (final k in ['features', 'social', 'developer']) k: await s.get(k)};
+    try {
+      await s.set('features', {
+        'maintenance': {'enabled': false},
+        'kill_switch': {'channels': ['x$stamp']},
+        'features': {'guide': false},
+      });
+      await s.saveSocial([
+        {'platform': 'x', 'handle': 'mtc$stamp', 'owner': 'developer', 'about': true},
+      ], {'whatsapp': '+962790000000'});
+      final rows = await anon.from('site_settings').select('key,value').inFilter('key', remoteKeys);
+      final rc = RemoteConfig({for (final r in rows) r['key'] as String: r['value']});
+      expect(rc.killedChannels, {'x$stamp'});
+      expect(rc.feature('guide'), isFalse);
+      expect(rc.social.single['handle'], 'mtc$stamp');
+      expect(rc.support['whatsapp'], '+962790000000');
+      // توافق الموقع القديم: developer.social
+      expect(((await s.get('developer') as Map)['social'] as Map)['x'], 'mtc$stamp');
+      // الزائر لا يكتب
+      await expectLater(anon.from('site_settings').upsert({'key': 'features', 'value': {}, 'is_public': true}), throwsA(anything));
+    } finally {
+      for (final e in before.entries) {
+        if (e.value != null) await s.set(e.key, e.value!);
+      }
+      if (before['features'] == null) await c.from('site_settings').delete().eq('key', 'features');
+      if (before['social'] == null) await c.from('site_settings').delete().eq('key', 'social');
+    }
   }, skip: skip);
 }

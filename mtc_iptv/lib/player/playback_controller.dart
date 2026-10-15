@@ -13,6 +13,7 @@ import '../core/logging/log.dart';
 import '../core/settings/local_settings.dart';
 import '../core/storage/catalog_db.dart';
 import '../data/catalog/catalog_repository.dart';
+import '../data/settings/remote_config.dart';
 import 'hls_resolver.dart';
 import 'tls_bundle.dart';
 
@@ -82,7 +83,13 @@ final playerProvider = Provider<Player>((ref) {
     final ca = TlsBundle.path;
     if (ca != null) native.setProperty('tls-ca-file', ca);
     native.setProperty('tls-verify', ca != null ? 'yes' : 'no');
-    native.setProperty('network-timeout', '15');
+    // G4 (الإعدادات المركزية) — تُقرأ عند إنشاء المشغّل؛ القيم الافتراضية عند غيابها
+    final rc = ref.read(remoteConfigProvider).value ?? RemoteConfig.empty;
+    native.setProperty('network-timeout', '${rc.playerSeconds('network_timeout_s', 15)}');
+    native.setProperty('cache-secs', '${rc.playerSeconds('cache_s', 10)}');
+    native.setProperty('hwdec', rc.player['hwdec'] == false ? 'no' : 'auto-safe');
+    final ua = rc.player['user_agent'] as String?;
+    if (ua != null && ua.trim().isNotEmpty) native.setProperty('user-agent', ua.trim());
   }
   ref.onDispose(p.dispose);
   return p;
@@ -104,6 +111,7 @@ class PlaybackController extends Notifier<PlaybackState> {
 
   Player get _p => ref.read(playerProvider);
   CatalogRepository get _repo => ref.read(catalogRepoProvider);
+  RemoteConfig get _rc => ref.read(remoteConfigProvider).value ?? RemoteConfig.empty;
 
   @override
   PlaybackState build() {
@@ -198,7 +206,7 @@ class PlaybackController extends Notifier<PlaybackState> {
     state = state.copyWith(source: src, phase: state.phase == PlayPhase.switching ? PlayPhase.switching : PlayPhase.loading);
     log.info('play ch=${state.channel?.number} server=${state.index + 1}/${state.streams.length} local=${src.viaLocalServer} variants=${src.variants.length}');
     await _p.open(Media(src.playUrl, httpHeaders: headers));
-    _arm(firstFrameTimeout, token, 'no first frame');
+    _arm(Duration(seconds: _rc.playerSeconds('first_frame_s', firstFrameTimeout.inSeconds)), token, 'no first frame');
   }
 
   void _arm(Duration d, int token, String why) {
@@ -217,7 +225,7 @@ class PlaybackController extends Notifier<PlaybackState> {
   void _onBuffering(bool b) {
     if (state.phase != PlayPhase.playing) return;
     if (b) {
-      _arm(stallTimeout, _token, 'stalled');
+      _arm(Duration(seconds: _rc.playerSeconds('stall_s', stallTimeout.inSeconds)), _token, 'stalled');
     } else {
       _watchdog?.cancel();
     }
@@ -228,7 +236,7 @@ class PlaybackController extends Notifier<PlaybackState> {
     log.warning('play failed ch=${state.channel?.number} server=${state.index + 1}: $code ${detail ?? ''}');
     // آخر رابط فشل: جولة إعادة واحدة على كل السيرفرات (تجمّد مؤقت في البث المباشر شائع)،
     // ثم نتوقف ونعرض رسالة مفهومة بدل الدوران بلا نهاية
-    if (state.index + 1 >= state.streams.length && _rounds < maxRounds) {
+    if (state.index + 1 >= state.streams.length && _rounds < _rc.playerSeconds('retry_rounds', maxRounds)) {
       _rounds++;
       state = state.copyWith(index: 0, phase: PlayPhase.switching, errorCode: code, clearPrefer: true);
       await _openCurrent();

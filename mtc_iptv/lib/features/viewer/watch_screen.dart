@@ -26,6 +26,7 @@ import 'report_screen.dart';
 import 'widgets/channel_card.dart';
 import 'widgets/mini_player.dart';
 import 'widgets/number_entry.dart';
+import '../../data/settings/remote_config.dart';
 
 final _isFavProvider = StreamProvider.family<bool, String>((ref, id) => ref.watch(catalogRepoProvider).watchIsFavorite(id));
 
@@ -42,6 +43,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
   // يُحفظ مسبقًا: استخدام ref داخل dispose غير مسموح في Riverpod 3
   late final PlaybackController _playback;
   late final WatchOpen _open;
+  bool _miniEnabled = true; // G5: إن أُوقف المشغّل المصغّر مركزيًا يتوقف البث عند المغادرة
 
   @override
   void initState() {
@@ -77,6 +79,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
     if (fullscreen && _desktop) windowManager.setFullScreen(false);
     // لا نوقف البث: يستمر في المشغّل المصغّر حتى يغلقه المستخدم
     Future.microtask(_open.leave);
+    if (!_miniEnabled) _playback.stop();
     super.dispose();
   }
 
@@ -99,6 +102,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
   Widget build(BuildContext context) {
     final c = context.colors;
     final s = ref.watch(playbackProvider);
+    _miniEnabled = ref.watch(remoteConfigProvider).value?.feature('mini_player') ?? true;
     final player = ref.watch(playerProvider);
     final vc = ref.watch(videoControllerProvider);
 
@@ -298,7 +302,7 @@ class _ControlBar extends ConsumerWidget {
           btn(fav ? Icons.favorite_rounded : Icons.favorite_border_rounded, fav ? t.removeFavorite : t.addFavorite,
               () => ref.read(catalogRepoProvider).toggleFavorite(id),
               color: fav ? c.accent : fg),
-        if (id != null && !fullscreen) btn(Icons.flag_outlined, t.reportTitle, () => showReportDialog(context, id)),
+        if (id != null && !fullscreen && (ref.watch(remoteConfigProvider).value?.feature('report') ?? true)) btn(Icons.flag_outlined, t.reportTitle, () => showReportDialog(context, id)),
         btn(fullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded, fullscreen ? t.exitFullscreen : t.fullscreen, onFullscreen),
       ]),
     );
