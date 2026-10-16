@@ -97,6 +97,150 @@ abstract class L10n {
     Locale('en'),
   ];
 
+  /// No description provided for @plErrHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'قد يكون البث متوقفًا مؤقتًا أو محجوبًا في منطقتك. جرّب لاحقًا أو اختر قناة أخرى.'**
+  String get plErrHint;
+
+  /// No description provided for @plLive.
+  ///
+  /// In ar, this message translates to:
+  /// **'مباشر'**
+  String get plLive;
+
+  /// No description provided for @plChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'قائمة القنوات'**
+  String get plChannels;
+
+  /// No description provided for @plSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإعدادات'**
+  String get plSettings;
+
+  /// No description provided for @plServer.
+  ///
+  /// In ar, this message translates to:
+  /// **'السيرفر'**
+  String get plServer;
+
+  /// No description provided for @plOtherServer.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيرفر آخر'**
+  String get plOtherServer;
+
+  /// No description provided for @plCantPlay.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تشغيل القناة'**
+  String get plCantPlay;
+
+  /// No description provided for @plStats.
+  ///
+  /// In ar, this message translates to:
+  /// **'معلومات البث'**
+  String get plStats;
+
+  /// No description provided for @plShortcuts.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختصارات لوحة المفاتيح'**
+  String get plShortcuts;
+
+  /// No description provided for @plVolume.
+  ///
+  /// In ar, this message translates to:
+  /// **'مستوى الصوت'**
+  String get plVolume;
+
+  /// No description provided for @plSameCategory.
+  ///
+  /// In ar, this message translates to:
+  /// **'نفس الفئة'**
+  String get plSameCategory;
+
+  /// No description provided for @plSameCountry.
+  ///
+  /// In ar, this message translates to:
+  /// **'نفس الدولة'**
+  String get plSameCountry;
+
+  /// No description provided for @plResolution.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدقة'**
+  String get plResolution;
+
+  /// No description provided for @plCodec.
+  ///
+  /// In ar, this message translates to:
+  /// **'الترميز'**
+  String get plCodec;
+
+  /// No description provided for @plDecoder.
+  ///
+  /// In ar, this message translates to:
+  /// **'فك الترميز'**
+  String get plDecoder;
+
+  /// No description provided for @plBuffer.
+  ///
+  /// In ar, this message translates to:
+  /// **'المخزن المؤقت'**
+  String get plBuffer;
+
+  /// No description provided for @plKeyPlay.
+  ///
+  /// In ar, this message translates to:
+  /// **'تشغيل / إيقاف'**
+  String get plKeyPlay;
+
+  /// No description provided for @plKeyChannel.
+  ///
+  /// In ar, this message translates to:
+  /// **'القناة السابقة / التالية'**
+  String get plKeyChannel;
+
+  /// No description provided for @plKeyVolume.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفع / خفض الصوت'**
+  String get plKeyVolume;
+
+  /// No description provided for @plKeyDigits.
+  ///
+  /// In ar, this message translates to:
+  /// **'إدخال رقم قناة'**
+  String get plKeyDigits;
+
+  /// No description provided for @plKeyServer.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيرفر آخر'**
+  String get plKeyServer;
+
+  /// No description provided for @plKeyHelp.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض الاختصارات'**
+  String get plKeyHelp;
+
+  /// No description provided for @plNotWorking.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يعمل'**
+  String get plNotWorking;
+
+  /// No description provided for @plChannelsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'↑ ↓ للتنقل · Enter للتشغيل · G للإغلاق'**
+  String get plChannelsHint;
+
   /// No description provided for @accountMenu.
   ///
   /// In ar, this message translates to:

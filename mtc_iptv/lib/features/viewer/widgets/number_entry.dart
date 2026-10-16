@@ -17,7 +17,8 @@ Future<void> showNumberPad(BuildContext context, {required void Function(Channel
     context: context,
     showDragHandle: true,
     useSafeArea: true,
-    builder: (_) => const _NumberPad(),
+    isScrollControlled: true, // وإلا يُقصّ صف «انتقال» على الجوال (ارتفاع الورقة محدود بنصف الشاشة)
+    builder: (_) => const SingleChildScrollView(child: _NumberPad()),
   );
   if (ch != null) onChannel(ch);
 }

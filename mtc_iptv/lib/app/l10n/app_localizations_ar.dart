@@ -10,6 +10,79 @@ class L10nAr extends L10n {
   L10nAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get plErrHint =>
+      'قد يكون البث متوقفًا مؤقتًا أو محجوبًا في منطقتك. جرّب لاحقًا أو اختر قناة أخرى.';
+
+  @override
+  String get plLive => 'مباشر';
+
+  @override
+  String get plChannels => 'قائمة القنوات';
+
+  @override
+  String get plSettings => 'الإعدادات';
+
+  @override
+  String get plServer => 'السيرفر';
+
+  @override
+  String get plOtherServer => 'سيرفر آخر';
+
+  @override
+  String get plCantPlay => 'تعذّر تشغيل القناة';
+
+  @override
+  String get plStats => 'معلومات البث';
+
+  @override
+  String get plShortcuts => 'اختصارات لوحة المفاتيح';
+
+  @override
+  String get plVolume => 'مستوى الصوت';
+
+  @override
+  String get plSameCategory => 'نفس الفئة';
+
+  @override
+  String get plSameCountry => 'نفس الدولة';
+
+  @override
+  String get plResolution => 'الدقة';
+
+  @override
+  String get plCodec => 'الترميز';
+
+  @override
+  String get plDecoder => 'فك الترميز';
+
+  @override
+  String get plBuffer => 'المخزن المؤقت';
+
+  @override
+  String get plKeyPlay => 'تشغيل / إيقاف';
+
+  @override
+  String get plKeyChannel => 'القناة السابقة / التالية';
+
+  @override
+  String get plKeyVolume => 'رفع / خفض الصوت';
+
+  @override
+  String get plKeyDigits => 'إدخال رقم قناة';
+
+  @override
+  String get plKeyServer => 'سيرفر آخر';
+
+  @override
+  String get plKeyHelp => 'عرض الاختصارات';
+
+  @override
+  String get plNotWorking => 'لا يعمل';
+
+  @override
+  String get plChannelsHint => '↑ ↓ للتنقل · Enter للتشغيل · G للإغلاق';
+
+  @override
   String get accountMenu => 'الحساب';
 
   @override

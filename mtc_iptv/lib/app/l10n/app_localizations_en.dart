@@ -10,6 +10,79 @@ class L10nEn extends L10n {
   L10nEn([String locale = 'en']) : super(locale);
 
   @override
+  String get plErrHint =>
+      'The stream may be temporarily down or blocked in your region. Try later or pick another channel.';
+
+  @override
+  String get plLive => 'LIVE';
+
+  @override
+  String get plChannels => 'Channel list';
+
+  @override
+  String get plSettings => 'Settings';
+
+  @override
+  String get plServer => 'Server';
+
+  @override
+  String get plOtherServer => 'Another server';
+
+  @override
+  String get plCantPlay => 'Can\'t play this channel';
+
+  @override
+  String get plStats => 'Stream info';
+
+  @override
+  String get plShortcuts => 'Keyboard shortcuts';
+
+  @override
+  String get plVolume => 'Volume';
+
+  @override
+  String get plSameCategory => 'Same category';
+
+  @override
+  String get plSameCountry => 'Same country';
+
+  @override
+  String get plResolution => 'Resolution';
+
+  @override
+  String get plCodec => 'Codec';
+
+  @override
+  String get plDecoder => 'Decoder';
+
+  @override
+  String get plBuffer => 'Buffer';
+
+  @override
+  String get plKeyPlay => 'Play / pause';
+
+  @override
+  String get plKeyChannel => 'Previous / next channel';
+
+  @override
+  String get plKeyVolume => 'Volume up / down';
+
+  @override
+  String get plKeyDigits => 'Type a channel number';
+
+  @override
+  String get plKeyServer => 'Another server';
+
+  @override
+  String get plKeyHelp => 'Show shortcuts';
+
+  @override
+  String get plNotWorking => 'not working';
+
+  @override
+  String get plChannelsHint => '↑ ↓ to move · Enter to play · G to close';
+
+  @override
   String get accountMenu => 'Account';
 
   @override

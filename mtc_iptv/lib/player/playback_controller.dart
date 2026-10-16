@@ -209,6 +209,14 @@ class PlaybackController extends Notifier<PlaybackState> {
     await _openCurrent();
   }
 
+  /// اختيار سيرفر بعينه من قائمة الإعدادات في المشغّل.
+  Future<void> selectServer(int i) async {
+    if (i < 0 || i >= state.streams.length) return;
+    _rounds = 0;
+    state = state.copyWith(index: i, phase: PlayPhase.switching, clearError: true, clearPrefer: true);
+    await _openCurrent();
+  }
+
   Future<void> retry() async {
     _rounds = 0;
     state = state.copyWith(index: 0, phase: PlayPhase.loading, clearError: true);
