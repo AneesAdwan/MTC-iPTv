@@ -97,6 +97,48 @@ abstract class L10n {
     Locale('en'),
   ];
 
+  /// No description provided for @accountMenu.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحساب'**
+  String get accountMenu;
+
+  /// No description provided for @signOutConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج من حساب المدير على هذا الجهاز؟'**
+  String get signOutConfirm;
+
+  /// No description provided for @adminPanel.
+  ///
+  /// In ar, this message translates to:
+  /// **'لوحة الإدارة'**
+  String get adminPanel;
+
+  /// No description provided for @notSignedIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير مسجّل الدخول'**
+  String get notSignedIn;
+
+  /// No description provided for @numPad.
+  ///
+  /// In ar, this message translates to:
+  /// **'لوحة الأرقام'**
+  String get numPad;
+
+  /// No description provided for @numPadHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب رقم القناة'**
+  String get numPadHint;
+
+  /// No description provided for @numPadGo.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتقال'**
+  String get numPadGo;
+
   /// No description provided for @appTitle.
   ///
   /// In ar, this message translates to:

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/l10n/app_localizations.dart';
+import '../../app/layout/h_scroller.dart';
 import '../../app/theme/tokens.dart';
 import '../../data/admin/admin_repository.dart';
 import '../../data/admin/health_service.dart';
@@ -63,9 +64,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     final sel = rows.where((r) => selected.contains(r.$1.id)).toList();
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      SizedBox(
-        height: 56,
-        child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.sm), children: [
+      HScroller.children(height: 56, spacing: 0, children: [
           for (final s in healthStates)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: Space.sm),
@@ -80,7 +79,6 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               ),
             ),
         ]),
-      ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: Space.lg),
         child: Wrap(spacing: Space.sm, runSpacing: Space.sm, crossAxisAlignment: WrapCrossAlignment.center, children: [

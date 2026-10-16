@@ -1,14 +1,19 @@
 // بطاقة القناة وشبكة القنوات (V-02/V-03/V-05/V-08): الشعار، الاسم، الرقم، الجودة.
 // قابلة للتركيز بلوحة المفاتيح والريموت بإطار واضح (§6.5).
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/l10n/app_localizations.dart';
+import '../../../app/layout/h_scroller.dart';
 import '../../../app/theme/tokens.dart';
 import '../../../core/settings/local_settings.dart';
 import '../../../core/storage/catalog_db.dart';
 import '../../../data/catalog/catalog_repository.dart';
+import '../../../player/hls_resolver.dart';
+import '../../../player/playback_controller.dart' show streamHeaders;
 
 class ChannelLogo extends StatelessWidget {
   final ChannelRow ch;
@@ -47,6 +52,23 @@ class ChannelCard extends ConsumerStatefulWidget {
 
 class _ChannelCardState extends ConsumerState<ChannelCard> {
   bool focused = false;
+  Timer? _warm;
+
+  /// الماوس استقر على البطاقة أو الريموت ركّز عليها ← جلب قائمة البث مسبقًا (يختصر انتظار الفتح).
+  void _intent(bool on) {
+    _warm?.cancel();
+    if (!on) return;
+    _warm = Timer(const Duration(milliseconds: 250), () async {
+      final s = (await ref.read(catalogRepoProvider).streamsFor(widget.ch.id)).firstOrNull;
+      if (s != null) await const HlsResolver().prefetch(s.url, headers: streamHeaders(s));
+    });
+  }
+
+  @override
+  void dispose() {
+    _warm?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +86,11 @@ class _ChannelCardState extends ConsumerState<ChannelCard> {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () => context.push('/watch/${ch.id}'),
-          onFocusChange: (f) => setState(() => focused = f),
+          onHover: _intent,
+          onFocusChange: (f) {
+            setState(() => focused = f);
+            _intent(f);
+          },
           child: Padding(
             padding: const EdgeInsets.all(Space.md),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -142,15 +168,12 @@ class ChannelRowSection extends StatelessWidget {
           ]),
         ),
         const SizedBox(height: Space.sm),
-        SizedBox(
+        // بالماوس: سحب + أسهم + شريط تمرير (العجلة تبقى لتمرير الصفحة نفسها)
+        HScroller(
           height: 136,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: Space.lg),
-            itemCount: channels.length,
-            separatorBuilder: (_, _) => const SizedBox(width: Space.md),
-            itemBuilder: (_, i) => ChannelCard(ch: channels[i]),
-          ),
+          spacing: Space.md,
+          itemCount: channels.length,
+          itemBuilder: (_, i) => ChannelCard(ch: channels[i]),
         ),
       ]),
     );

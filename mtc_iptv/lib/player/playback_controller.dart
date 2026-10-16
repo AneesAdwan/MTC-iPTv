@@ -33,6 +33,17 @@ String classifyPlayerError(String? msg) {
   return 'inconclusive';
 }
 
+/// ترويسات الطلب لرابط (§7.3): Headers المخزّنة + User-Agent + Referer.
+Map<String, String> streamHeaders(StreamRow s) {
+  final h = <String, String>{};
+  try {
+    (jsonDecode(s.headers) as Map).forEach((k, v) => h['$k'] = '$v');
+  } catch (_) {}
+  if (s.userAgent != null) h['User-Agent'] = s.userAgent!;
+  if (s.referrer != null) h['Referer'] = s.referrer!;
+  return h;
+}
+
 class PlaybackState {
   final ChannelRow? channel;
   final List<StreamRow> streams;
@@ -218,28 +229,23 @@ class PlaybackController extends Notifier<PlaybackState> {
     state = const PlaybackState();
   }
 
-  Map<String, String> _headers(StreamRow s) {
-    final h = <String, String>{};
-    try {
-      (jsonDecode(s.headers) as Map).forEach((k, v) => h['$k'] = '$v');
-    } catch (_) {}
-    if (s.userAgent != null) h['User-Agent'] = s.userAgent!;
-    if (s.referrer != null) h['Referer'] = s.referrer!;
-    return h;
-  }
+  Map<String, String> _headers(StreamRow s) => streamHeaders(s);
 
   Future<void> _openCurrent({bool keepIndex = false}) async {
     final s = state.stream;
     if (s == null) return;
     final token = ++_token;
     final headers = _headers(s);
+    // المحاولة تبدأ قبل جلب القائمة: زمن أول إطار يشمل كل ما ينتظره المستخدم
+    _closeAttempt(null);
+    _att = _Attempt(s.id, state.index);
     final maxQ = ref.read(settingsProvider).maxQuality ?? 1080; // V-10: حد الجودة التلقائية
+    final t0 = DateTime.now();
     final src = await HlsResolver(maxHeight: maxQ).resolve(s.url, headers: headers, prefer: state.preferHeight);
     if (token != _token) return; // أُلغيت بمحاولة أحدث
     state = state.copyWith(source: src, phase: state.phase == PlayPhase.switching ? PlayPhase.switching : PlayPhase.loading);
-    log.info('play ch=${state.channel?.number} server=${state.index + 1}/${state.streams.length} local=${src.viaLocalServer} variants=${src.variants.length}');
-    _closeAttempt(null);
-    _att = _Attempt(s.id, state.index);
+    log.info('play ch=${state.channel?.number} server=${state.index + 1}/${state.streams.length} local=${src.viaLocalServer} '
+        'variants=${src.variants.length} resolve=${DateTime.now().difference(t0).inMilliseconds}ms');
     await _p.open(Media(src.playUrl, httpHeaders: headers));
     _arm(Duration(seconds: _rc.playerSeconds('first_frame_s', firstFrameTimeout.inSeconds)), token, 'no first frame');
   }
@@ -261,6 +267,24 @@ class PlaybackController extends Notifier<PlaybackState> {
       a.height = _p.state.height;
     }
     state = state.copyWith(phase: PlayPhase.playing, clearError: true);
+    unawaited(_prefetchNeighbours());
+  }
+
+  /// أثناء المشاهدة: تجهيز قائمتي القناة التالية والسابقة في الخلفية، فالتنقل بينها لا ينتظر الشبكة.
+  Future<void> _prefetchNeighbours() async {
+    final id = state.channel?.id;
+    if (id == null) return;
+    try {
+      final ids = await _repo.orderedIds();
+      final i = ids.indexOf(id);
+      if (i < 0 || ids.length < 2) return;
+      for (final n in {ids[(i + 1) % ids.length], ids[(i - 1 + ids.length) % ids.length]}) {
+        final s = (await _repo.streamsFor(n)).firstOrNull;
+        if (s != null) unawaited(const HlsResolver().prefetch(s.url, headers: _headers(s)));
+      }
+    } catch (e) {
+      log.fine('prefetch skipped: $e');
+    }
   }
 
   void _onBuffering(bool b) {
@@ -276,6 +300,8 @@ class PlaybackController extends Notifier<PlaybackState> {
     if (state.channel == null || state.phase == PlayPhase.failed) return;
     log.warning('play failed ch=${state.channel?.number} server=${state.index + 1}: $code ${detail ?? ''}');
     _closeAttempt(code);
+    final failedUrl = state.stream?.url;
+    if (failedUrl != null) HlsResolver.invalidate(failedUrl); // جولة الإعادة تجلب القائمة من جديد
     // آخر رابط فشل: جولة إعادة واحدة على كل السيرفرات (تجمّد مؤقت في البث المباشر شائع)،
     // ثم نتوقف ونعرض رسالة مفهومة بدل الدوران بلا نهاية
     if (state.index + 1 >= state.streams.length && _rounds < _rc.playerSeconds('retry_rounds', maxRounds)) {

@@ -10,6 +10,27 @@ class L10nEn extends L10n {
   L10nEn([String locale = 'en']) : super(locale);
 
   @override
+  String get accountMenu => 'Account';
+
+  @override
+  String get signOutConfirm => 'Sign out of the admin account on this device?';
+
+  @override
+  String get adminPanel => 'Admin panel';
+
+  @override
+  String get notSignedIn => 'Not signed in';
+
+  @override
+  String get numPad => 'Number pad';
+
+  @override
+  String get numPadHint => 'Type a channel number';
+
+  @override
+  String get numPadGo => 'Go';
+
+  @override
   String get appTitle => 'MTC-iPTv';
 
   @override

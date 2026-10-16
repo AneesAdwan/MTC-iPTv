@@ -7,6 +7,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import '../core/logging/log.dart';
 
 class HlsVariant {
@@ -55,31 +57,76 @@ class LocalPlaylistServer {
   }
 }
 
+/// قائمة رئيسية محفوظة مؤقتًا (سرعة فتح البث، طلب المالك 2026-10-16): جلبها رحلة شبكة كاملة قبل أن يبدأ
+/// المشغّل، وهي ثابتة عادةً لدقائق. تُحفظ دقيقتين، وتُحذف عند فشل التشغيل منها (رابط برمز انتهى مثلًا).
+class _Cached {
+  final DateTime at;
+  final Uri base;
+  final String text;
+  _Cached(this.base, this.text) : at = DateTime.now();
+}
+
 class HlsResolver {
   final int maxHeight;
   final Duration timeout;
-  const HlsResolver({this.maxHeight = 1080, this.timeout = const Duration(seconds: 6)});
 
-  /// [prefer]: ارتفاع مطلوب يدويًا (اختيار الجودة)، وإلا أعلى نسخة ≤ [maxHeight].
-  Future<ResolvedSource> resolve(String url, {Map<String, String> headers = const {}, int? prefer}) async {
-    if (!url.toLowerCase().split('?').first.endsWith('.m3u8') && !url.toLowerCase().contains('.m3u8?')) {
-      return ResolvedSource(url);
-    }
+  /// 3 ث: بعدها نعطي المشغّل الرابط كما هو بدل الانتظار (كانت 6 ث).
+  const HlsResolver({this.maxHeight = 1080, this.timeout = const Duration(seconds: 3)});
+
+  static const ttl = Duration(minutes: 2);
+  static final _cache = <String, _Cached>{};
+  static final _inflight = <String, Future<_Cached?>>{};
+
+  static bool _isM3u8(String url) => url.toLowerCase().split('?').first.endsWith('.m3u8') || url.toLowerCase().contains('.m3u8?');
+
+  /// يُنسى ما حُفظ لهذا الرابط (بعد فشل التشغيل).
+  static void invalidate(String url) => _cache.remove(url);
+
+  @visibleForTesting
+  static void clearCache() => _cache.clear();
+
+  /// جلب مسبق في الخلفية (القناة التالية/السابقة أثناء المشاهدة) — لا يرمي أخطاء.
+  Future<void> prefetch(String url, {Map<String, String> headers = const {}}) async {
+    if (!_isM3u8(url)) return;
+    await _fetch(url, headers);
+  }
+
+  Future<_Cached?> _fetch(String url, Map<String, String> headers) {
+    final hit = _cache[url];
+    if (hit != null && DateTime.now().difference(hit.at) < ttl) return Future.value(hit);
+    // بلوك لا سهم: remove تُرجع الـ Future نفسه، وwhenComplete كانت ستنتظره ← انتظار ذاتي لا ينتهي
+    return _inflight[url] ??= _download(url, headers).whenComplete(() {
+      _inflight.remove(url);
+    });
+  }
+
+  Future<_Cached?> _download(String url, Map<String, String> headers) async {
     final client = HttpClient()..connectionTimeout = timeout;
     try {
       final req = await client.getUrl(Uri.parse(url)).timeout(timeout);
       headers.forEach(req.headers.set);
       final res = await req.close().timeout(timeout);
-      if (res.statusCode >= 400) return ResolvedSource(url); // يترك المشغّل يصنّف الخطأ
+      if (res.statusCode >= 400) return null; // يترك المشغّل يصنّف الخطأ
       final text = await res.transform(utf8.decoder).join().timeout(timeout);
       final base = res.redirects.isEmpty ? Uri.parse(url) : Uri.parse(url).resolveUri(res.redirects.last.location);
-      return await _fromPlaylist(url, base, text, prefer);
+      final c = _Cached(base, text);
+      if (_cache.length >= 60) _cache.remove(_cache.keys.first);
+      _cache[url] = c;
+      return c;
     } catch (e) {
       log.fine('hls resolve skipped: $e');
-      return ResolvedSource(url);
+      return null;
     } finally {
       client.close(force: true);
     }
+  }
+
+  /// [prefer]: ارتفاع مطلوب يدويًا (اختيار الجودة)، وإلا أعلى نسخة ≤ [maxHeight].
+  Future<ResolvedSource> resolve(String url, {Map<String, String> headers = const {}, int? prefer}) async {
+    if (!_isM3u8(url)) return ResolvedSource(url);
+    final c = await _fetch(url, headers);
+    if (c == null) return ResolvedSource(url);
+    return _fromPlaylist(url, c.base, c.text, prefer);
   }
 
   Future<ResolvedSource> _fromPlaylist(String original, Uri base, String text, int? prefer) async {

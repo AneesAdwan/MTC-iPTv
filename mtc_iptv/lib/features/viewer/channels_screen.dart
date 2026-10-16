@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/l10n/app_localizations.dart';
+import '../../app/layout/h_scroller.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/storage/catalog_db.dart';
 import '../../data/catalog/catalog_repository.dart';
@@ -32,24 +33,22 @@ class ChannelsScreen extends ConsumerWidget {
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      // الفئات: شرائح قابلة للتمرير؛ الدولة: قائمة منسدلة
-      SizedBox(
+      // الفئات: شرائح قابلة للتمرير (بالماوس أيضًا)؛ الدولة: قائمة منسدلة
+      HScroller(
         height: 52,
-        child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.sm), children: [
-          Padding(
-            padding: const EdgeInsetsDirectional.only(end: Space.sm),
-            child: ChoiceChip(label: Text(t.filterAll), selected: category == null, onSelected: (_) => context.go(q(cty: country))),
-          ),
-          for (final x in cats)
-            Padding(
-              padding: const EdgeInsetsDirectional.only(end: Space.sm),
-              child: ChoiceChip(
-                label: Text('${x.item.displayName(locale)} ${x.count}'),
-                selected: category == x.item.slug,
-                onSelected: (_) => context.go(q(cat: x.item.slug, cty: country)),
-              ),
-            ),
-        ]),
+        wheelScrolls: true,
+        padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.sm),
+        selectedIndex: category == null ? 0 : cats.indexWhere((x) => x.item.slug == category) + 1,
+        itemCount: cats.length + 1,
+        itemBuilder: (_, i) {
+          if (i == 0) return ChoiceChip(label: Text(t.filterAll), selected: category == null, onSelected: (_) => context.go(q(cty: country)));
+          final x = cats[i - 1];
+          return ChoiceChip(
+            label: Text('${x.item.displayName(locale)} ${x.count}'),
+            selected: category == x.item.slug,
+            onSelected: (_) => context.go(q(cat: x.item.slug, cty: country)),
+          );
+        },
       ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: Space.lg),

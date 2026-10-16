@@ -10,6 +10,27 @@ class L10nAr extends L10n {
   L10nAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get accountMenu => 'الحساب';
+
+  @override
+  String get signOutConfirm => 'تسجيل الخروج من حساب المدير على هذا الجهاز؟';
+
+  @override
+  String get adminPanel => 'لوحة الإدارة';
+
+  @override
+  String get notSignedIn => 'غير مسجّل الدخول';
+
+  @override
+  String get numPad => 'لوحة الأرقام';
+
+  @override
+  String get numPadHint => 'اكتب رقم القناة';
+
+  @override
+  String get numPadGo => 'انتقال';
+
+  @override
   String get appTitle => 'MTC-iPTv';
 
   @override

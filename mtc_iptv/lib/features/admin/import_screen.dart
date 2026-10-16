@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mtc_core/mtc_core.dart';
 
 import '../../app/l10n/app_localizations.dart';
+import '../../app/layout/h_scroller.dart';
 import '../../app/theme/tokens.dart';
 import '../../data/admin/admin_repository.dart';
 import '../../data/admin/import_service.dart';
@@ -222,9 +223,7 @@ class _PreviewStepState extends ConsumerState<_PreviewStep> {
           if (a.attributes.isNotEmpty) Text(a.attributes.take(8).join(' · '), style: TextStyle(color: c.textDim, fontSize: 12)),
         ]),
       ),
-      SizedBox(
-        height: 56,
-        child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.sm), children: [
+      HScroller.children(height: 56, spacing: 0, children: [
           for (final k in _kinds)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: Space.sm),
@@ -255,7 +254,6 @@ class _PreviewStepState extends ConsumerState<_PreviewStep> {
               ),
             ),
         ]),
-      ),
       if (a.vanishedStreamIds.isNotEmpty)
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: Space.lg),

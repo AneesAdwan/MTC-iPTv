@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/l10n/app_localizations.dart';
+import '../../app/layout/h_scroller.dart';
 import '../../app/theme/tokens.dart';
 import '../../data/admin/admin_repository.dart';
 import '../../data/admin/health_service.dart';
@@ -96,9 +97,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     Future<List<String>> allIds() async => await ref.read(adminRepoProvider)?.reviewIds(b) ?? const [];
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      SizedBox(
-        height: 56,
-        child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.sm), children: [
+      HScroller.children(height: 56, spacing: 0, children: [
           for (final x in reviewBuckets)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: Space.sm),
@@ -114,7 +113,6 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
               ),
             ),
         ]),
-      ),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: Space.lg),
         child: Container(

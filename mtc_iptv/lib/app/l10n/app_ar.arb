@@ -1,4 +1,11 @@
 {
+  "accountMenu": "الحساب",
+  "signOutConfirm": "تسجيل الخروج من حساب المدير على هذا الجهاز؟",
+  "adminPanel": "لوحة الإدارة",
+  "notSignedIn": "غير مسجّل الدخول",
+  "numPad": "لوحة الأرقام",
+  "numPadHint": "اكتب رقم القناة",
+  "numPadGo": "انتقال",
   "@@locale": "ar",
   "appTitle": "MTC-iPTv",
   "company": "مجموعة شركات مركز تكنولوجيا الشرق الأوسط — MTC-Group",

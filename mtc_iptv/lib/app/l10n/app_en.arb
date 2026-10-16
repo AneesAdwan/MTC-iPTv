@@ -1,4 +1,11 @@
 {
+  "accountMenu": "Account",
+  "signOutConfirm": "Sign out of the admin account on this device?",
+  "adminPanel": "Admin panel",
+  "notSignedIn": "Not signed in",
+  "numPad": "Number pad",
+  "numPadHint": "Type a channel number",
+  "numPadGo": "Go",
   "@@locale": "en",
   "appTitle": "MTC-iPTv",
   "company": "Middle East Technology Center Group — MTC-Group",

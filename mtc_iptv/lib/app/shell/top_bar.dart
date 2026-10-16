@@ -4,8 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/settings/local_settings.dart';
+import '../../core/text/bidi.dart';
+import '../../data/auth/admin_auth.dart';
 import '../../data/reminders/reminders.dart';
+import '../../features/viewer/widgets/number_entry.dart';
 import '../l10n/app_localizations.dart';
+import '../screens.dart';
 import '../theme/tokens.dart';
 import 'command_palette.dart';
 
@@ -32,8 +36,11 @@ class TopBar extends ConsumerWidget {
             icon: Icon(Icons.menu_rounded, color: c.textMuted),
           ),
           Expanded(child: Text(title, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: c.text))),
+          // لوحة الأرقام: الانتقال لقناة برقمها (طلب المالك — الجوال بلا لوحة مفاتيح أرقام)
+          IconButton(tooltip: t.numPad, onPressed: () => showNumberPad(context, onChannel: (ch) => context.push('/watch/${ch.id}')), icon: Icon(Icons.dialpad_rounded, color: c.textMuted)),
           IconButton(tooltip: t.searchHint, onPressed: () => showCommandPalette(context, ref), icon: Icon(Icons.search_rounded, color: c.textMuted)),
           const InboxBell(),
+          const AccountMenu(),
         ]),
       );
     }
@@ -82,12 +89,79 @@ class TopBar extends ConsumerWidget {
         ),
         const InboxBell(),
         const SizedBox(width: Space.xs),
-        CircleAvatar(
-          radius: 16,
-          backgroundColor: c.surface2,
-          child: Icon(Icons.person_rounded, size: 18, color: c.textMuted),
-        ),
+        const AccountMenu(),
       ]),
+    );
+  }
+}
+
+/// أيقونة الحساب (طلب المالك 2026-10-16): كانت شكلًا بلا وظيفة. الآن قائمة: الحالة، لوحة الإدارة،
+/// الحساب والأمان، وتسجيل الخروج بتأكيد — أو «دخول المدير» لغير المسجّل.
+class AccountMenu extends ConsumerWidget {
+  const AccountMenu({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.colors, t = L10n.of(context);
+    final st = ref.watch(adminStateProvider).value;
+    if (st == null || st.stage == AdminStage.noBackend) return const SizedBox.shrink();
+    final signedIn = st.stage != AdminStage.signedOut;
+    final email = st.email ?? '';
+    final initial = email.isEmpty ? '' : email.characters.first.toUpperCase();
+    return PopupMenuButton<String>(
+      tooltip: t.accountMenu,
+      position: PopupMenuPosition.under,
+      onSelected: (v) async {
+        switch (v) {
+          case 'panel':
+            context.go('/admin/dashboard');
+          case 'account':
+            context.go('/admin/account');
+          case 'login':
+            context.go(adminLoginScreen.path);
+          case 'logout':
+            final ok = await showDialog<bool>(
+              context: context,
+              builder: (d) => AlertDialog(
+                title: Text(t.signOut),
+                content: Text(t.signOutConfirm),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(d, false), child: Text(t.cancel)),
+                  FilledButton(onPressed: () => Navigator.pop(d, true), child: Text(t.signOut)),
+                ],
+              ),
+            );
+            if (ok == true) {
+              await ref.read(adminAuthProvider)?.signOut();
+              if (context.mounted) context.go('/home');
+            }
+        }
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem<String>(
+          enabled: false,
+          child: Text(signedIn ? t.signedInAs(ltr(email)) : t.notSignedIn, style: TextStyle(color: c.textMuted, fontSize: 12.5)),
+        ),
+        const PopupMenuDivider(),
+        if (st.isAdmin) PopupMenuItem(value: 'panel', child: ListTile(leading: const Icon(Icons.dashboard_rounded), title: Text(t.adminPanel), contentPadding: EdgeInsets.zero)),
+        if (st.isAdmin) PopupMenuItem(value: 'account', child: ListTile(leading: const Icon(Icons.admin_panel_settings_rounded), title: Text(t.sH1), contentPadding: EdgeInsets.zero)),
+        if (!st.isAdmin) PopupMenuItem(value: 'login', child: ListTile(leading: const Icon(Icons.lock_person_rounded), title: Text(t.adminSignIn), contentPadding: EdgeInsets.zero)),
+        if (signedIn)
+          PopupMenuItem(
+            value: 'logout',
+            child: ListTile(leading: Icon(Icons.logout_rounded, color: c.bad), title: Text(t.signOut, style: TextStyle(color: c.bad)), contentPadding: EdgeInsets.zero),
+          ),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: CircleAvatar(
+          radius: 16,
+          backgroundColor: signedIn ? c.accent.withValues(alpha: .18) : c.surface2,
+          child: initial.isEmpty
+              ? Icon(Icons.person_rounded, size: 18, color: c.textMuted)
+              : Text(initial, style: TextStyle(color: c.accent, fontWeight: FontWeight.w800, fontSize: 14)),
+        ),
+      ),
     );
   }
 }
