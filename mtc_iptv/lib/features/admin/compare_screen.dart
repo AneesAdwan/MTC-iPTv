@@ -11,6 +11,7 @@ import '../../app/theme/tokens.dart';
 import '../../data/admin/admin_repository.dart';
 import '../../player/tls_bundle.dart';
 import '../viewer/widgets/channel_card.dart' show EmptyState;
+import 'decisions_dialog.dart';
 import 'widgets/admin_widgets.dart';
 
 final _compareProvider = FutureProvider.autoDispose.family<List<(AdminChannel, List<AdminStream>)>, String>((ref, key) async {
@@ -68,6 +69,17 @@ class _CompareScreenState extends ConsumerState<CompareScreen> {
 
     return ListView(padding: const EdgeInsets.all(Space.lg), children: [
       Wrap(spacing: Space.sm, crossAxisAlignment: WrapCrossAlignment.center, children: [
+        // قرار لكل قناة (4.3)
+        FilledButton.icon(
+          onPressed: () async {
+            if (await showDecisions(context, widget.ids)) {
+              ref.invalidate(_compareProvider);
+              if (context.mounted) toast(context, t.dcDone);
+            }
+          },
+          icon: const Icon(Icons.rule_rounded, size: 18),
+          label: Text(t.dcOpen),
+        ),
         FilterChip(label: Text(t.diffOnly), selected: diffOnly, onSelected: (v) => setState(() => diffOnly = v)),
         FilledButton.tonalIcon(
           onPressed: () => setState(() => playing = !playing),

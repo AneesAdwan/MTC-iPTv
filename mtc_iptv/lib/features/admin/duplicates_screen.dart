@@ -11,6 +11,7 @@ import '../viewer/widgets/channel_card.dart' show EmptyState;
 import 'channels/channels_admin_screen.dart';
 import 'channels/stream_preview.dart';
 import 'dashboard_screen.dart';
+import 'decisions_dialog.dart';
 import 'widgets/admin_widgets.dart';
 
 final duplicatesProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async => await ref.watch(adminRepoProvider)?.duplicates() ?? const []);
@@ -42,6 +43,17 @@ class DuplicatesScreen extends ConsumerWidget {
           child: SectionCard(
             title: '${g['name']}${g['country'] == null ? '' : '  ·  ${g['country']}'}',
             trailing: Wrap(spacing: Space.xs, children: [
+              // قرار لكل قناة (4.3): إبقاء/نشر/إخفاء/دمج في…/سلة + تعديل، بملخص قبل التنفيذ
+              FilledButton.icon(
+                onPressed: () async {
+                  if (await showDecisions(context, [for (final x in g['channels'] as List) '${(x as Map)['id']}'])) {
+                    reload();
+                    if (context.mounted) toast(context, t.dcDone);
+                  }
+                },
+                icon: const Icon(Icons.rule_rounded, size: 18),
+                label: Text(t.dcOpen),
+              ),
               TextButton.icon(
                 onPressed: () => context.go('/admin/compare?ids=${[for (final x in (g['channels'] as List).take(4)) (x as Map)['id']].join(',')}'),
                 icon: const Icon(Icons.compare_arrows_rounded, size: 18),

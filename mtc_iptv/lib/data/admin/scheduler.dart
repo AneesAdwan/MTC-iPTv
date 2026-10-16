@@ -166,6 +166,12 @@ class SchedulerService extends Notifier<SchedulerState> {
         try {
           r['purged_fav_sets'] = await repo.db.rpc('admin_favsets_purge');
         } catch (_) {}
+        // سلة المحذوفات (0007): ما مضى عليه 30 يومًا يُحذف نهائيًا
+        try {
+          r['purged_trash'] = await repo.purgeExpiredTrash();
+        } catch (e) {
+          log.warning('trash purge failed', e);
+        }
         await repo.finishRun(runId!, status: 'ok', summary: r);
       case 'alerts':
         await repo.alertsScan();

@@ -10,6 +10,146 @@ class L10nAr extends L10n {
   L10nAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get dcTitle => 'قرار لكل قناة';
+
+  @override
+  String get dcOpen => 'قرارات';
+
+  @override
+  String get dcHint =>
+      'اختر لكل قناة ما يحدث لها، وعدّل اسمها أو رقمها أو تصنيفها إن لزم، ثم «تنفيذ». لا شيء يُنفَّذ قبل الملخص.';
+
+  @override
+  String get dcKeep => 'إبقاء كما هي';
+
+  @override
+  String get dcPublish => 'إبقاء ونشر';
+
+  @override
+  String get dcHide => 'إخفاء';
+
+  @override
+  String get dcMerge => 'دمج روابطها في…';
+
+  @override
+  String dcMergeInto(String name) {
+    return 'دمج في: $name';
+  }
+
+  @override
+  String get dcTrash => 'سلة المحذوفات';
+
+  @override
+  String get dcEdit => 'تعديل';
+
+  @override
+  String get dcDistinct => 'القنوات الباقية ليست مكررة (لا تظهر هنا مجددًا)';
+
+  @override
+  String get dcSummary => 'ملخص التنفيذ';
+
+  @override
+  String get dcApply => 'تنفيذ';
+
+  @override
+  String get dcNothing => 'لم تختر أي تغيير.';
+
+  @override
+  String get dcDone => 'تم تنفيذ القرارات.';
+
+  @override
+  String dcStreams(int ok, int n) {
+    return '$ok من $n روابط تعمل';
+  }
+
+  @override
+  String dcLineEdit(String name) {
+    return 'تعديل بيانات: $name';
+  }
+
+  @override
+  String dcLinePublish(String name) {
+    return 'نشر: $name';
+  }
+
+  @override
+  String dcLineHide(String name) {
+    return 'إخفاء: $name';
+  }
+
+  @override
+  String dcLineMerge(String name, String into) {
+    return 'دمج $name في $into (روابطها تصير سيرفرات إضافية، وتُخفى — قابل للتراجع)';
+  }
+
+  @override
+  String dcLineTrash(String name) {
+    return 'سلة المحذوفات: $name (تُسترجع خلال 30 يومًا)';
+  }
+
+  @override
+  String dcLineDistinct(int n) {
+    return 'تعليم الباقي «ليست مكررة»: $n قناة';
+  }
+
+  @override
+  String get dcMergeChain =>
+      'لا يمكن الدمج في قناة ستُدمج أو تُحذف أو تُخفى هي أيضًا.';
+
+  @override
+  String get aTrash => 'نقل للسلة';
+
+  @override
+  String get aRestore => 'استرجاع';
+
+  @override
+  String get aPurge => 'حذف نهائي';
+
+  @override
+  String get trashFilter => 'سلة المحذوفات';
+
+  @override
+  String confirmTrash(int n) {
+    return 'نقل $n قناة إلى سلة المحذوفات؟ تختفي من التطبيق فورًا، وتقدر تسترجعها خلال 30 يومًا، وبعدها تُحذف نهائيًا.';
+  }
+
+  @override
+  String confirmPurge(int n) {
+    return 'حذف $n قناة نهائيًا مع روابطها؟ لا يمكن التراجع.';
+  }
+
+  @override
+  String inTrashSince(String d, int n) {
+    return 'في السلة منذ $d · تُحذف نهائيًا بعد $n يوم';
+  }
+
+  @override
+  String get trashEmpty => 'السلة فاضية.';
+
+  @override
+  String get trashHint =>
+      'القنوات المحذوفة تبقى هنا 30 يومًا ثم تُحذف نهائيًا تلقائيًا. الاسترجاع يعيد حالتها ورقمها (إن لم يأخذه غيرها).';
+
+  @override
+  String get selectPage => 'تحديد المعروض';
+
+  @override
+  String selectAllMatching(int n) {
+    return 'تحديد كل النتائج ($n)';
+  }
+
+  @override
+  String get invertSelection => 'عكس التحديد';
+
+  @override
+  String get clearSelection => 'إلغاء التحديد';
+
+  @override
+  String selectedOf(int n, int total) {
+    return 'محدد $n من $total';
+  }
+
+  @override
   String get plErrHint =>
       'قد يكون البث متوقفًا مؤقتًا أو محجوبًا في منطقتك. جرّب لاحقًا أو اختر قناة أخرى.';
 
@@ -1168,13 +1308,15 @@ class L10nAr extends L10n {
       'نفس قناة موجودة في الكتالوج: ادمجها (تصبح روابطها سيرفرات إضافية) أو علّمها «ليست مكررة».';
 
   @override
-  String get bkOfflineHint => 'لا رابط يعمل. ارفضها، أو انتظر فحصًا جديدًا.';
+  String get bkOfflineHint =>
+      'لا رابط يعمل. افحصها من جديد (فحص تشغيل فعلي)، أو ارفضها للسلة.';
 
   @override
   String get bkLogoHint => 'الشعار لا يظهر. أصلحه قبل النشر.';
 
   @override
-  String get bkIncompleteHint => 'قنوات تعمل لكن بلا دولة. عدّلها قبل النشر.';
+  String get bkIncompleteHint =>
+      'قنوات تعمل لكن بلا دولة. حدّدها وعيّن الدولة دفعة واحدة، ثم وافق.';
 
   @override
   String get reviewEmpty => 'لا شيء بانتظار المراجعة.';
@@ -1183,7 +1325,7 @@ class L10nAr extends L10n {
   String get aApprove => 'موافقة ونشر';
 
   @override
-  String get aReject => 'رفض (حذف)';
+  String get aReject => 'رفض (للسلة)';
 
   @override
   String get aMerge => 'دمج في الأصلية';
@@ -1208,7 +1350,7 @@ class L10nAr extends L10n {
 
   @override
   String confirmReject(int n) {
-    return 'حذف $n قناة معلّقة مع روابطها؟';
+    return 'رفض $n قناة ونقلها لسلة المحذوفات؟ تُسترجع خلال 30 يومًا.';
   }
 
   @override

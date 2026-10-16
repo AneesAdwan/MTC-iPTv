@@ -97,6 +97,228 @@ abstract class L10n {
     Locale('en'),
   ];
 
+  /// No description provided for @dcTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قرار لكل قناة'**
+  String get dcTitle;
+
+  /// No description provided for @dcOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'قرارات'**
+  String get dcOpen;
+
+  /// No description provided for @dcHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر لكل قناة ما يحدث لها، وعدّل اسمها أو رقمها أو تصنيفها إن لزم، ثم «تنفيذ». لا شيء يُنفَّذ قبل الملخص.'**
+  String get dcHint;
+
+  /// No description provided for @dcKeep.
+  ///
+  /// In ar, this message translates to:
+  /// **'إبقاء كما هي'**
+  String get dcKeep;
+
+  /// No description provided for @dcPublish.
+  ///
+  /// In ar, this message translates to:
+  /// **'إبقاء ونشر'**
+  String get dcPublish;
+
+  /// No description provided for @dcHide.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء'**
+  String get dcHide;
+
+  /// No description provided for @dcMerge.
+  ///
+  /// In ar, this message translates to:
+  /// **'دمج روابطها في…'**
+  String get dcMerge;
+
+  /// No description provided for @dcMergeInto.
+  ///
+  /// In ar, this message translates to:
+  /// **'دمج في: {name}'**
+  String dcMergeInto(String name);
+
+  /// No description provided for @dcTrash.
+  ///
+  /// In ar, this message translates to:
+  /// **'سلة المحذوفات'**
+  String get dcTrash;
+
+  /// No description provided for @dcEdit.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل'**
+  String get dcEdit;
+
+  /// No description provided for @dcDistinct.
+  ///
+  /// In ar, this message translates to:
+  /// **'القنوات الباقية ليست مكررة (لا تظهر هنا مجددًا)'**
+  String get dcDistinct;
+
+  /// No description provided for @dcSummary.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملخص التنفيذ'**
+  String get dcSummary;
+
+  /// No description provided for @dcApply.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنفيذ'**
+  String get dcApply;
+
+  /// No description provided for @dcNothing.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تختر أي تغيير.'**
+  String get dcNothing;
+
+  /// No description provided for @dcDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تنفيذ القرارات.'**
+  String get dcDone;
+
+  /// No description provided for @dcStreams.
+  ///
+  /// In ar, this message translates to:
+  /// **'{ok} من {n} روابط تعمل'**
+  String dcStreams(int ok, int n);
+
+  /// No description provided for @dcLineEdit.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل بيانات: {name}'**
+  String dcLineEdit(String name);
+
+  /// No description provided for @dcLinePublish.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشر: {name}'**
+  String dcLinePublish(String name);
+
+  /// No description provided for @dcLineHide.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء: {name}'**
+  String dcLineHide(String name);
+
+  /// No description provided for @dcLineMerge.
+  ///
+  /// In ar, this message translates to:
+  /// **'دمج {name} في {into} (روابطها تصير سيرفرات إضافية، وتُخفى — قابل للتراجع)'**
+  String dcLineMerge(String name, String into);
+
+  /// No description provided for @dcLineTrash.
+  ///
+  /// In ar, this message translates to:
+  /// **'سلة المحذوفات: {name} (تُسترجع خلال 30 يومًا)'**
+  String dcLineTrash(String name);
+
+  /// No description provided for @dcLineDistinct.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعليم الباقي «ليست مكررة»: {n} قناة'**
+  String dcLineDistinct(int n);
+
+  /// No description provided for @dcMergeChain.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن الدمج في قناة ستُدمج أو تُحذف أو تُخفى هي أيضًا.'**
+  String get dcMergeChain;
+
+  /// No description provided for @aTrash.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقل للسلة'**
+  String get aTrash;
+
+  /// No description provided for @aRestore.
+  ///
+  /// In ar, this message translates to:
+  /// **'استرجاع'**
+  String get aRestore;
+
+  /// No description provided for @aPurge.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف نهائي'**
+  String get aPurge;
+
+  /// No description provided for @trashFilter.
+  ///
+  /// In ar, this message translates to:
+  /// **'سلة المحذوفات'**
+  String get trashFilter;
+
+  /// No description provided for @confirmTrash.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقل {n} قناة إلى سلة المحذوفات؟ تختفي من التطبيق فورًا، وتقدر تسترجعها خلال 30 يومًا، وبعدها تُحذف نهائيًا.'**
+  String confirmTrash(int n);
+
+  /// No description provided for @confirmPurge.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف {n} قناة نهائيًا مع روابطها؟ لا يمكن التراجع.'**
+  String confirmPurge(int n);
+
+  /// No description provided for @inTrashSince.
+  ///
+  /// In ar, this message translates to:
+  /// **'في السلة منذ {d} · تُحذف نهائيًا بعد {n} يوم'**
+  String inTrashSince(String d, int n);
+
+  /// No description provided for @trashEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'السلة فاضية.'**
+  String get trashEmpty;
+
+  /// No description provided for @trashHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'القنوات المحذوفة تبقى هنا 30 يومًا ثم تُحذف نهائيًا تلقائيًا. الاسترجاع يعيد حالتها ورقمها (إن لم يأخذه غيرها).'**
+  String get trashHint;
+
+  /// No description provided for @selectPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد المعروض'**
+  String get selectPage;
+
+  /// No description provided for @selectAllMatching.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد كل النتائج ({n})'**
+  String selectAllMatching(int n);
+
+  /// No description provided for @invertSelection.
+  ///
+  /// In ar, this message translates to:
+  /// **'عكس التحديد'**
+  String get invertSelection;
+
+  /// No description provided for @clearSelection.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء التحديد'**
+  String get clearSelection;
+
+  /// No description provided for @selectedOf.
+  ///
+  /// In ar, this message translates to:
+  /// **'محدد {n} من {total}'**
+  String selectedOf(int n, int total);
+
   /// No description provided for @plErrHint.
   ///
   /// In ar, this message translates to:
@@ -2296,7 +2518,7 @@ abstract class L10n {
   /// No description provided for @bkOfflineHint.
   ///
   /// In ar, this message translates to:
-  /// **'لا رابط يعمل. ارفضها، أو انتظر فحصًا جديدًا.'**
+  /// **'لا رابط يعمل. افحصها من جديد (فحص تشغيل فعلي)، أو ارفضها للسلة.'**
   String get bkOfflineHint;
 
   /// No description provided for @bkLogoHint.
@@ -2308,7 +2530,7 @@ abstract class L10n {
   /// No description provided for @bkIncompleteHint.
   ///
   /// In ar, this message translates to:
-  /// **'قنوات تعمل لكن بلا دولة. عدّلها قبل النشر.'**
+  /// **'قنوات تعمل لكن بلا دولة. حدّدها وعيّن الدولة دفعة واحدة، ثم وافق.'**
   String get bkIncompleteHint;
 
   /// No description provided for @reviewEmpty.
@@ -2326,7 +2548,7 @@ abstract class L10n {
   /// No description provided for @aReject.
   ///
   /// In ar, this message translates to:
-  /// **'رفض (حذف)'**
+  /// **'رفض (للسلة)'**
   String get aReject;
 
   /// No description provided for @aMerge.
@@ -2362,7 +2584,7 @@ abstract class L10n {
   /// No description provided for @confirmReject.
   ///
   /// In ar, this message translates to:
-  /// **'حذف {n} قناة معلّقة مع روابطها؟'**
+  /// **'رفض {n} قناة ونقلها لسلة المحذوفات؟ تُسترجع خلال 30 يومًا.'**
   String confirmReject(int n);
 
   /// No description provided for @doneCount.

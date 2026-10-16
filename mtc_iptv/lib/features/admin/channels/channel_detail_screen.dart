@@ -251,18 +251,45 @@ class _InfoTabState extends ConsumerState<_InfoTab> {
               label: Text(t.save),
             ),
             const Spacer(),
-            TextButton.icon(
-              style: TextButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
-              onPressed: () async {
-                final repo = ref.read(adminRepoProvider);
-                if (repo == null || !await confirm(context, t.confirmDelete(1))) return;
-                await repo.deleteChannels([widget.ch.id]);
-                ref.invalidate(adminChannelsProvider);
-                if (context.mounted) context.go('/admin/channels');
-              },
-              icon: const Icon(Icons.delete_outline_rounded),
-              label: Text(t.aDelete),
-            ),
+            // سلة المحذوفات (0007): لا حذف فوري؛ والقناة التي في السلة تُسترجع أو تُحذف نهائيًا من هنا
+            if (widget.ch.trashedAt != null) ...[
+              FilledButton.tonalIcon(
+                onPressed: () async {
+                  final repo = ref.read(adminRepoProvider);
+                  if (repo == null) return;
+                  await repo.restoreChannels([widget.ch.id]);
+                  ref.invalidate(adminChannelsProvider);
+                  widget.onSaved();
+                },
+                icon: const Icon(Icons.restore_from_trash_rounded),
+                label: Text(t.aRestore),
+              ),
+              const SizedBox(width: Space.sm),
+              TextButton.icon(
+                style: TextButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
+                onPressed: () async {
+                  final repo = ref.read(adminRepoProvider);
+                  if (repo == null || !await confirm(context, t.confirmPurge(1))) return;
+                  await repo.purgeChannels([widget.ch.id]);
+                  ref.invalidate(adminChannelsProvider);
+                  if (context.mounted) context.go('/admin/channels');
+                },
+                icon: const Icon(Icons.delete_forever_rounded),
+                label: Text(t.aPurge),
+              ),
+            ] else
+              TextButton.icon(
+                style: TextButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
+                onPressed: () async {
+                  final repo = ref.read(adminRepoProvider);
+                  if (repo == null || !await confirm(context, t.confirmTrash(1))) return;
+                  await repo.trashChannels([widget.ch.id]);
+                  ref.invalidate(adminChannelsProvider);
+                  if (context.mounted) context.go('/admin/channels');
+                },
+                icon: const Icon(Icons.delete_outline_rounded),
+                label: Text(t.aTrash),
+              ),
           ]),
         ]),
       ),

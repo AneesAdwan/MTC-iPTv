@@ -174,3 +174,85 @@ Future<bool> confirm(BuildContext context, String message) async {
       ) ??
       false;
 }
+
+/// شريط التحديد الجماعي الموحّد (خطة التحسينات 4.1، طلب المالك: «مش منطقي أحدد قناة قناة»):
+/// تحديد المعروض · تحديد كل النتائج (كل الصفحات حسب الفلتر) · عكس · إلغاء، مع عدّاد، ثم أزرار الإجراءات.
+class SelectionBar extends StatefulWidget {
+  final Set<String> selected;
+  final List<String> pageIds;
+  final int total;
+
+  /// يجلب معرّفات كل النتائج المطابقة (كل الصفحات)؛ null = لا يوجد (القائمة كلها معروضة).
+  final Future<List<String>> Function()? allIds;
+  final VoidCallback onChanged;
+  final List<Widget> actions;
+  final bool busy;
+  const SelectionBar({
+    super.key,
+    required this.selected,
+    required this.pageIds,
+    required this.total,
+    required this.onChanged,
+    this.allIds,
+    this.actions = const [],
+    this.busy = false,
+  });
+
+  @override
+  State<SelectionBar> createState() => _SelectionBarState();
+}
+
+class _SelectionBarState extends State<SelectionBar> {
+  bool loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = L10n.of(context), c = context.colors;
+    final sel = widget.selected;
+    final page = widget.pageIds;
+    final onPage = page.where(sel.contains).length;
+    final pageState = page.isEmpty || onPage == 0 ? false : (onPage == page.length ? true : null);
+    void change(void Function() f) {
+      f();
+      widget.onChanged();
+    }
+
+    final any = sel.isNotEmpty;
+    return Container(
+      color: any ? c.accent.withValues(alpha: .10) : null,
+      padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.xs),
+      child: Wrap(spacing: Space.sm, runSpacing: Space.xs, crossAxisAlignment: WrapCrossAlignment.center, children: [
+        Checkbox(
+          tristate: true,
+          value: pageState,
+          onChanged: page.isEmpty ? null : (_) => change(() => pageState == true ? sel.removeAll(page) : sel.addAll(page)),
+        ),
+        Text(any ? t.selectedOf(sel.length, widget.total) : t.selectPage, style: TextStyle(color: c.text, fontWeight: any ? FontWeight.w700 : FontWeight.w400)),
+        TextButton(onPressed: page.isEmpty ? null : () => change(() => sel.addAll(page)), child: Text(t.selectPage)),
+        if (widget.allIds != null && widget.total > page.length)
+          TextButton.icon(
+            onPressed: loading
+                ? null
+                : () async {
+                    setState(() => loading = true);
+                    try {
+                      final ids = await widget.allIds!();
+                      change(() => sel.addAll(ids));
+                    } finally {
+                      if (mounted) setState(() => loading = false);
+                    }
+                  },
+            icon: loading ? const SizedBox.square(dimension: 14, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.select_all_rounded, size: 18),
+            label: Text(t.selectAllMatching(widget.total)),
+          ),
+        TextButton(
+          onPressed: page.isEmpty ? null : () => change(() => [for (final id in page) sel.contains(id) ? sel.remove(id) : sel.add(id)]),
+          child: Text(t.invertSelection),
+        ),
+        if (any) TextButton(onPressed: () => change(sel.clear), child: Text(t.clearSelection)),
+        if (any && widget.busy) const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+        if (any) ...widget.actions,
+      ]),
+    );
+  }
+}

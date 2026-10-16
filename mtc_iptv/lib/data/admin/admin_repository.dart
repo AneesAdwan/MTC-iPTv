@@ -89,6 +89,10 @@ class AdminChannel {
   final bool isFeatured, isManual, parentalLocked;
   final int epgOffset;
   final DateTime? updatedAt;
+
+  /// سلة المحذوفات (0007)
+  final DateTime? trashedAt;
+  final String? trashReason;
   final List<String> streamStates; // health_state لكل رابط (للعمود تعمل/الكل)
 
   const AdminChannel({
@@ -114,6 +118,8 @@ class AdminChannel {
     this.parentalLocked = false,
     this.epgOffset = 0,
     this.updatedAt,
+    this.trashedAt,
+    this.trashReason,
     this.streamStates = const [],
   });
 
@@ -140,6 +146,8 @@ class AdminChannel {
         parentalLocked: j['parental_locked'] == true,
         epgOffset: (j['epg_offset_minutes'] as num?)?.toInt() ?? 0,
         updatedAt: DateTime.tryParse('${j['updated_at']}')?.toLocal(),
+        trashedAt: j['trashed_at'] == null ? null : DateTime.tryParse('${j['trashed_at']}')?.toLocal(),
+        trashReason: j['trash_reason'] as String?,
         streamStates: [for (final s in (j['streams'] as List?) ?? const []) '${(s as Map)['health_state']}'],
       );
 
@@ -151,11 +159,14 @@ class ChannelQuery {
   final String search;
   final String? state, country, category;
   final bool featured, noLogo, manual;
+
+  /// سلة المحذوفات (0007): القنوات فيها لا تظهر إلا بهذا الفلتر.
+  final bool trash;
   final int page;
   static const pageSize = 50;
-  const ChannelQuery({this.search = '', this.state, this.country, this.category, this.featured = false, this.noLogo = false, this.manual = false, this.page = 0});
+  const ChannelQuery({this.search = '', this.state, this.country, this.category, this.featured = false, this.noLogo = false, this.manual = false, this.trash = false, this.page = 0});
 
-  ChannelQuery copyWith({String? search, String? state, String? country, String? category, bool? featured, bool? noLogo, bool? manual, int? page, bool clearState = false, bool clearCountry = false, bool clearCategory = false}) =>
+  ChannelQuery copyWith({String? search, String? state, String? country, String? category, bool? featured, bool? noLogo, bool? manual, bool? trash, int? page, bool clearState = false, bool clearCountry = false, bool clearCategory = false}) =>
       ChannelQuery(
         search: search ?? this.search,
         state: clearState ? null : (state ?? this.state),
@@ -164,6 +175,7 @@ class ChannelQuery {
         featured: featured ?? this.featured,
         noLogo: noLogo ?? this.noLogo,
         manual: manual ?? this.manual,
+        trash: trash ?? this.trash,
         page: page ?? 0, // أي تغيير في الفلاتر يعيد للصفحة الأولى
       );
 
@@ -177,9 +189,10 @@ class ChannelQuery {
       other.featured == featured &&
       other.noLogo == noLogo &&
       other.manual == manual &&
+      other.trash == trash &&
       other.page == page;
   @override
-  int get hashCode => Object.hash(search, state, country, category, featured, noLogo, manual, page);
+  int get hashCode => Object.hash(search, state, country, category, featured, noLogo, manual, trash, page);
 }
 
 class ChannelPage {
@@ -233,7 +246,7 @@ class AdminRepository {
   AdminRepository(this.db);
 
   static const _channelCols =
-      'id,uid,number,name,name_ar,name_en,alt_names,network,logo_url,country_code,category_slug,language_code,quality,description,website,epg_id,publish_state,is_featured,is_manual,parental_locked,epg_offset_minutes,updated_at';
+      'id,uid,number,name,name_ar,name_en,alt_names,network,logo_url,country_code,category_slug,language_code,quality,description,website,epg_id,publish_state,is_featured,is_manual,parental_locked,epg_offset_minutes,updated_at,trashed_at,trash_reason';
   static const _streamCols =
       'id,channel_id,url,label,quality,priority,user_agent,referrer,headers,protocol,has_credentials,health_state,health_reason,health_score,http_status,response_ms,last_checked_at';
 
@@ -302,8 +315,9 @@ class AdminRepository {
   }
 
   // ── القنوات ──────────────────────────────────────────────────────────────
-  Future<ChannelPage> channels(ChannelQuery q) async {
-    var f = db.from('channels').select('$_channelCols,streams(health_state)');
+  /// فلاتر القائمة (للصفحة ولـ «تحديد كل النتائج»).
+  PostgrestFilterBuilder<T> _channelFilters<T>(PostgrestFilterBuilder<T> f, ChannelQuery q) {
+    f = q.trash ? f.not('trashed_at', 'is', null) : f.isFilter('trashed_at', null);
     if (q.state != null) f = f.eq('publish_state', q.state!);
     if (q.country != null) f = f.eq('country_code', q.country!);
     if (q.category != null) f = f.eq('category_slug', q.category!);
@@ -316,6 +330,11 @@ class AdminRepository {
       final like = '%${s.replaceAll(RegExp(r'[,()%*]'), ' ')}%';
       f = n != null ? f.eq('number', n) : f.or('name.ilike.$like,name_ar.ilike.$like,name_en.ilike.$like,uid.ilike.$like,network.ilike.$like');
     }
+    return f;
+  }
+
+  Future<ChannelPage> channels(ChannelQuery q) async {
+    final f = _channelFilters(db.from('channels').select('$_channelCols,streams(health_state)'), q);
     final from = q.page * ChannelQuery.pageSize;
     final res = await f.order('number', ascending: true, nullsFirst: false).order('name', ascending: true).range(from, from + ChannelQuery.pageSize - 1).count(CountOption.exact);
     return ChannelPage([for (final r in res.data) AdminChannel.fromJson(r)], res.count);
@@ -330,7 +349,21 @@ class AdminRepository {
 
   Future<void> updateChannels(List<String> ids, Map<String, dynamic> fields) => db.from('channels').update(fields).inFilter('id', ids);
 
-  Future<void> deleteChannels(List<String> ids) => db.from('channels').delete().inFilter('id', ids);
+  /// كل معرّفات القنوات المطابقة للفلاتر (كل الصفحات) — «تحديد كل النتائج» (خطة التحسينات 4.1).
+  Future<List<String>> channelIds(ChannelQuery q) async =>
+      [for (final r in await _all((a, b) => _channelFilters(db.from('channels').select('id'), q).order('id', ascending: true).range(a, b))) r['id'] as String];
+
+  // ── سلة المحذوفات (0007): لا حذف فوري من اللوحة ──
+  Future<int> trashChannels(List<String> ids, {String? reason}) async =>
+      ((await db.rpc('admin_trash', params: {'p_ids': ids, 'p_reason': reason})) as num).toInt();
+
+  Future<int> restoreChannels(List<String> ids) async => ((await db.rpc('admin_restore', params: {'p_ids': ids})) as num).toInt();
+
+  /// حذف نهائي لقنوات من السلة فقط (الدالة ترفض ما ليس في السلة).
+  Future<int> purgeChannels(List<String> ids) async => ((await db.rpc('admin_trash_purge', params: {'p_ids': ids})) as num).toInt();
+
+  /// ما مضى عليه 30 يومًا في السلة (المُجدوِل).
+  Future<int> purgeExpiredTrash() async => ((await db.rpc('admin_trash_purge')) as num).toInt();
 
   /// إضافة يدوية (§9.4): تتجاوز المراجعة، معلَّمة يدوية.
   Future<String> createChannel({required String nameAr, required String nameEn, int? number, String? country, String? category, String? logoUrl}) async {
@@ -352,7 +385,11 @@ class AdminRepository {
         })
         .select('id')
         .single();
-    return r['id'] as String;
+    final id = r['id'] as String;
+    // بوابة المراجعة (channels_review_gate) تجعل كل إدراج «قيد المراجعة» ولو أرسلنا is_published؛
+    // الإضافة اليدوية راجعها المدير بنفسه، فتُنشر فورًا (كانت تذهب لقيد المراجعة — اكتُشف باختبار 2026-10-16)
+    await db.from('channels').update({'publish_state': 'published'}).eq('id', id);
+    return id;
   }
 
   Future<int?> nextFreeNumber() async {
@@ -516,6 +553,28 @@ class AdminRepository {
       ],
       res.count,
     );
+  }
+
+  /// معرّفات كل الروابط المطابقة للفلاتر (كل الصفحات) — «تحديد كل النتائج» (4.1).
+  Future<List<String>> streamIds({String host = '', String? state, String? protocol, bool credentialsOnly = false}) async {
+    final rows = await _all((a, b) {
+      var f = db.from('streams').select('id');
+      if (host.trim().isNotEmpty) f = f.ilike('host', '%${host.trim().replaceAll(RegExp(r'[%*,()]'), '')}%');
+      if (state != null) f = f.eq('health_state', state);
+      if (protocol != null) f = f.eq('protocol', protocol);
+      if (credentialsOnly) f = f.eq('has_credentials', true);
+      return f.order('id', ascending: true).range(a, b);
+    });
+    return [for (final r in rows) r['id'] as String];
+  }
+
+  Future<List<AdminStream>> streamsByIds(List<String> ids) async {
+    final out = <AdminStream>[];
+    for (var i = 0; i < ids.length; i += 200) {
+      final part = ids.sublist(i, (i + 200).clamp(0, ids.length));
+      out.addAll([for (final r in await db.from('streams').select(_streamCols).inFilter('id', part)) AdminStream.fromJson(r)]);
+    }
+    return out;
   }
 
   /// ملخّص النطاقات: عدد الروابط والعاملة لكل نطاق.

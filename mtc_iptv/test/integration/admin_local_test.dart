@@ -104,12 +104,68 @@ void main() {
     expect(history.map((e) => e.action), containsAll(['INSERT', 'UPDATE']));
     expect(history.firstWhere((e) => e.action == 'UPDATE').changes.map((x) => x.$1), contains('publish_state'));
 
-    // جماعي ثم حذف
+    // جماعي ثم حذف (0007: السلة أولًا، والنهائي من السلة فقط)
     await repo.updateChannels([id], {'is_featured': true});
     expect((await repo.channel(id))!.isFeatured, isTrue);
-    await repo.deleteChannels([id]);
+    expect(await repo.purgeChannels([id]), 0, reason: 'not in the bin: never purged');
+    await repo.trashChannels([id]);
+    expect(await repo.purgeChannels([id]), 1);
     expect(await repo.channel(id), isNull);
     expect(await repo.streamsOf(id), isEmpty);
+  }, skip: skip);
+
+  test('phase 4 (0007): recycle bin, restore, select-all ids, review reject to bin, decisions', () async {
+    final base = 80000 + stamp % 9000;
+    final a = await repo.createChannel(nameAr: '', nameEn: 'Bin A $stamp', number: base);
+    final b = await repo.createChannel(nameAr: '', nameEn: 'Bin B $stamp', number: base + 1);
+    final c3 = await repo.createChannel(nameAr: '', nameEn: 'Bin C $stamp', number: base + 2);
+    await repo.addStream(a, url: 'https://example.com/$stamp/bin-a.m3u8');
+    await repo.addStream(b, url: 'https://example.com/$stamp/bin-b.m3u8');
+    await repo.addStream(c3, url: 'https://example.com/$stamp/bin-c.m3u8');
+    try {
+      // «تحديد كل النتائج» يجلب كل الصفحات حسب الفلتر
+      final ids = await repo.channelIds(ChannelQuery(search: 'Bin '));
+      expect(ids, containsAll([a, b, c3]));
+
+      // السلة: تختفي من القائمة العادية، تظهر بفلتر السلة، رقمها يتحرر
+      expect(await repo.trashChannels([c3], reason: 'test'), 1);
+      expect((await repo.channels(ChannelQuery(search: 'Bin C $stamp'))).items, isEmpty);
+      final binned = (await repo.channels(ChannelQuery(search: 'Bin C $stamp', trash: true))).items.single;
+      expect(binned.trashedAt, isNotNull);
+      expect(binned.trashReason, 'test');
+      expect(binned.number, isNull);
+      expect(binned.publishState, 'hidden');
+
+      // الاسترجاع يعيد الحالة والرقم
+      expect(await repo.restoreChannels([c3]), 1);
+      final back = (await repo.channel(c3))!;
+      expect(back.trashedAt, isNull);
+      expect(back.number, base + 2);
+      expect(back.publishState, 'published');
+
+      // «قرارات»: B تُدمج في A (روابطها تنتقل، تُخفى، قابلة للتراجع) و C إلى السلة
+      await repo.mergeChannels(a, [b]);
+      await repo.trashChannels([c3]);
+      expect((await repo.streamsOf(a)).length, 2);
+      expect((await repo.channel(b))!.publishState, 'hidden');
+      expect((await repo.channels(ChannelQuery(search: 'Bin C $stamp', trash: true))).items, hasLength(1));
+      expect(await repo.unmerge(b), greaterThan(0));
+      expect((await repo.streamsOf(b)).length, 1);
+
+      // قيد المراجعة: «رفض» ← السلة (لا حذف)
+      final pending = (jsonDecode((await admin('POST', '/rest/v1/channels?select=id', {'uid': 'bin.pending.$stamp', 'name': 'Bin P $stamp', 'is_published': true})).body) as List).single['id'] as String;
+      expect(await repo.reviewApply('reject', [pending]), 1);
+      expect((await repo.channels(ChannelQuery(search: 'Bin P $stamp', trash: true))).items.single.id, pending);
+      await repo.purgeChannels([pending]);
+
+      // تحديد كل الروابط حسب الفلتر
+      final sids = await repo.streamIds(host: 'example.com');
+      expect(sids.length, greaterThanOrEqualTo(3));
+      expect((await repo.streamsByIds(sids.take(2).toList())).length, 2);
+    } finally {
+      await repo.trashChannels([a, b, c3]);
+      await repo.purgeChannels([a, b, c3]);
+    }
   }, skip: skip);
 
   test('batch 4b: review queue, renumbering, taxonomy, streams, task runs', () async {
@@ -503,7 +559,8 @@ void main() {
     } finally {
       await admin('DELETE', '/rest/v1/admin_alerts?dedupe_key=eq.test:$stamp');
       await admin('DELETE', '/rest/v1/playback_stats_daily?stream_id=eq.$sid');
-      await repo.deleteChannels([id]);
+      await repo.trashChannels([id]);
+      await repo.purgeChannels([id]);
     }
   }, skip: skip);
 }

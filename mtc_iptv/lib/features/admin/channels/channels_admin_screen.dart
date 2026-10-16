@@ -138,17 +138,44 @@ class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
       FilterChip(label: Text(t.fFeatured), selected: q.featured, onSelected: (v) => _set(q.copyWith(featured: v))),
       FilterChip(label: Text(t.fNoLogo), selected: q.noLogo, onSelected: (v) => _set(q.copyWith(noLogo: v))),
       FilterChip(label: Text(t.fManual), selected: q.manual, onSelected: (v) => _set(q.copyWith(manual: v))),
-      FilledButton.icon(onPressed: _add, icon: const Icon(Icons.add_rounded), label: Text(t.addChannel)),
+      FilterChip(
+        avatar: Icon(Icons.delete_outline_rounded, size: 18, color: q.trash ? c.accent : c.textMuted),
+        label: Text(t.trashFilter),
+        selected: q.trash,
+        onSelected: (v) => _set(q.copyWith(trash: v)),
+      ),
+      if (!q.trash) FilledButton.icon(onPressed: _add, icon: const Icon(Icons.add_rounded), label: Text(t.addChannel)),
     ]);
 
-    final bulk = selected.isEmpty
-        ? const SizedBox.shrink()
-        : Container(
-            color: c.accent.withValues(alpha: .10),
-            padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.sm),
-            child: Wrap(spacing: Space.sm, runSpacing: Space.sm, crossAxisAlignment: WrapCrossAlignment.center, children: [
-              Text(t.selected(selected.length), style: TextStyle(color: c.text, fontWeight: FontWeight.w700)),
-              if (busy) const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+    const red = Color(0xFFEF4444);
+    final trashActions = <Widget>[
+      FilledButton.tonalIcon(
+        onPressed: busy ? null : () => _bulk((r, ids) => r.restoreChannels(ids)),
+        icon: const Icon(Icons.restore_from_trash_rounded, size: 18),
+        label: Text(t.aRestore),
+      ),
+      OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(foregroundColor: red),
+        onPressed: busy
+            ? null
+            : () async {
+                if (await confirm(context, t.confirmPurge(selected.length))) await _bulk((r, ids) => r.purgeChannels(ids));
+              },
+        icon: const Icon(Icons.delete_forever_rounded, size: 18),
+        label: Text(t.aPurge),
+      ),
+    ];
+
+    final bulk = SelectionBar(
+      selected: selected,
+      pageIds: [for (final x in items) x.id],
+      total: data?.total ?? 0,
+      allIds: () async => await ref.read(adminRepoProvider)?.channelIds(q) ?? const [],
+      onChanged: () => setState(() {}),
+      busy: busy,
+      actions: q.trash
+          ? trashActions
+          : [
               OutlinedButton(onPressed: busy ? null : () => _bulk((r, ids) => r.updateChannels(ids, {'publish_state': 'published'})), child: Text(t.aPublish)),
               OutlinedButton(onPressed: busy ? null : () => _bulk((r, ids) => r.updateChannels(ids, {'publish_state': 'hidden', 'hidden_reason': 'manual'})), child: Text(t.aHide)),
               OutlinedButton(onPressed: busy ? null : () => _bulk((r, ids) => r.updateChannels(ids, {'is_featured': true})), child: Text(t.aFeature)),
@@ -185,20 +212,32 @@ class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
                 icon: const Icon(Icons.monitor_heart_rounded, size: 18),
                 label: Text(t.aCheckStreams),
               ),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(foregroundColor: red),
                 onPressed: busy
                     ? null
                     : () async {
-                        if (await confirm(context, t.confirmDelete(selected.length))) await _bulk((r, ids) => r.deleteChannels(ids));
+                        if (await confirm(context, t.confirmTrash(selected.length))) await _bulk((r, ids) => r.trashChannels(ids));
                       },
-                child: Text(t.aDelete),
+                icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                label: Text(t.aTrash),
               ),
-            ]),
-          );
+            ],
+    );
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Padding(padding: const EdgeInsets.fromLTRB(Space.lg, Space.md, Space.lg, Space.sm), child: toolbar),
+      if (q.trash)
+        Container(
+          margin: const EdgeInsets.fromLTRB(Space.lg, 0, Space.lg, Space.sm),
+          padding: const EdgeInsets.all(Space.md),
+          decoration: BoxDecoration(color: red.withValues(alpha: .07), borderRadius: BorderRadius.circular(Radii.md), border: Border.all(color: red.withValues(alpha: .3))),
+          child: Row(children: [
+            const Icon(Icons.delete_outline_rounded, color: red),
+            const SizedBox(width: Space.md),
+            Expanded(child: Text(items.isEmpty && !page.isLoading ? t.trashEmpty : t.trashHint, style: TextStyle(color: c.text))),
+          ]),
+        ),
       bulk,
       if (page.isLoading) const LinearProgressIndicator(minHeight: 2),
       if (page.hasError) Padding(padding: const EdgeInsets.all(Space.lg), child: Text('${page.error}', style: const TextStyle(color: Color(0xFFEF4444)))),
@@ -208,14 +247,11 @@ class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
           separatorBuilder: (_, _) => Divider(height: 1, color: c.line),
           itemBuilder: (_, i) {
             if (i == 0) {
-              final allSel = items.isNotEmpty && items.every((x) => selected.contains(x.id));
+              // تحديد الصفحة صار في شريط التحديد أعلاه
               return _Row(
                 header: true,
-                leading: Checkbox(
-                  value: allSel,
-                  onChanged: (v) => setState(() => v == true ? selected.addAll(items.map((x) => x.id)) : selected.removeAll(items.map((x) => x.id))),
-                ),
-                cells: [Text(t.colNumber), Text(t.colName), Text(t.colCountry), Text(t.colCategory), Text(t.colStreams), Text(t.colState), Text(t.colUpdated)],
+                leading: const SizedBox(width: 48),
+                cells: [Text(t.colNumber), Text(t.colName), Text(t.colCountry), Text(t.colCategory), Text(t.colStreams), Text(t.colState), Text(q.trash ? t.trashFilter : t.colUpdated)],
               );
             }
             final ch = items[i - 1];
@@ -250,7 +286,15 @@ class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
                   Pill('${ch.streamsOk}/${ch.streamStates.length}',
                       ch.streamStates.isEmpty ? healthColor('unavailable') : (ch.streamsOk == 0 ? healthColor('unavailable') : healthColor(ch.streamsOk == ch.streamStates.length ? 'playable' : 'degraded'))),
                   Align(alignment: AlignmentDirectional.centerStart, child: StatePill(ch.publishState)),
-                  Text(ch.updatedAt == null ? '' : shortTime(ch.updatedAt!), style: TextStyle(color: c.textMuted, fontSize: 12)),
+                  q.trash && ch.trashedAt != null
+                      ? Tooltip(
+                          message: [
+                            t.inTrashSince(shortTime(ch.trashedAt!), (30 - DateTime.now().difference(ch.trashedAt!).inDays).clamp(0, 30)),
+                            ?ch.trashReason,
+                          ].join('\n'),
+                          child: Text(shortTime(ch.trashedAt!), style: const TextStyle(color: red, fontSize: 12)),
+                        )
+                      : Text(ch.updatedAt == null ? '' : shortTime(ch.updatedAt!), style: TextStyle(color: c.textMuted, fontSize: 12)),
                 ],
               ),
             );

@@ -10,6 +10,147 @@ class L10nEn extends L10n {
   L10nEn([String locale = 'en']) : super(locale);
 
   @override
+  String get dcTitle => 'Decide per channel';
+
+  @override
+  String get dcOpen => 'Decisions';
+
+  @override
+  String get dcHint =>
+      'Choose what happens to each channel, edit its name, number or tags if needed, then Apply. Nothing runs before the summary.';
+
+  @override
+  String get dcKeep => 'Keep as is';
+
+  @override
+  String get dcPublish => 'Keep and publish';
+
+  @override
+  String get dcHide => 'Hide';
+
+  @override
+  String get dcMerge => 'Merge its streams into…';
+
+  @override
+  String dcMergeInto(String name) {
+    return 'Merge into: $name';
+  }
+
+  @override
+  String get dcTrash => 'Recycle bin';
+
+  @override
+  String get dcEdit => 'Edit';
+
+  @override
+  String get dcDistinct =>
+      'The remaining channels are not duplicates (don\'t show them here again)';
+
+  @override
+  String get dcSummary => 'Summary';
+
+  @override
+  String get dcApply => 'Apply';
+
+  @override
+  String get dcNothing => 'No changes chosen.';
+
+  @override
+  String get dcDone => 'Decisions applied.';
+
+  @override
+  String dcStreams(int ok, int n) {
+    return '$ok of $n streams working';
+  }
+
+  @override
+  String dcLineEdit(String name) {
+    return 'Edit details: $name';
+  }
+
+  @override
+  String dcLinePublish(String name) {
+    return 'Publish: $name';
+  }
+
+  @override
+  String dcLineHide(String name) {
+    return 'Hide: $name';
+  }
+
+  @override
+  String dcLineMerge(String name, String into) {
+    return 'Merge $name into $into (its streams become extra servers; it is hidden — undoable)';
+  }
+
+  @override
+  String dcLineTrash(String name) {
+    return 'Recycle bin: $name (restorable for 30 days)';
+  }
+
+  @override
+  String dcLineDistinct(int n) {
+    return 'Mark the rest as not duplicates: $n channel(s)';
+  }
+
+  @override
+  String get dcMergeChain =>
+      'Can\'t merge into a channel that is itself merged, binned or hidden.';
+
+  @override
+  String get aTrash => 'Move to bin';
+
+  @override
+  String get aRestore => 'Restore';
+
+  @override
+  String get aPurge => 'Delete forever';
+
+  @override
+  String get trashFilter => 'Recycle bin';
+
+  @override
+  String confirmTrash(int n) {
+    return 'Move $n channel(s) to the recycle bin? They disappear from the apps now, can be restored for 30 days, then are deleted for good.';
+  }
+
+  @override
+  String confirmPurge(int n) {
+    return 'Delete $n channel(s) and their streams for good? This cannot be undone.';
+  }
+
+  @override
+  String inTrashSince(String d, int n) {
+    return 'In the bin since $d · deleted for good in $n days';
+  }
+
+  @override
+  String get trashEmpty => 'The recycle bin is empty.';
+
+  @override
+  String get trashHint =>
+      'Deleted channels stay here for 30 days, then are removed automatically. Restoring brings back their state and number (if still free).';
+
+  @override
+  String get selectPage => 'Select shown';
+
+  @override
+  String selectAllMatching(int n) {
+    return 'Select all results ($n)';
+  }
+
+  @override
+  String get invertSelection => 'Invert selection';
+
+  @override
+  String get clearSelection => 'Clear selection';
+
+  @override
+  String selectedOf(int n, int total) {
+    return '$n of $total selected';
+  }
+
+  @override
   String get plErrHint =>
       'The stream may be temporarily down or blocked in your region. Try later or pick another channel.';
 
@@ -1193,7 +1334,7 @@ class L10nEn extends L10n {
   String get aApprove => 'Approve & publish';
 
   @override
-  String get aReject => 'Reject (delete)';
+  String get aReject => 'Reject (to bin)';
 
   @override
   String get aMerge => 'Merge into original';
@@ -1218,7 +1359,7 @@ class L10nEn extends L10n {
 
   @override
   String confirmReject(int n) {
-    return 'Delete $n pending channel(s) and their streams?';
+    return 'Reject $n channel(s) and move them to the recycle bin? Restorable for 30 days.';
   }
 
   @override

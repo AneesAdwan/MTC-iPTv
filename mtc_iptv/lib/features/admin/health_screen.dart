@@ -63,42 +63,58 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     });
     final sel = rows.where((r) => selected.contains(r.$1.id)).toList();
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      HScroller.children(height: 56, spacing: 0, children: [
-          for (final s in healthStates)
-            Padding(
-              padding: const EdgeInsetsDirectional.only(end: Space.sm),
-              child: ChoiceChip(
-                avatar: Icon(healthIcon(s), size: 16, color: healthColor(s)),
-                label: Text('${healthLabel(t, s)} ${counts[s] ?? ''}'),
-                selected: state == s,
-                onSelected: (_) => setState(() {
-                  state = s;
-                  selected.clear();
-                }),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        HScroller.children(
+          height: 56,
+          spacing: 0,
+          children: [
+            for (final s in healthStates)
+              Padding(
+                padding: const EdgeInsetsDirectional.only(end: Space.sm),
+                child: ChoiceChip(
+                  avatar: Icon(healthIcon(s), size: 16, color: healthColor(s)),
+                  label: Text('${healthLabel(t, s)} ${counts[s] ?? ''}'),
+                  selected: state == s,
+                  onSelected: (_) => setState(() {
+                    state = s;
+                    selected.clear();
+                  }),
+                ),
               ),
-            ),
-        ]),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Space.lg),
-        child: Wrap(spacing: Space.sm, runSpacing: Space.sm, crossAxisAlignment: WrapCrossAlignment.center, children: [
-          Tooltip(
-            message: t.playCheckHint,
-            child: FilterChip(label: Text(t.playCheck), selected: playCheck, onSelected: (v) => setState(() => playCheck = v)),
-          ),
-          FilledButton.icon(
-            onPressed: job.running || rows.isEmpty
-                ? null
-                : () => ref.read(healthJobProvider.notifier).run([for (final r in (sel.isEmpty ? rows : sel)) r.$1], playCheck: playCheck),
-            icon: const Icon(Icons.monitor_heart_rounded),
-            label: Text(sel.isEmpty ? '${t.aCheck} (${rows.length})' : '${t.aCheck} (${sel.length})'),
-          ),
-          if (job.running) ...[
-            Text(t.checkRunning(job.done, job.total), style: TextStyle(color: c.textMuted)),
-            TextButton(onPressed: ref.read(healthJobProvider.notifier).cancel, child: Text(t.stop)),
           ],
-          if (sel.isNotEmpty) ...[
-            Text(t.selected(sel.length), style: TextStyle(color: c.text, fontWeight: FontWeight.w700)),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: Space.lg),
+          child: Wrap(
+            spacing: Space.sm,
+            runSpacing: Space.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Tooltip(
+                message: t.playCheckHint,
+                child: FilterChip(label: Text(t.playCheck), selected: playCheck, onSelected: (v) => setState(() => playCheck = v)),
+              ),
+              FilledButton.icon(
+                onPressed: job.running || rows.isEmpty ? null : () => ref.read(healthJobProvider.notifier).run([for (final r in (sel.isEmpty ? rows : sel)) r.$1], playCheck: playCheck),
+                icon: const Icon(Icons.monitor_heart_rounded),
+                label: Text(sel.isEmpty ? '${t.aCheck} (${rows.length})' : '${t.aCheck} (${sel.length})'),
+              ),
+              if (job.running) ...[
+                Text(t.checkRunning(job.done, job.total), style: TextStyle(color: c.textMuted)),
+                TextButton(onPressed: ref.read(healthJobProvider.notifier).cancel, child: Text(t.stop)),
+              ],
+            ],
+          ),
+        ),
+        // التحديد (القائمة كاملة معروضة): الكل / عكس / إلغاء + إجراءات المحدد
+        SelectionBar(
+          selected: selected,
+          pageIds: [for (final r in rows) r.$1.id],
+          total: rows.length,
+          onChanged: () => setState(() {}),
+          actions: [
             OutlinedButton(
               onPressed: () => _act((r) async {
                 for (final x in sel) {
@@ -120,6 +136,16 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               onPressed: () => _act((r) => r.updateChannels({for (final x in sel) x.$1.channelId}.toList(), {'publish_state': 'hidden', 'hidden_reason': 'offline'})),
               child: Text(t.aHideChannel),
             ),
+            // قنوات الروابط المحددة إلى السلة (تُسترجع خلال 30 يومًا)
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
+              onPressed: () async {
+                final ch = {for (final x in sel) x.$1.channelId}.toList();
+                if (await confirm(context, t.confirmTrash(ch.length))) await _act((r) => r.trashChannels(ch, reason: 'من صحة الروابط'));
+              },
+              icon: const Icon(Icons.delete_outline_rounded, size: 18),
+              label: Text(t.aTrash),
+            ),
             OutlinedButton(
               style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
               onPressed: () async {
@@ -128,40 +154,69 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               child: Text(t.aDelete),
             ),
           ],
-        ]),
-      ),
-      const SizedBox(height: Space.sm),
-      if (job.running) LinearProgressIndicator(value: job.progress, minHeight: 2) else if (list.isLoading) const LinearProgressIndicator(minHeight: 2),
-      Expanded(
-        child: rows.isEmpty
-            ? Center(child: Text(list.isLoading ? '' : t.noStreamsInState, style: TextStyle(color: c.textMuted)))
-            : ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.sm),
-                itemCount: rows.length,
-                separatorBuilder: (_, _) => Divider(height: 1, color: c.line),
-                itemBuilder: (_, i) {
-                  final (s, name, number) = rows[i];
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Checkbox(value: selected.contains(s.id), onChanged: (v) => setState(() => v == true ? selected.add(s.id) : selected.remove(s.id))),
-                    title: Row(children: [
-                      Text('${number ?? '—'}  ', style: TextStyle(color: c.textMuted)),
-                      Flexible(child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: c.text, fontWeight: FontWeight.w600))),
-                      if (s.label != null) Text('  · ${s.label}', style: TextStyle(color: c.textMuted)),
-                    ]),
-                    subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Directionality(textDirection: TextDirection.ltr, child: Text(s.maskedUrl, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: c.textMuted, fontSize: 12))),
-                      Text([s.lastCheckedAt == null ? t.neverChecked : t.lastChecked(shortTime(s.lastCheckedAt!)), ?s.healthReason].join(' · '),
-                          maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: c.textDim, fontSize: 11.5)),
-                    ]),
-                    trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                      IconButton(tooltip: t.aTry, onPressed: () => showStreamPreview(context, s, name), icon: const Icon(Icons.play_circle_outline_rounded)),
-                      IconButton(tooltip: t.aOpenChannel, onPressed: () => context.go('/admin/channel/${s.channelId}'), icon: const Icon(Icons.open_in_new_rounded)),
-                    ]),
-                  );
-                },
-              ),
-      ),
-    ]);
+        ),
+        const SizedBox(height: Space.sm),
+        if (job.running) LinearProgressIndicator(value: job.progress, minHeight: 2) else if (list.isLoading) const LinearProgressIndicator(minHeight: 2),
+        Expanded(
+          child: rows.isEmpty
+              ? Center(
+                  child: Text(list.isLoading ? '' : t.noStreamsInState, style: TextStyle(color: c.textMuted)),
+                )
+              : ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.sm),
+                  itemCount: rows.length,
+                  separatorBuilder: (_, _) => Divider(height: 1, color: c.line),
+                  itemBuilder: (_, i) {
+                    final (s, name, number) = rows[i];
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Checkbox(value: selected.contains(s.id), onChanged: (v) => setState(() => v == true ? selected.add(s.id) : selected.remove(s.id))),
+                      title: Row(
+                        children: [
+                          Text('${number ?? '—'}  ', style: TextStyle(color: c.textMuted)),
+                          Flexible(
+                            child: Text(
+                              name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: c.text, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          if (s.label != null) Text('  · ${s.label}', style: TextStyle(color: c.textMuted)),
+                        ],
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Text(
+                              s.maskedUrl,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: c.textMuted, fontSize: 12),
+                            ),
+                          ),
+                          Text(
+                            [s.lastCheckedAt == null ? t.neverChecked : t.lastChecked(shortTime(s.lastCheckedAt!)), ?s.healthReason].join(' · '),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: c.textDim, fontSize: 11.5),
+                          ),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(tooltip: t.aTry, onPressed: () => showStreamPreview(context, s, name), icon: const Icon(Icons.play_circle_outline_rounded)),
+                          IconButton(tooltip: t.aOpenChannel, onPressed: () => context.go('/admin/channel/${s.channelId}'), icon: const Icon(Icons.open_in_new_rounded)),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
   }
 }

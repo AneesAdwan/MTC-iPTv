@@ -44,10 +44,10 @@ class _StreamsScreenState extends ConsumerState<StreamsScreen> {
   }
 
   void _set(VoidCallback f) => setState(() {
-        f();
-        page = 0;
-        selected.clear();
-      });
+    f();
+    page = 0;
+    selected.clear();
+  });
 
   Future<void> _act(Future<void> Function(AdminRepository r) f) async {
     final repo = ref.read(adminRepoProvider);
@@ -68,6 +68,16 @@ class _StreamsScreenState extends ConsumerState<StreamsScreen> {
     });
   }
 
+  /// الروابط المحددة ككائنات: من الصفحة إن كانت كلها فيها، وإلا من الخادم (تحديد كل النتائج).
+  Future<List<AdminStream>> _selectedStreams(List<(AdminStream, String, int?)> rows) async {
+    final onPage = [
+      for (final r in rows)
+        if (selected.contains(r.$1.id)) r.$1,
+    ];
+    if (onPage.length == selected.length) return onPage;
+    return await ref.read(adminRepoProvider)?.streamsByIds(selected.toList()) ?? onPage;
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = L10n.of(context), c = context.colors;
@@ -79,49 +89,78 @@ class _StreamsScreenState extends ConsumerState<StreamsScreen> {
     ref.listen(healthJobProvider, (prev, next) {
       if (prev?.running == true && !next.running) ref.invalidate(_streamsQProvider);
     });
-    final sel = rows.where((r) => selected.contains(r.$1.id)).toList();
 
-    final list = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(Space.lg, Space.md, Space.lg, Space.sm),
-        child: Wrap(spacing: Space.sm, runSpacing: Space.sm, crossAxisAlignment: WrapCrossAlignment.center, children: [
-          SizedBox(
-            width: 220,
-            child: TextField(
-              controller: hostCtrl,
-              textDirection: TextDirection.ltr,
-              decoration: InputDecoration(hintText: t.hostFilter, prefixIcon: const Icon(Icons.dns_rounded), isDense: true),
-              onSubmitted: (v) => _set(() => host = v),
+    final list = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(Space.lg, Space.md, Space.lg, Space.sm),
+          child: Wrap(
+            spacing: Space.sm,
+            runSpacing: Space.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              SizedBox(
+                width: 220,
+                child: TextField(
+                  controller: hostCtrl,
+                  textDirection: TextDirection.ltr,
+                  decoration: InputDecoration(hintText: t.hostFilter, prefixIcon: const Icon(Icons.dns_rounded), isDense: true),
+                  onSubmitted: (v) => _set(() => host = v),
+                ),
+              ),
+              DropdownButton<String?>(
+                value: state,
+                hint: Text(t.allStates),
+                items: [
+                  DropdownMenuItem(value: null, child: Text(t.allStates)),
+                  for (final s in healthStates) DropdownMenuItem(value: s, child: Text(healthLabel(t, s))),
+                ],
+                onChanged: (v) => _set(() => state = v),
+              ),
+              DropdownButton<String?>(
+                value: protocol,
+                hint: Text(t.allProtocols),
+                items: [
+                  DropdownMenuItem(value: null, child: Text(t.allProtocols)),
+                  for (final p in const ['hls', 'dash', 'ts', 'mp4', 'flv', 'rtmp', 'rtsp', 'udp', 'http']) DropdownMenuItem(value: p, child: Text(p)),
+                ],
+                onChanged: (v) => _set(() => protocol = v),
+              ),
+              FilterChip(label: Text(t.fCredentials), selected: creds, onSelected: (v) => _set(() => creds = v)),
+              if (job.running) Text(t.checkRunning(job.done, job.total), style: TextStyle(color: c.textMuted)),
+            ],
+          ),
+        ),
+        // التحديد: المعروض / كل النتائج (كل الصفحات) / عكس / إلغاء
+        SelectionBar(
+          selected: selected,
+          pageIds: [for (final r in rows) r.$1.id],
+          total: total,
+          allIds: () async => await ref.read(adminRepoProvider)?.streamIds(host: host, state: state, protocol: protocol, credentialsOnly: creds) ?? const [],
+          onChanged: () => setState(() {}),
+          actions: [
+            OutlinedButton(
+              onPressed: job.running
+                  ? null
+                  : () async {
+                      final health = ref.read(healthJobProvider.notifier);
+                      health.run(await _selectedStreams(rows));
+                    },
+              child: Text(t.aCheck),
             ),
-          ),
-          DropdownButton<String?>(
-            value: state,
-            hint: Text(t.allStates),
-            items: [DropdownMenuItem(value: null, child: Text(t.allStates)), for (final s in healthStates) DropdownMenuItem(value: s, child: Text(healthLabel(t, s)))],
-            onChanged: (v) => _set(() => state = v),
-          ),
-          DropdownButton<String?>(
-            value: protocol,
-            hint: Text(t.allProtocols),
-            items: [DropdownMenuItem(value: null, child: Text(t.allProtocols)), for (final p in const ['hls', 'dash', 'ts', 'mp4', 'flv', 'rtmp', 'rtsp', 'udp', 'http']) DropdownMenuItem(value: p, child: Text(p))],
-            onChanged: (v) => _set(() => protocol = v),
-          ),
-          FilterChip(label: Text(t.fCredentials), selected: creds, onSelected: (v) => _set(() => creds = v)),
-          if (sel.isNotEmpty) ...[
-            Text(t.selected(sel.length), style: TextStyle(color: c.text, fontWeight: FontWeight.w700)),
-            OutlinedButton(onPressed: job.running ? null : () => ref.read(healthJobProvider.notifier).run([for (final x in sel) x.$1]), child: Text(t.aCheck)),
             OutlinedButton(
               onPressed: () => _act((r) async {
-                for (final x in sel) {
-                  await r.updateStream(x.$1.id, {'health_state': 'disabled'});
+                for (final s in await _selectedStreams(rows)) {
+                  await r.updateStream(s.id, {'health_state': 'disabled'});
                 }
               }),
               child: Text(t.aDisable),
             ),
             OutlinedButton(
               onPressed: () => _act((r) async {
-                for (final x in sel.where((x) => x.$1.healthState == 'disabled')) {
-                  await r.updateStream(x.$1.id, {'health_state': 'inconclusive'});
+                for (final s in (await _selectedStreams(rows)).where((s) => s.healthState == 'disabled')) {
+                  await r.updateStream(s.id, {'health_state': 'inconclusive'});
                 }
               }),
               child: Text(t.aEnable),
@@ -129,80 +168,131 @@ class _StreamsScreenState extends ConsumerState<StreamsScreen> {
             OutlinedButton(
               style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
               onPressed: () async {
-                if (await confirm(context, t.confirmDelete(sel.length))) await _act((r) => r.deleteStreams([for (final x in sel) x.$1.id]));
+                if (await confirm(context, t.confirmDelete(selected.length))) await _act((r) => r.deleteStreams(selected.toList()));
               },
               child: Text(t.aDelete),
             ),
           ],
-          if (job.running) Text(t.checkRunning(job.done, job.total), style: TextStyle(color: c.textMuted)),
-        ]),
-      ),
-      if (data.isLoading) const LinearProgressIndicator(minHeight: 2),
-      Expanded(
-        child: ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: Space.lg),
-          itemCount: rows.length,
-          separatorBuilder: (_, _) => Divider(height: 1, color: c.line),
-          itemBuilder: (_, i) {
-            final (s, name, number) = rows[i];
-            return ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Checkbox(value: selected.contains(s.id), onChanged: (v) => setState(() => v == true ? selected.add(s.id) : selected.remove(s.id))),
-              title: Row(children: [
-                HealthPill(s.healthState),
-                const SizedBox(width: Space.sm),
-                Flexible(child: Text('${number ?? '—'} · $name', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: c.text, fontWeight: FontWeight.w600))),
-                if (s.hasCredentials) Padding(padding: const EdgeInsetsDirectional.only(start: 6), child: Icon(Icons.key_rounded, size: 15, color: healthColor('degraded'))),
-              ]),
-              subtitle: Directionality(
-                textDirection: TextDirection.ltr,
-                child: Text(s.maskedUrl, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: c.textMuted, fontSize: 12)),
-              ),
-              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                if (s.protocol != null) Text(s.protocol!, style: TextStyle(color: c.textDim, fontSize: 12)),
-                IconButton(tooltip: t.aTry, onPressed: () => showStreamPreview(context, s, name), icon: const Icon(Icons.play_circle_outline_rounded)),
-                IconButton(tooltip: t.aOpenChannel, onPressed: () => context.go('/admin/channel/${s.channelId}'), icon: const Icon(Icons.open_in_new_rounded)),
-              ]),
-            );
-          },
         ),
-      ),
-      Container(
-        decoration: BoxDecoration(border: Border(top: BorderSide(color: c.line))),
-        padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.xs),
-        child: Row(children: [
-          Text(total == 0 ? '' : t.pageOf(page * 100 + 1, page * 100 + rows.length, total), style: TextStyle(color: c.textMuted)),
-          const Spacer(),
-          IconButton(onPressed: page == 0 ? null : () => setState(() => page--), icon: const Icon(Icons.chevron_left_rounded)),
-          IconButton(onPressed: page * 100 + rows.length >= total ? null : () => setState(() => page++), icon: const Icon(Icons.chevron_right_rounded)),
-        ]),
-      ),
-    ]);
+        if (data.isLoading) const LinearProgressIndicator(minHeight: 2),
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: Space.lg),
+            itemCount: rows.length,
+            separatorBuilder: (_, _) => Divider(height: 1, color: c.line),
+            itemBuilder: (_, i) {
+              final (s, name, number) = rows[i];
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Checkbox(value: selected.contains(s.id), onChanged: (v) => setState(() => v == true ? selected.add(s.id) : selected.remove(s.id))),
+                title: Row(
+                  children: [
+                    HealthPill(s.healthState),
+                    const SizedBox(width: Space.sm),
+                    Flexible(
+                      child: Text(
+                        '${number ?? '—'} · $name',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: c.text, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    if (s.hasCredentials)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.only(start: 6),
+                        child: Icon(Icons.key_rounded, size: 15, color: healthColor('degraded')),
+                      ),
+                  ],
+                ),
+                subtitle: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Text(
+                    s.maskedUrl,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: c.textMuted, fontSize: 12),
+                  ),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (s.protocol != null) Text(s.protocol!, style: TextStyle(color: c.textDim, fontSize: 12)),
+                    IconButton(tooltip: t.aTry, onPressed: () => showStreamPreview(context, s, name), icon: const Icon(Icons.play_circle_outline_rounded)),
+                    IconButton(tooltip: t.aOpenChannel, onPressed: () => context.go('/admin/channel/${s.channelId}'), icon: const Icon(Icons.open_in_new_rounded)),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: c.line)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: Space.lg, vertical: Space.xs),
+          child: Row(
+            children: [
+              Text(total == 0 ? '' : t.pageOf(page * 100 + 1, page * 100 + rows.length, total), style: TextStyle(color: c.textMuted)),
+              const Spacer(),
+              IconButton(onPressed: page == 0 ? null : () => setState(() => page--), icon: const Icon(Icons.chevron_left_rounded)),
+              IconButton(onPressed: page * 100 + rows.length >= total ? null : () => setState(() => page++), icon: const Icon(Icons.chevron_right_rounded)),
+            ],
+          ),
+        ),
+      ],
+    );
 
     final hostPanel = Container(
-      decoration: BoxDecoration(border: BorderDirectional(start: BorderSide(color: c.line))),
-      child: ListView(padding: const EdgeInsets.all(Space.md), children: [
-        Text(t.hostsTitle, style: TextStyle(color: c.text, fontWeight: FontWeight.w700)),
-        const SizedBox(height: Space.sm),
-        for (final (h, n, ok) in hosts.take(80))
-          InkWell(
-            onTap: () => _set(() {
-              host = h;
-              hostCtrl.text = h;
-            }),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Row(children: [
-                Expanded(child: Directionality(textDirection: TextDirection.ltr, child: Text(h, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: host == h ? c.accent : c.text, fontSize: 12.5)))),
-                Pill('$ok/$n', ok == 0 ? healthColor('unavailable') : healthColor(ok == n ? 'playable' : 'degraded')),
-              ]),
-            ),
+      decoration: BoxDecoration(
+        border: BorderDirectional(start: BorderSide(color: c.line)),
+      ),
+      child: ListView(
+        padding: const EdgeInsets.all(Space.md),
+        children: [
+          Text(
+            t.hostsTitle,
+            style: TextStyle(color: c.text, fontWeight: FontWeight.w700),
           ),
-      ]),
+          const SizedBox(height: Space.sm),
+          for (final (h, n, ok) in hosts.take(80))
+            InkWell(
+              onTap: () => _set(() {
+                host = h;
+                hostCtrl.text = h;
+              }),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Text(
+                          h,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: host == h ? c.accent : c.text, fontSize: 12.5),
+                        ),
+                      ),
+                    ),
+                    Pill('$ok/$n', ok == 0 ? healthColor('unavailable') : healthColor(ok == n ? 'playable' : 'degraded')),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
     );
 
     return LayoutBuilder(
-      builder: (context, box) => box.maxWidth >= 1100 ? Row(children: [Expanded(child: list), SizedBox(width: 300, child: hostPanel)]) : list,
+      builder: (context, box) => box.maxWidth >= 1100
+          ? Row(
+              children: [
+                Expanded(child: list),
+                SizedBox(width: 300, child: hostPanel),
+              ],
+            )
+          : list,
     );
   }
 }
