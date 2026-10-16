@@ -85,7 +85,7 @@ class _ChannelDrawerState extends ConsumerState<ChannelDrawer> {
       _mark(sel - 10, n);
     } else if ((k == LogicalKeyboardKey.enter || k == LogicalKeyboardKey.numpadEnter || k == LogicalKeyboardKey.select) && sel >= 0 && sel < n) {
       widget.onPick(items[sel]);
-    } else if (k == LogicalKeyboardKey.escape || e.physicalKey == PhysicalKeyboardKey.keyG || k == LogicalKeyboardKey.keyG || k == LogicalKeyboardKey.goBack) {
+    } else if (k == LogicalKeyboardKey.escape || e.physicalKey == PhysicalKeyboardKey.keyG || k == LogicalKeyboardKey.keyG) { // goBack: عبر رجوع النظام (handleBack في المشغّل)
       widget.onClose();
     } else {
       return KeyEventResult.ignored;

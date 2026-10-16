@@ -140,7 +140,16 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
                 : ListView(children: [video, info]);
           });
 
-    return NumberEntry(
+    return PopScope(
+      // رجوع النظام: المشغّل أولًا (قائمة مفتوحة/التحكم على التلفزيون)، ثم الخروج من ملء الشاشة، ثم الرجوع
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        final Object? p = _playerKey.currentState;
+        if (p is PlayerBackHandler && p.handleBack()) return;
+        _back();
+      },
+      child: NumberEntry(
       onChannel: (ch) => context.replace('/watch/${ch.id}'),
       child: Material(
         color: fs ? Colors.black : c.bg,
@@ -169,6 +178,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
           ),
         ]),
       ),
+    ),
     );
   }
 

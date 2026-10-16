@@ -42,6 +42,12 @@ final _tracksProvider = StreamProvider<Tracks>((ref) => ref.watch(playerProvider
 
 enum _Menu { main, quality, audio, subs, server }
 
+/// زر الرجوع في النظام (Android) لا يصل كمفتاح بل كطلب رجوع: شاشة المشاهدة تسأل المشغّل أولًا.
+abstract interface class PlayerBackHandler {
+  /// يُغلق قائمة/نافذة مفتوحة أو يخفي التحكم على التلفزيون؛ true إن استهلك الرجوع.
+  bool handleBack();
+}
+
 class PlayerView extends ConsumerStatefulWidget {
   final bool fullscreen;
   final VoidCallback onToggleFullscreen;
@@ -54,8 +60,9 @@ class PlayerView extends ConsumerStatefulWidget {
   ConsumerState<PlayerView> createState() => _PlayerViewState();
 }
 
-class _PlayerViewState extends ConsumerState<PlayerView> with TickerProviderStateMixin {
-  final _focus = FocusNode(debugLabel: 'player');
+class _PlayerViewState extends ConsumerState<PlayerView> with TickerProviderStateMixin implements PlayerBackHandler {
+  // skipTraversal: المشغّل كله ليس هدفًا للأسهم (كان يسرق التركيز من أزرار الشريط على التلفزيون بلا حلقة)
+  final _focus = FocusNode(debugLabel: 'player', skipTraversal: true);
   final _playBtn = FocusNode(debugLabel: 'player-play');
   final _bar = FocusNode(debugLabel: 'player-bar', skipTraversal: true); // يحوي أزرار الشريط: hasFocus = التركيز على أحدها
   bool show = true;
@@ -172,6 +179,29 @@ class _PlayerViewState extends ConsumerState<PlayerView> with TickerProviderStat
     _wake();
   }
 
+  @override
+  bool handleBack() {
+    if (help || stats) {
+      setState(() => help = stats = false);
+      return true;
+    }
+    if (menu != null) {
+      _openMenu(null);
+      return true;
+    }
+    if (drawer) {
+      toggleDrawer(false);
+      return true;
+    }
+    // التلفزيون: الرجوع الأول يخفي التحكم (والثاني يخرج)
+    if (isAndroidTv && show && ref.read(playerProvider).state.playing) {
+      _focus.requestFocus();
+      _hideNow();
+      return true;
+    }
+    return false;
+  }
+
   // ── لوحة المفاتيح والريموت ──
   KeyEventResult _onKey(FocusNode _, KeyEvent e) {
     if (e is! KeyDownEvent && e is! KeyRepeatEvent) return KeyEventResult.ignored;
@@ -186,21 +216,32 @@ class _PlayerViewState extends ConsumerState<PlayerView> with TickerProviderStat
       return KeyEventResult.handled;
     }
 
-    if (k == LogicalKeyboardKey.escape || k == LogicalKeyboardKey.goBack) {
+    // goBack (زر رجوع Android) لا يُعالج هنا: يصل أيضًا كطلب رجوع من النظام (PopScope في شاشة المشاهدة)،
+    // ومعالجته مرتين كانت تنفّذ خطوتين بضغطة واحدة وتُغلق التطبيق.
+    if (k == LogicalKeyboardKey.escape) {
       if (help) return done(() => setState(() => help = false));
       if (stats) return done(() => setState(() => stats = false));
       if (menu != null) return done(() => _openMenu(null));
       if (drawer) return done(() => toggleDrawer(false));
-      if (tv && show) return done(_hideNow);
+      if (tv && show) {
+        // لا done(): تُظهر التحكم بعد الفعل. والتركيز يعود للمشغّل حتى لا يضغط OK زرًا مخفيًا
+        _focus.requestFocus();
+        _hideNow();
+        return KeyEventResult.handled;
+      }
       return done(widget.fullscreen && !tv ? widget.onToggleFullscreen : widget.onBack);
     }
     if (_overlayOpen) return KeyEventResult.ignored; // القوائم تعالج أسهمها
-    // التلفزيون والتحكم ظاهر: الأسهم للتنقل بين الأزرار
-    if (tv && show && (k == LogicalKeyboardKey.arrowLeft || k == LogicalKeyboardKey.arrowRight || k == LogicalKeyboardKey.arrowUp || k == LogicalKeyboardKey.arrowDown)) {
+    // التلفزيون: التركيز داخل الشريط ← يمين/يسار تتنقل بين الأزرار وOK يضغط الزر (أعلى/أسفل تبقى لتغيير القناة).
+    // لا تركيز على الشريط ← OK أو يمين/يسار تُظهر التحكم وتركّز «تشغيل».
+    final horizontal = k == LogicalKeyboardKey.arrowLeft || k == LogicalKeyboardKey.arrowRight;
+    final ok = k == LogicalKeyboardKey.select || k == LogicalKeyboardKey.enter || k == LogicalKeyboardKey.numpadEnter;
+    if (tv && _bar.hasFocus && (horizontal || ok)) {
       _wake();
       return KeyEventResult.ignored;
     }
-    if (tv && !show && (k == LogicalKeyboardKey.select || k == LogicalKeyboardKey.enter || k == LogicalKeyboardKey.arrowLeft || k == LogicalKeyboardKey.arrowRight)) {
+    // فقط حين لا يكون شيء آخر مركّزًا (أزرار شاشة الخطأ مثلًا تُضغط بـ OK كالمعتاد)
+    if (tv && _focus.hasPrimaryFocus && (horizontal || ok)) {
       return done(() => WidgetsBinding.instance.addPostFrameCallback((_) => _playBtn.requestFocus()));
     }
     if (k == LogicalKeyboardKey.space || (ph == PhysicalKeyboardKey.keyK || k == LogicalKeyboardKey.keyK) || k == LogicalKeyboardKey.mediaPlayPause) return done(togglePlay);
@@ -305,7 +346,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> with TickerProviderStat
           ),
         if (_osd != null) Positioned(top: 16, left: 0, right: 0, child: IgnorePointer(child: Center(child: _Chip(_osd!)))),
         // أسهم القناة السابقة/التالية على الجانبين (ملء الشاشة، غير اللمس)
-        if (widget.fullscreen && !touch && !drawer) ...[
+        // ليست على التلفزيون: ↑↓ تغيّر القناة، وكانت الأسهم تسرق التركيز من أزرار الشريط
+        if (widget.fullscreen && !touch && !drawer && !isAndroidTv) ...[
           Positioned(left: 18, top: 0, bottom: 0, child: Center(child: _SideArrow(visible: visible, icon: Icons.chevron_left_rounded, tip: t.prevChannel, onTap: () => widget.onStep(-1)))),
           Positioned(right: 18, top: 0, bottom: 0, child: Center(child: _SideArrow(visible: visible, icon: Icons.chevron_right_rounded, tip: t.nextChannel, onTap: () => widget.onStep(1)))),
         ],
@@ -494,25 +536,76 @@ class _PlayerViewState extends ConsumerState<PlayerView> with TickerProviderStat
   }
 }
 
-/// زر شفاف بنمط الموقع (40×40، أبيض، تركيز واضح للريموت).
-class _BarButton extends StatelessWidget {
+/// زر شفاف بنمط الموقع (40×40، أبيض). حلقة تركيز بيضاء مرسومة بنفسه: حبر InkResponse يُرسم على أقرب
+/// Material وهي تحت الفيديو، فلم يكن التركيز يظهر على التلفزيون (محاكي Android TV، 2026-10-16).
+/// لا FocusNode جديدة في كل بناء (كانت تُفقد التركيز مع كل تحديث للشريط).
+class _BarButton extends StatefulWidget {
   final String tooltip;
   final VoidCallback onPressed;
   final Widget child;
   final FocusNode? focusNode;
   const _BarButton({super.key, required this.tooltip, required this.onPressed, required this.child, this.focusNode});
   @override
-  Widget build(BuildContext context) => Tooltip(
-        message: tooltip,
-        child: InkResponse(
-          focusNode: focusNode ?? FocusNode(debugLabel: 'pb-${(key as ValueKey?)?.value}'),
-          onTap: onPressed,
-          radius: 22,
-          focusColor: Colors.white24,
-          highlightShape: BoxShape.circle,
-          child: SizedBox(width: 40, height: 40, child: Center(child: child)),
+  State<_BarButton> createState() => _BarButtonState();
+}
+
+class _BarButtonState extends State<_BarButton> {
+  bool hover = false;
+  FocusNode? _own;
+  FocusNode get _node => widget.focusNode ?? (_own ??= FocusNode());
+
+  @override
+  void initState() {
+    super.initState();
+    _node.addListener(_onFocus);
+  }
+
+  @override
+  void didUpdateWidget(_BarButton old) {
+    super.didUpdateWidget(old);
+    if (old.focusNode != widget.focusNode) {
+      (old.focusNode ?? _own)?.removeListener(_onFocus);
+      _node.addListener(_onFocus);
+    }
+  }
+
+  void _onFocus() => mounted ? setState(() {}) : null;
+
+  @override
+  void dispose() {
+    _node.removeListener(_onFocus);
+    _own?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final focused = _node.hasPrimaryFocus;
+    return Tooltip(
+        message: widget.tooltip,
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkResponse(
+            focusNode: _node,
+            onTap: widget.onPressed,
+            onHover: (h) => setState(() => hover = h),
+            radius: 22,
+            highlightShape: BoxShape.circle,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: focused ? Colors.white24 : (hover ? Colors.white10 : Colors.transparent),
+                border: focused ? Border.all(color: Colors.white, width: 2) : null,
+              ),
+              child: Center(child: widget.child),
+            ),
+          ),
         ),
       );
+  }
 }
 
 class _LiveBadge extends StatelessWidget {

@@ -187,6 +187,7 @@ class _NumberEntryState extends ConsumerState<NumberEntry> {
   Widget build(BuildContext context) {
     final c = context.colors;
     return Focus(
+      skipTraversal: true, // مستمع للأرقام فقط، لا هدف للأسهم
       onKeyEvent: _onKey,
       child: Stack(children: [
         widget.child,
