@@ -3,16 +3,16 @@
   <channel>
     <title>MTC-iPTv (alpha)</title>
     <item>
-      <title>MTC-iPTv 3.0.0-alpha.19</title>
-      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.19] — 2026-10-16<br/><br/>### المرحلة 7 (الدفعة الثانية): القياس قبل القبول<br/>- **أول تحديث من داخل البرنامج:** إذا ثبّت alpha.18، افتح &#171;حول&#187; ← &#171;تحقق من التحديثات&#187;. يظهر هذا الإصدار، فينزّل ويتحقق من التوقيع ويثبّت، ثم يفتح البرنامج والبيانات كما هي.<br/>- **الأداء (&#167;26.1)**، مقيس ومثبت باختبارات تعمل في كل إصدار:<br/>  - **الاستيراد:** ملف من 50,000 سطر يُحلَّل في 0.28 ثانية، ويطابَق مع كتالوج من 10,000 قناة في 0.24 ثانية.<br/>  - **البحث:** البحث في 10,000 قناة يستغرق 4–6 ms، وعرضها كلها 100 ms، بذاكرة إضافية نحو 47 MB.<br/>- **لوحة المفاتيح وحدها (&#167;26.2):** اختبارات آلية تثبت أن Tab يتنقّل بين العناصر دون أن يعلق، وأن Enter يفتح عنصر القائمة، وأن بطاقات القنوات يصلها التركيز بإطار ظاهر.<br/>- **تغطية اختبارات النواة `mtc_core`:** 92% (الهدف 90%).<br/>- **قائمة قبول R1:** حُدّثت بالأرقام الفعلية.<br/>- **تنظيف:** حُذفت 3 ملفات فارغة كانت في جذر المستودع بالخطأ.</div>]]></description>
-      <pubDate>Fri, 16 Oct 2026 00:58:56 GMT</pubDate>
+      <title>MTC-iPTv 3.0.0-alpha.20</title>
+      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.20] — 2026-10-16<br/><br/>### تجهيز Android (R2) — إصلاحات مهمة لنسخة المعاينة<br/>- **إصلاح:** كل نسخ Android السابقة كانت **بلا صلاحية إنترنت**، فلا مزامنة ولا تشغيل. Flutter يضيف هذه الصلاحية لبناء التطوير فقط، وأضفناها الآن للنسخة النهائية.<br/>- **إصلاح:** نسخ Android كانت موقّعة بمفتاح التطوير. صارت تُوقَّع **بالمفتاح الرسمي نفسه لتطبيق React Native**، حتى تثبت فوقه دون حذف في R2. السكربت يرفض النشر إن لم تطابق البصمة.<br/>  - ⚠️ إن كانت عندك نسخة معاينة Android سابقة: **احذفها مرة واحدة** قبل تثبيت هذه، لأن المفتاح تغيّر.<br/>- **رقم البناء على Android** صار `30000 + رقم الإصدار`، فهو أعلى من تطبيق RN الحالي (21) كما يشترط الترقية.<br/>- **روابط http:** مصادر كثيرة تبث عبر http، وAndroid يمنعها افتراضيًا، فسُمح بها.<br/>- **الروابط العميقة على Android:** `mtciptv://watch/&lt;id&gt;` يفتح التطبيق على القناة، وكذلك إن كان يعمل.<br/>- **Android TV:** يظهر في الشاشة الرئيسية للتلفاز ببانر خاص، ولا يشترط شاشة لمس.<br/>- **ترحيل بيانات تطبيق React Native:**<br/>  - **ما يُنقل:** عند الترقية فوقه تُنقل المفضلة (بترتيبها) والسجل والإشعارات تلقائيًا عند أول تشغيل.<br/>  - **ما لا يُنقل:** جلسة المدير لا تُنقل، فيدخل المدير من جديد بالتحقق بخطوتين.<br/>  - **بيانات RN القديمة:** لا تُحذف، فيمكن إعادة المحاولة إن لزم.<br/>- **دليل اختبار الترقية على الأجهزة:** `docs/releases/r2-android-upgrade-test.md`.</div>]]></description>
+      <pubDate>Fri, 16 Oct 2026 01:40:54 GMT</pubDate>
       <sparkle:minimumSystemVersion>10.0.19044</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.19/MTC-iPTv-3.0.0-alpha.19-windows-setup.exe"
-                 sparkle:version="3.0.0+19"
-                 sparkle:shortVersionString="3.0.0-alpha.19"
+      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.20/MTC-iPTv-3.0.0-alpha.20-windows-setup.exe"
+                 sparkle:version="3.0.0+20"
+                 sparkle:shortVersionString="3.0.0-alpha.20"
                  sparkle:os="windows"
-                 sparkle:dsaSignature="MD0CHQDnGxgNKCNPzkSGX0qzl7+sX14i6qDavgUiGcLlAhw1fmzOOafgDALUwwGk+BzEkiW44kW8r3NXmRVP"
-                 length="28273419"
+                 sparkle:dsaSignature="MDwCHG9yfJ/NnULGSHPqQPmzr+0V0GeCRM/2gSiaYWACHBgaZN7b39jH2rWDzirC8b2JHvnZzYb2PHNevSQ="
+                 length="28274188"
                  type="application/octet-stream" />
     </item>
   </channel>
