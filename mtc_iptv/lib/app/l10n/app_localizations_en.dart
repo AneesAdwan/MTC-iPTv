@@ -10,6 +10,44 @@ class L10nEn extends L10n {
   L10nEn([String locale = 'en']) : super(locale);
 
   @override
+  String get spTag => 'Live TV · thousands of channels worldwide';
+
+  @override
+  String get spMsg1 => 'Preparing channels…';
+
+  @override
+  String get spMsg2 => 'Finding the best servers…';
+
+  @override
+  String get spMsg3 => 'Sorting channels by country…';
+
+  @override
+  String get spMsg4 => 'Loading logos…';
+
+  @override
+  String get spMsg5 => 'Almost ready…';
+
+  @override
+  String spReady(int n) {
+    return '$n channels ready to watch';
+  }
+
+  @override
+  String get spReadyNoCount => 'Ready';
+
+  @override
+  String get sgCap1 => 'Presented by';
+
+  @override
+  String get sgCap2 => 'A company of';
+
+  @override
+  String get sgName => 'Middle East Technology Center Group';
+
+  @override
+  String get spSkip => 'Tap to skip';
+
+  @override
   String get dcTitle => 'Decide per channel';
 
   @override

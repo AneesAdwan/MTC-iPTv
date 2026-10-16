@@ -10,6 +10,44 @@ class L10nAr extends L10n {
   L10nAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get spTag => 'بث مباشر · آلاف القنوات من حول العالم';
+
+  @override
+  String get spMsg1 => 'جارٍ تجهيز القنوات…';
+
+  @override
+  String get spMsg2 => 'نبحث عن أفضل السيرفرات…';
+
+  @override
+  String get spMsg3 => 'نرتّب القنوات حسب الدول…';
+
+  @override
+  String get spMsg4 => 'نجهّز الصور والشعارات…';
+
+  @override
+  String get spMsg5 => 'تقريبًا جاهز…';
+
+  @override
+  String spReady(int n) {
+    return '$n قناة جاهزة للمشاهدة';
+  }
+
+  @override
+  String get spReadyNoCount => 'جاهز';
+
+  @override
+  String get sgCap1 => 'تقدّم';
+
+  @override
+  String get sgCap2 => 'إحدى شركات';
+
+  @override
+  String get sgName => 'مجموعة شركات مركز تكنولوجيا الشرق الأوسط';
+
+  @override
+  String get spSkip => 'اضغط للتخطي';
+
+  @override
   String get dcTitle => 'قرار لكل قناة';
 
   @override

@@ -1,77 +1,601 @@
-// V-01 — المقدمة (§6.7): نسخة قصيرة ≤ ثانية واحدة فوق التطبيق، ثم تختفي.
-// تحترم «تقليل الحركة» في النظام (تُتخطّى). المقدمة الكاملة لأول تشغيل تُبنى في المرحلة 3.
+// V-01 — المقدمة (خطة التحسينات، المرحلة 3): مقدمة الموقع نفسها (#splash في index.html + styles.css):
+//   1) مشهد MTC-Group: هالة، الشعار، «تقدّم ← إحدى شركات»، الاسم بلمعة، خط ذهبي بجوهرة، الاسم الكامل.
+//   2) يصعد المشهد للأعلى ويصغر، وتتجمّع أشرطة ضوء نحو موضع الشعار.
+//   3) شعار MTC-iPTv: يظهر بقفزة، يُرسم المثلث ثم الموجات، حلقات نابضة، ومدار بنقطة تدور.
+//   4) حروف «MTC-iPTv» تظهر واحدًا تلو الآخر (من الضبابية)، و«-iPTv» بتدرّج لامع، ثم الشعار النصي.
+//   5) شريط التحميل برسائل متتالية، ثم «N قناة جاهزة للمشاهدة»، ثم تتلاشى المقدمة عن التطبيق.
+// حسب الجهاز: كمبيوتر/تابلت/تلفزيون أفقي (الشعار بجانب الاسم)، الجوال عمودي (الشعار فوق الاسم) بمقاسات أصغر.
+// الكاملة (9.4 ث مثل INTRO_MIN في الموقع) أول تشغيل فقط، ثم نسخة قصيرة (3 ث). لمسة/مفتاح يتخطّى،
+// و«تقليل الحركة» في النظام يلغيها.
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show KeyDownEvent;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../app/theme/tokens.dart';
+import '../../app/l10n/app_localizations.dart';
+import '../../app/layout/form_factor.dart';
+import '../../core/settings/local_settings.dart';
+import '../../data/catalog/catalog_repository.dart';
+import '../viewer/home_screen.dart' show channelsProvider;
 
-class SplashGate extends StatefulWidget {
+const _red = Color(0xFFFF2D55), _orange = Color(0xFFFF7A1A), _amber = Color(0xFFFFB02E);
+
+class SplashGate extends ConsumerStatefulWidget {
   final Widget child;
   const SplashGate({super.key, required this.child});
   @override
-  State<SplashGate> createState() => _SplashGateState();
+  ConsumerState<SplashGate> createState() => _SplashGateState();
 }
 
-class _SplashGateState extends State<SplashGate> with SingleTickerProviderStateMixin {
-  late final AnimationController ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 950));
-  bool done = false;
+class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStateMixin {
+  late final bool full = !ref.read(settingsProvider).introSeen;
+  late final double total = full ? 9.4 : 3.0; // ثوانٍ
+  late final AnimationController tl = AnimationController(vsync: this, duration: Duration(milliseconds: (total * 1000).round()));
+  late final AnimationController loop = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400))..repeat();
+  late final AnimationController drift = AnimationController(vsync: this, duration: const Duration(seconds: 12))..repeat(reverse: true);
+  bool done = false, started = false;
+  final _focus = FocusNode(debugLabel: 'splash');
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (started) return;
+    started = true;
     if (MediaQuery.of(context).disableAnimations) {
+      loop.stop();
+      drift.stop();
       done = true;
-    } else if (!ctrl.isAnimating && !done) {
-      ctrl.forward().whenComplete(() {
-        if (mounted) setState(() => done = true);
-      });
+      return;
     }
+    tl.forward().whenComplete(_finish);
+    if (full) Future.microtask(() => ref.read(settingsProvider.notifier).markIntroSeen());
+    WidgetsBinding.instance.addPostFrameCallback((_) => mounted ? _focus.requestFocus() : null);
+  }
+
+  void _finish() {
+    // الحركات المتكررة (النبض، الأضواء) تتوقف مع انتهاء المقدمة: لا إطارات بلا داعٍ (ولا تعلق الاختبارات)
+    loop.stop();
+    drift.stop();
+    if (mounted && !done) setState(() => done = true);
+  }
+
+  /// لمسة أو مفتاح: قفز لمرحلة الخروج.
+  void _skip() {
+    if (done) return;
+    final outStart = (total - 1.1) / total;
+    if (tl.value < outStart) tl.value = outStart;
+    tl.forward().whenComplete(_finish);
   }
 
   @override
   void dispose() {
-    ctrl.dispose();
+    tl.dispose();
+    loop.dispose();
+    drift.dispose();
+    _focus.dispose();
     super.dispose();
+  }
+
+  /// تقدّم مقطع من الخط الزمني: يبدأ عند [start] ثانية ويستغرق [dur] ثانية (0..1).
+  double seg(double start, double dur, [Curve curve = Curves.linear]) {
+    final t = tl.value * total;
+    return curve.transform(((t - start) / dur).clamp(0.0, 1.0));
   }
 
   @override
   Widget build(BuildContext context) {
     if (done) return widget.child;
-    final c = context.colors;
-    // 0→0.45 ظهور الشعار، 0.45→0.7 ثبات، 0.7→1 تلاشي الطبقة عن التطبيق
-    final logoIn = CurvedAnimation(parent: ctrl, curve: const Interval(0, 0.45, curve: Curves.easeOutBack));
-    final out = CurvedAnimation(parent: ctrl, curve: const Interval(0.7, 1, curve: Curves.easeIn));
     return Stack(children: [
       widget.child,
-      AnimatedBuilder(
-        animation: ctrl,
-        builder: (_, _) => IgnorePointer(
-          child: Opacity(
-            opacity: 1 - out.value,
-            child: ColoredBox(
-              color: c.bg,
-              child: Center(
-                child: Transform.scale(
-                  scale: 0.8 + 0.2 * logoIn.value,
-                  child: Opacity(
-                    opacity: logoIn.value.clamp(0, 1),
+      Positioned.fill(
+        child: Focus(
+          focusNode: _focus,
+          onKeyEvent: (_, e) {
+            if (e is KeyDownEvent) _skip();
+            return KeyEventResult.handled;
+          },
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: _skip,
+            child: AnimatedBuilder(animation: Listenable.merge([tl, loop, drift]), builder: (context, _) => _scene(context)),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _scene(BuildContext context) {
+    final t = L10n.of(context);
+    final size = MediaQuery.sizeOf(context);
+    final ff = formFactorOf(context);
+    final phone = ff == FormFactor.phone;
+    final w = size.width, h = size.height, vmin = math.min(w, h);
+    // مقاس الشعار (--s في الموقع: clamp(72px, 11vw, 124px))، أكبر على التلفزيون وأصغر على الجوال
+    final s = phone ? (w * .2).clamp(60.0, 92.0) : (w * .11).clamp(72.0, ff == FormFactor.tv ? 150.0 : 124.0);
+    final out = seg(total - 1.1, 1.1, Curves.easeInOut);
+
+    return Opacity(
+      opacity: (1 - out).clamp(0.0, 1.0),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Stack(fit: StackFit.expand, children: [
+          _background(w, h),
+          if (full) _group(t, w, h, vmin, phone),
+          Center(
+            child: Transform.translate(
+              offset: Offset(0, phone ? 0 : -h * .06),
+              child: Transform.scale(
+                scale: (full ? .93 + .07 * seg(2.2, 7, const Cubic(.2, .6, .2, 1)) : 1) * (1 - .08 * out),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: w * .94),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      SvgPicture.asset('assets/brand/mtc-iptv-icon.svg', width: 96, height: 96),
-                      const SizedBox(height: Space.lg),
-                      ShaderMask(
-                        shaderCallback: (r) => c.brandGradient.createShader(r),
-                        child: const Text('MTC-iPTv', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700, color: Colors.white)),
-                      ),
-                      const SizedBox(height: Space.xs),
-                      Text('MTC-Group', style: TextStyle(color: c.textDim, fontSize: 12, letterSpacing: 2)),
+                      _logo(s, phone, w),
+                      SizedBox(height: s * .34),
+                      _tag(t, phone),
                     ]),
                   ),
                 ),
               ),
             ),
           ),
+          _footer(t, h, phone),
+        ]),
+      ),
+    );
+  }
+
+  // ── الخلفية: داكنة + أضواء «أورورا» تتحرك ببطء + تعتيم الأطراف ──
+  Widget _background(double w, double h) {
+    final a = full ? seg(.1, 2.1, Curves.easeOut) : seg(0, .6, Curves.easeOut);
+    final d = Curves.easeInOut.transform(drift.value);
+    final m = math.max(w, h);
+    Widget blob(Color c, double size, double dx, double dy, double op) => Positioned(
+          left: w / 2 + dx - size / 2,
+          top: h / 2 + dy - size / 2,
+          child: Container(width: size, height: size, decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [c.withValues(alpha: op), c.withValues(alpha: 0)], stops: const [0, .65]))),
+        );
+    return Stack(fit: StackFit.expand, children: [
+      const ColoredBox(color: Color(0xFF050508)),
+      Opacity(
+        opacity: a,
+        child: ImageFiltered(
+          imageFilter: ui.ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+          child: Stack(children: [
+            blob(_red, m * .46 * (1 + .15 * d), -m * .15 + m * .08 * d, -m * .07 + m * .04 * d, .55),
+            blob(_orange, m * .46 * (1 - .1 * d), m * .17 - m * .09 * d, m * .09 - m * .05 * d, .55),
+            blob(const Color(0xFFB0127A), m * .36 * (1 + .2 * d), -m * .0 + m * .05 * d, -m * .08 - m * .07 * d, .4),
+          ]),
         ),
       ),
+      const DecoratedBox(decoration: BoxDecoration(gradient: RadialGradient(colors: [Colors.transparent, Color(0xBF000000)], stops: [.35, 1], radius: .9))),
     ]);
   }
+
+  // ── المشهد الأول: MTC-Group، ثم يصعد للأعلى ويصغر ──
+  Widget _group(L10n t, double w, double h, double vmin, bool phone) {
+    final settle = seg(2.6, 1.1, const Cubic(.65, 0, .25, 1));
+    final k = 1 - (1 - .54) * settle;
+    final gy = (h / 2 - (phone ? (h * .16).clamp(95.0, 150.0) : (h * .26).clamp(165.0, 245.0))) * settle;
+    final emb = phone ? (vmin * .3).clamp(84.0, 140.0) : (vmin * .25).clamp(116.0, 230.0);
+    double fade(double start) => seg(start, .9, const Cubic(.2, .8, .2, 1));
+    Widget rise(double start, Widget child) {
+      final p = fade(start);
+      return Opacity(
+        opacity: p,
+        child: Transform.translate(offset: Offset(0, 8 * (1 - p)), child: p < 1 ? ImageFiltered(imageFilter: ui.ImageFilter.blur(sigmaX: 12 * (1 - p), sigmaY: 12 * (1 - p)), child: child) : child),
+      );
+    }
+
+    final capSwap = seg(2.75, .45);
+    final cap2 = seg(3.2, .6);
+    final rule = seg(1.25, 1.1, const Cubic(.65, 0, .35, 1));
+    final gem = seg(2.0, .6, const Cubic(.34, 1.56, .64, 1));
+    final track = seg(1.45, 1.6, const Cubic(.2, .8, .2, 1));
+    final shimmer = (tl.value * total - 1.8) / 3.6 % 1;
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    final nameSize = phone ? (vmin * .1).clamp(30.0, 46.0) : (vmin * .08).clamp(36.0, 78.0);
+
+    final texts = Column(
+      crossAxisAlignment: phone ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // «تقدّم» ← «إحدى شركات»
+        SizedBox(
+          height: (phone ? 18.0 : (vmin * .024).clamp(14.0, 21.0)) * 1.9,
+          child: Stack(alignment: phone ? Alignment.bottomCenter : (rtl ? Alignment.bottomRight : Alignment.bottomLeft), children: [
+            Opacity(
+              opacity: fade(.85) * (1 - capSwap),
+              child: Text(t.sgCap1, style: TextStyle(color: const Color(0xFFFFB37A), fontWeight: FontWeight.w700, letterSpacing: 4, fontSize: phone ? 15 : (vmin * .024).clamp(14.0, 21.0))),
+            ),
+            Opacity(
+              opacity: cap2,
+              child: Transform.translate(
+                offset: Offset(0, 6 * (1 - cap2)),
+                child: Text(t.sgCap2, style: TextStyle(color: const Color(0xFFFFC9A3), fontWeight: FontWeight.w700, fontSize: (phone ? 15.0 : (vmin * .024).clamp(14.0, 21.0)) * 1.5)),
+              ),
+            ),
+          ]),
+        ),
+        rise(
+          1.0,
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('MTC', style: TextStyle(color: Colors.white, fontSize: nameSize, fontWeight: FontWeight.w900, height: 1.02, shadows: const [Shadow(color: Color(0x40FF7850), blurRadius: 40)])),
+              _shimmerText('-Group', TextStyle(fontSize: nameSize, fontWeight: FontWeight.w900, height: 1.02), shimmer),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 4),
+        // خط ذهبي يتمدد من الوسط، وجوهرة في منتصفه
+        SizedBox(
+          width: nameSize * 5.2,
+          height: 10,
+          child: Stack(alignment: Alignment.center, children: [
+            Transform.scale(
+              scaleX: rule,
+              child: Container(
+                height: 1,
+                decoration: const BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, Color(0xFFFFC37A), _orange, Color(0xFFFFC37A), Colors.transparent], stops: [0, .18, .5, .82, 1])),
+              ),
+            ),
+            Transform.rotate(
+              angle: math.pi / 4,
+              child: Transform.scale(
+                scale: gem,
+                child: Container(
+                  width: 7,
+                  height: 7,
+                  decoration: BoxDecoration(color: const Color(0xFFFFE2BF), boxShadow: [BoxShadow(color: const Color(0xFFFF9A4A), blurRadius: 12 + 8 * math.sin(loop.value * 2 * math.pi).abs())]),
+                ),
+              ),
+            ),
+          ]),
+        ),
+        const SizedBox(height: 4),
+        rise(1.15, Text(t.sgName, textAlign: phone ? TextAlign.center : TextAlign.start, style: TextStyle(color: const Color(0xFFF2F2F7), fontWeight: FontWeight.w700, fontSize: phone ? 15 : (vmin * .033).clamp(16.0, 31.0)))),
+        const SizedBox(height: 4),
+        Opacity(
+          opacity: track,
+          child: Text(
+            'MIDDLE EAST TECHNOLOGY CENTER GROUP',
+            style: TextStyle(color: const Color(0xCCFFDCB4), fontWeight: FontWeight.w600, fontSize: phone ? 10 : (vmin * .021).clamp(12.0, 19.0), letterSpacing: (phone ? 2.0 : 5.0) + 10 * (1 - track)),
+          ),
+        ),
+      ],
+    );
+
+    final halo = seg(.3, 2.6);
+    final emblemIn = seg(.3, 1.0, const Cubic(.34, 1.56, .64, 1));
+    final emblem = Opacity(
+      opacity: emblemIn.clamp(0.0, 1.0),
+      child: Transform.scale(
+        scale: .6 + .4 * emblemIn,
+        child: Container(
+          decoration: const BoxDecoration(boxShadow: [BoxShadow(color: Color(0x73FF2D55), blurRadius: 34, offset: Offset(0, 12))], shape: BoxShape.circle),
+          child: SvgPicture.asset('assets/brand/mtc-group-emblem-static.svg', width: emb, height: emb),
+        ),
+      ),
+    );
+
+    return Positioned.fill(
+      child: Center(
+        child: Transform.translate(
+          offset: Offset(0, -gy),
+          child: Transform.scale(
+            scale: k,
+            child: Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [
+              // الهالة
+              Opacity(
+                opacity: (halo < .35 ? halo / .35 : 1 - (halo - .35) / .65).clamp(0.0, 1.0),
+                child: Transform.scale(
+                  scale: .6 + .8 * halo,
+                  child: Container(
+                    width: emb * 4,
+                    height: emb * 2.4,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(colors: [_red.withValues(alpha: .32), _orange.withValues(alpha: .1), Colors.transparent], stops: const [0, .55, 1]),
+                    ),
+                  ),
+                ),
+              ),
+              // يصغر ليناسب الشاشات الضيقة جدًا بدل أن يفيض
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: w * .94, maxHeight: h * .9),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Directionality(
+                    textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+                    child: phone
+                        ? Column(mainAxisSize: MainAxisSize.min, children: [emblem, const SizedBox(height: 14), texts])
+                        : Row(mainAxisSize: MainAxisSize.min, children: [emblem, SizedBox(width: (vmin * .028).clamp(16.0, 32.0)), texts]),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _shimmerText(String text, TextStyle style, double phase) => ShaderMask(
+        blendMode: BlendMode.srcIn,
+        shaderCallback: (r) => LinearGradient(
+          colors: const [_red, _orange, Color(0xFFFFD3A8), _orange, _red],
+          stops: const [0, .35, .5, .65, 1],
+          begin: Alignment(-1 - 2.5 + 4 * phase, 0),
+          end: Alignment(1 - 2.5 + 4 * phase + 1.5, 0),
+        ).createShader(r),
+        child: Text(text, style: style.copyWith(color: Colors.white)),
+      );
+
+  // ── الشعار: الرمز + «MTC-iPTv» (أفقي، أو عمودي على الجوال) ──
+  Widget _logo(double s, bool phone, double w) {
+    final T = full ? 0.0 : -3.5; // القصيرة تبدأ مباشرة بمرحلة الشعار
+    double at(double sec) => (sec + T).clamp(0.0, 99.0);
+    final pop = seg(at(3.5), full ? 1.2 : .7, const Cubic(.34, 1.56, .64, 1));
+    final glow = seg(at(3.7), 1.6);
+    final tri = seg(at(4.2) * (full ? 1 : .45), full ? .9 : .5, const Cubic(.65, 0, .35, 1));
+    final fill = seg(at(4.9) * (full ? 1 : .45), .4);
+    final wave1 = seg(at(5.0) * (full ? 1 : .5), .6, const Cubic(.65, 0, .35, 1));
+    final wave2 = seg(at(5.18) * (full ? 1 : .5), .6, const Cubic(.65, 0, .35, 1));
+    final orbit = seg(at(5.6) * (full ? 1 : .5), .8);
+    final ringsOn = seg(at(5.3) * (full ? 1 : .5), .2);
+
+    final mark = SizedBox(
+      width: s,
+      height: s,
+      child: Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [
+        if (full && !phone) _Ribbons(progress: [for (var i = 0; i < 4; i++) seg(2.4 + i * .15, 1.4, const Cubic(.7, 0, .25, 1))], s: s, w: w),
+        // التوهج خلف الرمز ينبض
+        Opacity(
+          opacity: glow * (.85 + .15 * math.sin(loop.value * 2 * math.pi)),
+          child: Container(
+            width: s * 1.44,
+            height: s * 1.44,
+            decoration: const BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [Color(0x8CFF463C), Colors.transparent], stops: [0, .62])),
+          ),
+        ),
+        // حلقتان تتسعان وتتلاشيان
+        for (final off in [0.0, .5])
+          Builder(builder: (_) {
+            final p = (loop.value + off) % 1;
+            final o = (p < .12 ? p / .12 : 1 - (p - .12) / .88) * ringsOn;
+            return Opacity(
+              opacity: o.clamp(0.0, 1.0),
+              child: Transform.scale(
+                scale: .8 + 2.6 * p,
+                child: Container(
+                  width: s * .39,
+                  height: s * .39,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xBFFF8246), width: 2 / (.8 + 2.6 * p)),
+                    boxShadow: const [BoxShadow(color: Color(0x8CFF503C), blurRadius: 16)],
+                  ),
+                ),
+              ),
+            );
+          }),
+        Opacity(
+          opacity: (pop * 1.6).clamp(0.0, 1.0),
+          child: Transform.rotate(
+            angle: -.21 * (1 - pop),
+            child: Transform.scale(
+              scale: .3 + .7 * pop,
+              child: CustomPaint(size: Size.square(s), painter: _MarkPainter(tri: tri, fill: fill, wave1: wave1, wave2: wave2, orbit: orbit, spin: loop.value, beat: (tl.value * total > at(6.2)) ? loop.value : 0)),
+            ),
+          ),
+        ),
+      ]),
+    );
+
+    final fontSize = phone ? s * .52 : s * .676;
+    const word = 'MTC-iPTv';
+    final shimmer = ((tl.value * total - at(6.5)) / 3.2) % 1;
+    final letters = Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
+      for (var i = 0; i < word.length; i++)
+        Builder(builder: (_) {
+          final p = seg(at(full ? 4.8 + i * .12 : 4.35 + i * .06), full ? 1.1 : .6, const Cubic(.2, .8, .2, 1));
+          final style = TextStyle(fontSize: fontSize, fontWeight: FontWeight.w900, height: 1, letterSpacing: -fontSize * .022);
+          final ch = i < 3 ? Text(word[i], style: style.copyWith(color: Colors.white)) : _shimmerText(word[i], style, shimmer);
+          return Opacity(
+            opacity: p,
+            child: Transform.translate(
+              offset: Offset(0, fontSize * .35 * (1 - p)),
+              child: Transform.scale(
+                scale: .96 + .04 * p,
+                child: p < 1 ? ImageFiltered(imageFilter: ui.ImageFilter.blur(sigmaX: 14 * (1 - p), sigmaY: 14 * (1 - p)), child: ch) : ch,
+              ),
+            ),
+          );
+        }),
+    ]);
+
+    return phone
+        ? Column(mainAxisSize: MainAxisSize.min, children: [mark, SizedBox(height: s * .3), letters])
+        : Row(mainAxisSize: MainAxisSize.min, children: [mark, SizedBox(width: s * .294), letters]);
+  }
+
+  Widget _tag(L10n t, bool phone) {
+    final p = full ? seg(6.3, 1.4, const Cubic(.2, .8, .2, 1)) : seg(1.0, .6, const Cubic(.2, .8, .2, 1));
+    final fs = phone ? 12.5 : (MediaQuery.sizeOf(context).width * .015).clamp(13.0, 16.0);
+    return Opacity(
+      opacity: p,
+      child: Directionality(
+        textDirection: Localizations.localeOf(context).languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+        child: Text(t.spTag, textAlign: TextAlign.center, style: TextStyle(color: const Color(0x9EFFFFFF), fontSize: fs, fontWeight: FontWeight.w500, letterSpacing: fs * (.12 + .38 * (1 - p)))),
+      ),
+    );
+  }
+
+  // ── أسفل: شريط تحميل ورسائل متتالية، ثم «N قناة جاهزة» ──
+  Widget _footer(L10n t, double h, bool phone) {
+    final appear = full ? seg(6.6, 1) : seg(.8, .5);
+    final readyAt = total - 1.5;
+    final ready = tl.value * total >= readyAt;
+    final msgs = [t.spMsg1, t.spMsg2, t.spMsg3, t.spMsg4, t.spMsg5];
+    final idx = ((tl.value * total - (full ? 6.6 : .8)) / 1.6).floor().clamp(0, msgs.length - 1);
+    final count = ref.watch(channelsProvider(const ChannelFilter())).value?.length ?? 0;
+    final msg = ready ? (count > 0 ? t.spReady(count) : t.spReadyNoCount) : msgs[idx];
+    final barW = (MediaQuery.sizeOf(context).width * .44).clamp(0.0, 200.0);
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: (h * .11).clamp(40.0, 96.0),
+      child: Opacity(
+        opacity: appear,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Container(
+            width: barW,
+            height: 2,
+            decoration: BoxDecoration(color: Colors.white.withValues(alpha: .1), borderRadius: BorderRadius.circular(2)),
+            clipBehavior: Clip.hardEdge,
+            child: ready
+                ? Container(decoration: const BoxDecoration(gradient: LinearGradient(colors: [_red, _orange]), boxShadow: [BoxShadow(color: Color(0xE6FF5A3C), blurRadius: 10)]))
+                : Align(
+                    alignment: Alignment(-1.6 + 3.2 * Curves.easeInOutCubic.transform((loop.value * 1.6) % 1), 0),
+                    child: Container(width: barW * .35, decoration: const BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, _orange, _red, Colors.transparent]))),
+                  ),
+          ),
+          const SizedBox(height: 14),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: Directionality(
+              key: ValueKey(msg),
+              textDirection: Localizations.localeOf(context).languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+              child: Text(msg, style: TextStyle(color: ready ? Colors.white : Colors.white54, fontSize: 13, fontWeight: ready ? FontWeight.w700 : FontWeight.w400)),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// أشرطة ضوء تأتي من الطرفين وتنكمش نحو مركز الرمز (spRibbon في الموقع).
+class _Ribbons extends StatelessWidget {
+  final List<double> progress;
+  final double s, w;
+  const _Ribbons({required this.progress, required this.s, required this.w});
+  @override
+  Widget build(BuildContext context) {
+    const ys = [-30.0, -10.0, 10.0, 30.0];
+    return IgnorePointer(
+      child: CustomPaint(
+        size: Size.square(s),
+        painter: _RibbonPainter(progress: progress, ys: [for (final y in ys) y * s / 124], len: w * .6, far: w * .7),
+      ),
+    );
+  }
+}
+
+class _RibbonPainter extends CustomPainter {
+  final List<double> progress, ys;
+  final double len, far;
+  _RibbonPainter({required this.progress, required this.ys, required this.len, required this.far});
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    for (var i = 0; i < progress.length; i++) {
+      final p = progress[i];
+      if (p <= 0 || p >= 1) continue;
+      final op = p < .25 ? p / .25 : 1 - (p - .25) / .75;
+      final fromRight = i.isEven;
+      final x = far * (1 - p), sx = 1 - .98 * p;
+      canvas.save();
+      canvas.translate(c.dx, c.dy);
+      if (!fromRight) canvas.rotate(math.pi);
+      canvas.translate(x, ys[i] * (fromRight ? 1 : -1));
+      canvas.scale(sx, 1);
+      final r = Rect.fromLTWH(0, -1, len, 2);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(r, const Radius.circular(2)),
+        Paint()
+          ..shader = LinearGradient(colors: [Colors.white.withValues(alpha: .95 * op), _orange.withValues(alpha: op), _red.withValues(alpha: 0)], stops: const [0, .3, 1]).createShader(r)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 3),
+      );
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RibbonPainter o) => true;
+}
+
+/// رمز MTC-iPTv (img/mtc-iptv-icon.svg في الموقع، viewBox 64): دائرة متدرجة، مثلث تشغيل يُرسم ثم يمتلئ،
+/// موجتا بث على الجانبين تُرسمان، ومدار منقّط بنقطة تدور.
+class _MarkPainter extends CustomPainter {
+  final double tri, fill, wave1, wave2, orbit, spin, beat;
+  _MarkPainter({required this.tri, required this.fill, required this.wave1, required this.wave2, required this.orbit, required this.spin, required this.beat});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final k = size.width / 64;
+    canvas.scale(k);
+    const c = Offset(32, 32);
+    final grad = const LinearGradient(colors: [_red, Color(0xFFFF5A36), _amber]).createShader(const Rect.fromLTWH(8, 8, 48, 48));
+
+    // المدار + النقطة
+    if (orbit > 0) {
+      final dash = Paint()
+        ..color = _orange.withValues(alpha: .3 * orbit)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = .8;
+      for (var a = 0.0; a < 2 * math.pi; a += 4.5 / 27.5) {
+        canvas.drawArc(Rect.fromCircle(center: c, radius: 27.5), a, 1.5 / 27.5, false, dash);
+      }
+      final ang = -math.pi / 2 + spin * 2 * math.pi * .6;
+      canvas.drawCircle(c + Offset(math.cos(ang), math.sin(ang)) * 27.5, 2.2, Paint()..color = Colors.white.withValues(alpha: orbit));
+    }
+
+    // الدائرة الملونة (تنبض قليلًا مع المثلث)
+    final b = beat == 0 ? 1.0 : 1 - .06 * math.sin(beat * 2 * math.pi).abs();
+    canvas.drawCircle(c, 12.5 * b, Paint()..shader = grad);
+
+    // المثلث: رسم الحدّ ثم الامتلاء
+    final triPath = Path()
+      ..moveTo(28.5, 25.5)
+      ..lineTo(38.5, 32)
+      ..lineTo(28.5, 38.5)
+      ..close();
+    if (fill > 0) canvas.drawPath(triPath, Paint()..color = Colors.white.withValues(alpha: fill));
+    if (tri > 0) {
+      final m = triPath.computeMetrics().first;
+      canvas.drawPath(
+        m.extractPath(0, m.length * tri),
+        Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3
+          ..strokeJoin = StrokeJoin.round
+          ..strokeCap = StrokeCap.round
+          ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 1),
+      );
+    }
+
+    // الموجتان (±40° حول الأفقي، نصفا قطر 16 و25)
+    final wp = Paint()
+      ..shader = grad
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.8
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 1.2);
+    for (final (r, p) in [(16.0, wave1), (25.0, wave2)]) {
+      if (p <= 0) continue;
+      const span = 80 * math.pi / 180;
+      canvas.drawArc(Rect.fromCircle(center: c, radius: r), -40 * math.pi / 180, span * p, false, wp);
+      canvas.drawArc(Rect.fromCircle(center: c, radius: r), 140 * math.pi / 180, span * p, false, wp);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_MarkPainter o) => true;
 }

@@ -97,6 +97,78 @@ abstract class L10n {
     Locale('en'),
   ];
 
+  /// No description provided for @spTag.
+  ///
+  /// In ar, this message translates to:
+  /// **'بث مباشر · آلاف القنوات من حول العالم'**
+  String get spTag;
+
+  /// No description provided for @spMsg1.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ تجهيز القنوات…'**
+  String get spMsg1;
+
+  /// No description provided for @spMsg2.
+  ///
+  /// In ar, this message translates to:
+  /// **'نبحث عن أفضل السيرفرات…'**
+  String get spMsg2;
+
+  /// No description provided for @spMsg3.
+  ///
+  /// In ar, this message translates to:
+  /// **'نرتّب القنوات حسب الدول…'**
+  String get spMsg3;
+
+  /// No description provided for @spMsg4.
+  ///
+  /// In ar, this message translates to:
+  /// **'نجهّز الصور والشعارات…'**
+  String get spMsg4;
+
+  /// No description provided for @spMsg5.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقريبًا جاهز…'**
+  String get spMsg5;
+
+  /// No description provided for @spReady.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} قناة جاهزة للمشاهدة'**
+  String spReady(int n);
+
+  /// No description provided for @spReadyNoCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاهز'**
+  String get spReadyNoCount;
+
+  /// No description provided for @sgCap1.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقدّم'**
+  String get sgCap1;
+
+  /// No description provided for @sgCap2.
+  ///
+  /// In ar, this message translates to:
+  /// **'إحدى شركات'**
+  String get sgCap2;
+
+  /// No description provided for @sgName.
+  ///
+  /// In ar, this message translates to:
+  /// **'مجموعة شركات مركز تكنولوجيا الشرق الأوسط'**
+  String get sgName;
+
+  /// No description provided for @spSkip.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط للتخطي'**
+  String get spSkip;
+
   /// No description provided for @dcTitle.
   ///
   /// In ar, this message translates to:
