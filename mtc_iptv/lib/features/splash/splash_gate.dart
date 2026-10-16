@@ -5,8 +5,8 @@
 //   4) حروف «MTC-iPTv» تظهر واحدًا تلو الآخر (من الضبابية)، و«-iPTv» بتدرّج لامع، ثم الشعار النصي.
 //   5) شريط التحميل برسائل متتالية، ثم «N قناة جاهزة للمشاهدة»، ثم تتلاشى المقدمة عن التطبيق.
 // حسب الجهاز: كمبيوتر/تابلت/تلفزيون أفقي (الشعار بجانب الاسم)، الجوال عمودي (الشعار فوق الاسم) بمقاسات أصغر.
-// الكاملة (9.4 ث مثل INTRO_MIN في الموقع) أول تشغيل فقط، ثم نسخة قصيرة (3 ث). لمسة/مفتاح يتخطّى،
-// و«تقليل الحركة» في النظام يلغيها.
+// تُعرض كاملة في كل تشغيل وأبطأ من الموقع (طلب المالك 2026-10-17: «سريع كثير… ما شفنا اشي»):
+// الخط الزمني مصمم بـ10.4 ث ويُشغَّل ×1.4 (≈14.6 ث). لمسة/مفتاح يتخطّى، و«تقليل الحركة» في النظام يلغيها.
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -17,7 +17,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/layout/form_factor.dart';
 import '../../core/config/env.dart';
-import '../../core/settings/local_settings.dart';
 import '../../core/text/bidi.dart';
 import '../../data/catalog/catalog_repository.dart';
 import '../../data/settings/remote_config.dart';
@@ -34,9 +33,9 @@ class SplashGate extends ConsumerStatefulWidget {
 }
 
 class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStateMixin {
-  late final bool full = !ref.read(settingsProvider).introSeen;
-  late final double total = full ? 9.4 : 3.0; // ثوانٍ
-  late final AnimationController tl = AnimationController(vsync: this, duration: Duration(milliseconds: (total * 1000).round()));
+  /// مدة الخط الزمني بثواني التصميم (كل التوقيتات أدناه بها)، وكم أبطأ يُشغَّل.
+  static const double total = 10.4, _slow = 1.4;
+  late final AnimationController tl = AnimationController(vsync: this, duration: Duration(milliseconds: (total * _slow * 1000).round()));
   late final AnimationController loop = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400))..repeat();
   late final AnimationController drift = AnimationController(vsync: this, duration: const Duration(seconds: 12))..repeat(reverse: true);
   bool done = false, started = false;
@@ -54,7 +53,6 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
       return;
     }
     tl.forward().whenComplete(_finish);
-    if (full) Future.microtask(() => ref.read(settingsProvider.notifier).markIntroSeen());
     WidgetsBinding.instance.addPostFrameCallback((_) => mounted ? _focus.requestFocus() : null);
   }
 
@@ -130,12 +128,12 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
         textDirection: TextDirection.ltr,
         child: Stack(fit: StackFit.expand, children: [
           _background(w, h),
-          if (full) _group(t, w, h, vmin, phone),
+          _group(t, w, h, vmin, phone),
           Center(
             child: Transform.translate(
               offset: Offset(0, phone ? 0 : -h * .06),
               child: Transform.scale(
-                scale: (full ? .93 + .07 * seg(2.2, 7, const Cubic(.2, .6, .2, 1)) : 1) * (1 - .08 * out),
+                scale: (.93 + .07 * seg(2.2, 7, const Cubic(.2, .6, .2, 1))) * (1 - .08 * out),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: w * .94),
                   child: FittedBox(
@@ -152,6 +150,7 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
           ),
           _footer(t, h, phone),
           _corners(t, h),
+          _skipHint(t, h),
         ]),
       ),
     );
@@ -159,7 +158,7 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
 
   // ── الخلفية: داكنة + أضواء «أورورا» تتحرك ببطء + تعتيم الأطراف ──
   Widget _background(double w, double h) {
-    final a = full ? seg(.1, 2.1, Curves.easeOut) : seg(0, .6, Curves.easeOut);
+    final a = seg(.1, 2.1, Curves.easeOut);
     final d = Curves.easeInOut.transform(drift.value);
     final m = math.max(w, h);
     Widget blob(Color c, double size, double dx, double dy, double op) => Positioned(
@@ -337,22 +336,20 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
 
   // ── الشعار: الرمز + «MTC-iPTv» (أفقي، أو عمودي على الجوال) ──
   Widget _logo(double s, bool phone, double w) {
-    final T = full ? 0.0 : -3.5; // القصيرة تبدأ مباشرة بمرحلة الشعار
-    double at(double sec) => (sec + T).clamp(0.0, 99.0);
-    final pop = seg(at(3.5), full ? 1.2 : .7, const Cubic(.34, 1.56, .64, 1));
-    final glow = seg(at(3.7), 1.6);
-    final tri = seg(at(4.2) * (full ? 1 : .45), full ? .9 : .5, const Cubic(.65, 0, .35, 1));
-    final fill = seg(at(4.9) * (full ? 1 : .45), .4);
-    final wave1 = seg(at(5.0) * (full ? 1 : .5), .6, const Cubic(.65, 0, .35, 1));
-    final wave2 = seg(at(5.18) * (full ? 1 : .5), .6, const Cubic(.65, 0, .35, 1));
-    final orbit = seg(at(5.6) * (full ? 1 : .5), .8);
-    final ringsOn = seg(at(5.3) * (full ? 1 : .5), .2);
+    final pop = seg(3.5, 1.2, const Cubic(.34, 1.56, .64, 1));
+    final glow = seg(3.7, 1.6);
+    final tri = seg(4.2, .9, const Cubic(.65, 0, .35, 1));
+    final fill = seg(4.9, .4);
+    final wave1 = seg(5.0, .6, const Cubic(.65, 0, .35, 1));
+    final wave2 = seg(5.18, .6, const Cubic(.65, 0, .35, 1));
+    final orbit = seg(5.6, .8);
+    final ringsOn = seg(5.3, .2);
 
     final mark = SizedBox(
       width: s,
       height: s,
       child: Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [
-        if (full && !phone) _Ribbons(progress: [for (var i = 0; i < 4; i++) seg(2.4 + i * .15, 1.4, const Cubic(.7, 0, .25, 1))], s: s, w: w),
+        if (!phone) _Ribbons(progress: [for (var i = 0; i < 4; i++) seg(2.4 + i * .15, 1.4, const Cubic(.7, 0, .25, 1))], s: s, w: w),
         // التوهج خلف الرمز ينبض
         Opacity(
           opacity: glow * (.85 + .15 * math.sin(loop.value * 2 * math.pi)),
@@ -389,7 +386,7 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
             angle: -.21 * (1 - pop),
             child: Transform.scale(
               scale: .3 + .7 * pop,
-              child: CustomPaint(size: Size.square(s), painter: _MarkPainter(tri: tri, fill: fill, wave1: wave1, wave2: wave2, orbit: orbit, spin: loop.value, beat: (tl.value * total > at(6.2)) ? loop.value : 0)),
+              child: CustomPaint(size: Size.square(s), painter: _MarkPainter(tri: tri, fill: fill, wave1: wave1, wave2: wave2, orbit: orbit, spin: loop.value, beat: (tl.value * total > 6.2) ? loop.value : 0)),
             ),
           ),
         ),
@@ -398,11 +395,11 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
 
     final fontSize = phone ? s * .52 : s * .676;
     const word = 'MTC-iPTv';
-    final shimmer = ((tl.value * total - at(6.5)) / 3.2) % 1;
+    final shimmer = ((tl.value * total - 6.5) / 3.2) % 1;
     final letters = Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
       for (var i = 0; i < word.length; i++)
         Builder(builder: (_) {
-          final p = seg(at(full ? 4.8 + i * .12 : 4.35 + i * .06), full ? 1.1 : .6, const Cubic(.2, .8, .2, 1));
+          final p = seg(4.8 + i * .12, 1.1, const Cubic(.2, .8, .2, 1));
           final style = TextStyle(fontSize: fontSize, fontWeight: FontWeight.w900, height: 1, letterSpacing: -fontSize * .022);
           final ch = i < 3 ? Text(word[i], style: style.copyWith(color: Colors.white)) : _shimmerText(word[i], style, shimmer);
           return Opacity(
@@ -424,7 +421,7 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
   }
 
   Widget _tag(L10n t, bool phone) {
-    final p = full ? seg(6.3, 1.4, const Cubic(.2, .8, .2, 1)) : seg(1.0, .6, const Cubic(.2, .8, .2, 1));
+    final p = seg(6.3, 1.4, const Cubic(.2, .8, .2, 1));
     final fs = phone ? 12.5 : (MediaQuery.sizeOf(context).width * .015).clamp(13.0, 16.0);
     return Opacity(
       opacity: p,
@@ -435,7 +432,7 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
           SizedBox(height: fs * .7),
           // MTC-iPTv هي الشركة المشغّلة، وإحدى شركات MTC-Group (الشركة الأم)
           Opacity(
-            opacity: full ? seg(6.8, 1.0) : seg(1.3, .5),
+            opacity: seg(6.8, 1.0),
             child: Text(t.spOperator, textAlign: TextAlign.center, style: TextStyle(color: const Color(0xCCFFC9A3), fontSize: fs * .82, fontWeight: FontWeight.w600)),
           ),
         ]),
@@ -445,7 +442,7 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
 
   // ── الزاويتان السفليتان: رقم الإصدار يسارًا، واسم المطوّر يمينًا ──
   Widget _corners(L10n t, double h) {
-    final p = full ? seg(6.6, 1) : seg(.8, .5);
+    final p = seg(6.6, 1);
     final lang = Localizations.localeOf(context).languageCode;
     final dev = ref.watch(remoteConfigProvider).value?.developerName(lang) ?? (lang == 'ar' ? 'أنيس عدوان' : 'Anees Adwan'); // قبل أول مزامنة
     final style = TextStyle(color: Colors.white.withValues(alpha: .42), fontSize: 11.5, fontWeight: FontWeight.w500, letterSpacing: .3);
@@ -466,13 +463,29 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
     );
   }
 
+  // ── أعلى: «اضغط للتخطي» (المقدمة صارت أطول) ──
+  Widget _skipHint(L10n t, double h) {
+    final p = seg(1.6, .8) * (1 - seg(total - 1.6, .4));
+    final lang = Localizations.localeOf(context).languageCode;
+    return Positioned(
+      top: (h * .035).clamp(14.0, 28.0),
+      left: 0,
+      right: 0,
+      child: Opacity(
+        opacity: p * .5,
+        child: Text(t.spSkip, textAlign: TextAlign.center, textDirection: lang == 'ar' ? TextDirection.rtl : TextDirection.ltr, style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w500, letterSpacing: .4)),
+      ),
+    );
+  }
+
   // ── أسفل: شريط تحميل ورسائل متتالية، ثم «N قناة جاهزة» ──
   Widget _footer(L10n t, double h, bool phone) {
-    final appear = full ? seg(6.6, 1) : seg(.8, .5);
-    final readyAt = total - 1.5;
+    final appear = seg(6.6, 1);
+    final readyAt = total - 1.6;
     final ready = tl.value * total >= readyAt;
     final msgs = [t.spMsg1, t.spMsg2, t.spMsg3, t.spMsg4, t.spMsg5];
-    final idx = ((tl.value * total - (full ? 6.6 : .8)) / 1.6).floor().clamp(0, msgs.length - 1);
+    // ثلاث رسائل ≈ ثانية لكل منها قبل «جاهزة»
+    final idx = ((tl.value * total - 6.6) / .75).floor().clamp(0, msgs.length - 1);
     final count = ref.watch(channelsProvider(const ChannelFilter())).value?.length ?? 0;
     final msg = ready ? (count > 0 ? t.spReady(count) : t.spReadyNoCount) : msgs[idx];
     final barW = (MediaQuery.sizeOf(context).width * .44).clamp(0.0, 200.0);

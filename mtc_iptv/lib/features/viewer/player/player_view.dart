@@ -16,7 +16,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
@@ -30,9 +30,10 @@ import '../../../data/epg/epg_repository.dart';
 import '../../../data/settings/remote_config.dart';
 import '../../../player/pip.dart';
 import '../../../player/playback_controller.dart';
-import '../guide_screen.dart' show fmtRange;
+import '../guide_screen.dart' show fmtRange, fmtTime, latinDigits;
 import '../report_screen.dart';
 import '../widgets/channel_card.dart' show ChannelLogo;
+import 'brand_bug.dart';
 import 'channel_drawer.dart';
 
 const _red = Color(0xFFFF0033); // --yt-red
@@ -320,7 +321,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> with TickerProviderStat
         Positioned(
           top: gutter,
           left: gutter,
-          child: IgnorePointer(child: _Watermark(height: (w * .036).clamp(18.0, 40.0), dim: visible)),
+          child: IgnorePointer(child: BrandBug(height: (w * .036).clamp(20.0, 44.0), dim: visible)),
         ),
         // العنوان (ملء الشاشة فقط، مثل الموقع)
         if (widget.fullscreen && ch != null)
@@ -335,7 +336,8 @@ class _PlayerViewState extends ConsumerState<PlayerView> with TickerProviderStat
           left: gutter,
           right: gutter,
           bottom: visible ? (w * .08).clamp(58.0, 72.0) : gutter,
-          child: IgnorePointer(child: _LowerThird(anim: _lt, ch: ch, scale: (w / 900).clamp(.62, 1.15))),
+          // بعرض الشاشة كلها (طلب المالك)، والمقاسات تكبر مع عرض الفيديو
+          child: IgnorePointer(child: _LowerThird(anim: _lt, ch: ch, scale: (w / 1000).clamp(.62, 1.4))),
         ),
         if (s.phase == PlayPhase.loading || s.phase == PlayPhase.switching) IgnorePointer(child: _Spinner(ch: ch, switching: s.phase == PlayPhase.switching)),
         // الأيقونة في المنتصف
@@ -629,79 +631,6 @@ class _LiveBadge extends StatelessWidget {
       );
 }
 
-/// شعار MTC-iPTv بمقاسات img/mtc-iptv-logo.svg تمامًا (viewBox 300×64): الرمز SVG (متجهي، حاد بأي مقاس)،
-/// والاسم نص حقيقي بخط Inter 900 — كان نص SVG يُرسم بخط بديل لأن Inter غير موجود، فبدا «معدّلًا».
-/// ظل ناعم يتبع الحروف (لا مربع) ليُقرأ فوق الفيديو الفاتح.
-class _BrandMark extends StatelessWidget {
-  final double height;
-  const _BrandMark({required this.height});
-  @override
-  Widget build(BuildContext context) {
-    final s = height / 64;
-    final style = TextStyle(
-      fontFamily: 'Inter',
-      fontWeight: FontWeight.w900,
-      fontSize: 40 * s,
-      letterSpacing: -1 * s,
-      height: 1,
-      shadows: const [Shadow(color: Color(0x8C000000), blurRadius: 6, offset: Offset(0, 1))],
-    );
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        SvgPicture.asset('assets/brand/mtc-iptv-icon.svg', width: height, height: height),
-        SizedBox(width: 14 * s),
-        Text('MTC', style: style.copyWith(color: Colors.white)),
-        ShaderMask(
-          blendMode: BlendMode.srcIn,
-          shaderCallback: (r) => const LinearGradient(colors: [Color(0xFFFF2D55), Color(0xFFFF7A1A)]).createShader(r),
-          child: Text('-iPTv', style: style.copyWith(color: Colors.white)),
-        ),
-      ]),
-    );
-  }
-}
-
-/// للاختبارات ومعاينة التصميم فقط.
-@visibleForTesting
-Widget debugBrandMark(double height) => _BrandMark(height: height);
-
-/// شعار MTC-iPTv فوق البث: يظهر بمسح من اليسار عند الفتح، وأخفت قليلًا حين يظهر التحكم.
-class _Watermark extends StatefulWidget {
-  final double height;
-  final bool dim;
-  const _Watermark({required this.height, required this.dim});
-  @override
-  State<_Watermark> createState() => _WatermarkState();
-}
-
-class _WatermarkState extends State<_Watermark> with SingleTickerProviderStateMixin {
-  late final _in = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100))..forward();
-
-  @override
-  void dispose() {
-    _in.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final reveal = CurvedAnimation(parent: _in, curve: const Cubic(.75, 0, .2, 1));
-    return AnimatedOpacity(
-      opacity: widget.dim ? .55 : .85,
-      duration: const Duration(milliseconds: 300),
-      child: AnimatedBuilder(
-        animation: _in,
-        // مسح من اليسار عند الظهور فقط؛ بعده الشعار ثابت بمقاسه الأصلي (النبضة كانت تغيّر شكله)
-        builder: (_, child) => reveal.value >= 1
-            ? child!
-            : ClipRect(child: Align(alignment: Alignment.centerLeft, widthFactor: reveal.value.clamp(0.05, 1.0), child: child)),
-        child: _BrandMark(height: widget.height),
-      ),
-    );
-  }
-}
-
 class _TopTitle extends ConsumerWidget {
   final ChannelRow ch;
   const _TopTitle({required this.ch});
@@ -946,7 +875,28 @@ class _LowerThirdState extends ConsumerState<_LowerThird> with SingleTickerProvi
                 ),
               ),
               child: Stack(children: [
-                Row(children: [numberBadge, SizedBox(width: 12 * k), logoTile, SizedBox(width: 14 * k), Expanded(child: info)]),
+                Row(children: [
+                  numberBadge,
+                  SizedBox(width: 12 * k),
+                  logoTile,
+                  SizedBox(width: 14 * k),
+                  Expanded(child: info),
+                  // الطرف الآخر على الشاشات العريضة: الساعة والتاريخ مثل شاشات القنوات
+                  if (k >= .8) ...[
+                    SizedBox(width: 18 * k),
+                    Container(width: 1, height: 52 * k, color: Colors.white.withValues(alpha: .14)),
+                    SizedBox(width: 18 * k),
+                    appear(
+                      meta,
+                      Column(crossAxisAlignment: CrossAxisAlignment.end, mainAxisSize: MainAxisSize.min, children: [
+                        Text(ltr(fmtTime(context, DateTime.now())),
+                            style: TextStyle(color: Colors.white, fontSize: 26 * k, fontWeight: FontWeight.w800, height: 1, letterSpacing: .5)),
+                        SizedBox(height: 4 * k),
+                        Text(latinDigits(intl.DateFormat.MMMEd(locale.languageCode).format(DateTime.now())), style: TextStyle(color: Colors.white54, fontSize: 11 * k, fontWeight: FontWeight.w600)),
+                      ]),
+                    ),
+                  ],
+                ]),
                 // لمعة تعبر البطاقة مرة واحدة
                 if (shine > 0 && shine < 1)
                   Positioned.fill(
@@ -987,8 +937,8 @@ class _LowerThirdState extends ConsumerState<_LowerThird> with SingleTickerProvi
           textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
           child: Align(
             alignment: AlignmentDirectional.bottomStart,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 680 * k),
+            child: SizedBox(
+              width: double.infinity,
               child: Opacity(
                 opacity: (leaving ? 1 - exitT : card).clamp(0.0, 1.0),
                 child: Transform.translate(

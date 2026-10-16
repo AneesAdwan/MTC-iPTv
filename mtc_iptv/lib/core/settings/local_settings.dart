@@ -33,9 +33,6 @@ class LocalSettings {
   /// الملفات القديمة (بلا المفتاح) تُعدّ مخصّصة حتى لا نغيّر واجهة مستخدم قائم.
   final bool customized;
 
-  /// شوهدت المقدمة الكاملة (المرحلة 3): الكاملة أول مرة فقط، ثم القصيرة.
-  final bool introSeen;
-
   const LocalSettings({
     this.locale = const Locale('ar'),
     this.themeMode = ThemeMode.dark,
@@ -46,7 +43,6 @@ class LocalSettings {
     this.pinHash,
     this.lockedCategories = const [],
     this.customized = false,
-    this.introSeen = false,
   });
 
   bool get parentalOn => pinHash != null;
@@ -63,11 +59,9 @@ class LocalSettings {
     bool clearPin = false,
     List<String>? lockedCategories,
     bool? customized,
-    bool? introSeen,
   }) =>
       LocalSettings(
         customized: customized ?? this.customized,
-        introSeen: introSeen ?? this.introSeen,
         locale: locale ?? this.locale,
         themeMode: themeMode ?? this.themeMode,
         sidebarCollapsed: sidebarCollapsed ?? this.sidebarCollapsed,
@@ -88,7 +82,6 @@ class LocalSettings {
         'pinHash': pinHash,
         'lockedCategories': lockedCategories,
         'customized': customized,
-        'introSeen': introSeen,
       };
 
   factory LocalSettings.fromJson(Map<String, dynamic> j) => LocalSettings(
@@ -101,7 +94,6 @@ class LocalSettings {
         pinHash: j['pinHash'] is String ? j['pinHash'] as String : null,
         lockedCategories: [for (final x in (j['lockedCategories'] as List?) ?? const []) '$x'],
         customized: j['customized'] != false,
-        introSeen: j['introSeen'] == true,
       );
 }
 
@@ -129,7 +121,6 @@ class SettingsController extends Notifier<LocalSettings> {
     if (l != state.locale || m != state.themeMode) _set(state.copyWith(locale: l, themeMode: m));
   }
   void toggleTheme() => setThemeMode(state.themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark);
-  void markIntroSeen() => state.introSeen ? null : _set(state.copyWith(introSeen: true));
   void toggleSidebar() => _set(state.copyWith(sidebarCollapsed: !state.sidebarCollapsed));
   void setShowNumbers(bool v) => _set(state.copyWith(showNumbers: v));
   void setMaxQuality(int? h) => _set(h == null ? state.copyWith(clearMaxQuality: true) : state.copyWith(maxQuality: h));
