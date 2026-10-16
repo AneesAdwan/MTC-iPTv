@@ -1887,6 +1887,70 @@ class L10nAr extends L10n {
   String get anFailed => 'فشلت';
 
   @override
+  String get copy => 'نسخ';
+
+  @override
+  String get favSyncTitle => 'مزامنة المفضلة';
+
+  @override
+  String get favSyncCreate => 'مزامنة المفضلة بين أجهزتك';
+
+  @override
+  String get favSyncCreateHint =>
+      'دون حساب: يُنشأ رمز من 8 أحرف تدخله على جهازك الآخر.';
+
+  @override
+  String get favSyncCreateBtn => 'إنشاء رمز';
+
+  @override
+  String get favSyncJoin => 'ربط برمز من جهاز آخر';
+
+  @override
+  String get favSyncJoinShort => 'أدخل الرمز أو مفتاح التعديل.';
+
+  @override
+  String get favSyncJoinHint =>
+      'الرمز وحده يجلب مفضلة الجهاز الآخر ويضيفها لمفضلتك. «مفتاح التعديل» (الرمز ثم - ثم السرّ) يجعل الجهازين يتشاركان قائمة واحدة يعدّلانها معًا.';
+
+  @override
+  String get favSyncLink => 'ربط';
+
+  @override
+  String get favSyncBadCode => 'الرمز غير صحيح';
+
+  @override
+  String get favSyncLinked => 'تم الربط وجُلبت المفضلة.';
+
+  @override
+  String get favSyncNotFound => 'لا توجد مفضلة بهذا الرمز.';
+
+  @override
+  String get favSyncFailed => 'تعذّرت المزامنة. حاول لاحقًا.';
+
+  @override
+  String get favSyncCode => 'الرمز';
+
+  @override
+  String get favSyncOwnerHint =>
+      'يُرفع كل تغيير تلقائيًا. أعطِ الرمز لجهاز آخر ليجلب القائمة، أو «مفتاح التعديل» ليعدّلها أيضًا.';
+
+  @override
+  String get favSyncFollowerHint =>
+      'يجلب هذا الجهاز القائمة عند كل تشغيل ويضيفها لمفضلته، ولا يعدّلها.';
+
+  @override
+  String get favSyncCopyKey => 'نسخ مفتاح التعديل';
+
+  @override
+  String get favSyncUnlink => 'فك الربط';
+
+  @override
+  String get favSyncUnlinkHint => 'تبقى مفضلتك على هذا الجهاز كما هي.';
+
+  @override
+  String get favSyncDeleteRemote => 'احذف القائمة المشتركة من الخادم أيضًا';
+
+  @override
   String get anEmpty =>
       'لم تصل إحصاءات تشغيل بعد. تظهر بعد أن يشاهد المستخدمون بالإصدار الجديد ويُجمَّع اليوم.';
 

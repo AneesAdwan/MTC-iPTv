@@ -57,5 +57,12 @@ Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs 
 Name: "{group}\MTC-iPTv"; Filename: "{app}\mtc_iptv.exe"
 Name: "{autodesktop}\MTC-iPTv"; Filename: "{app}\mtc_iptv.exe"; Tasks: desktopicon
 
+[Registry]
+; Deep links mtciptv://watch/<id> (same scheme as the web site and the React Native app). Per-user (HKCU), no admin.
+Root: HKCU; Subkey: "Software\Classes\mtciptv"; ValueType: string; ValueName: ""; ValueData: "URL:MTC-iPTv"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\mtciptv"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\mtciptv\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: """{app}\mtc_iptv.exe"",0"
+Root: HKCU; Subkey: "Software\Classes\mtciptv\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\mtc_iptv.exe"" ""%1"""
+
 [Run]
 Filename: "{app}\mtc_iptv.exe"; Description: "{cm:LaunchProgram,MTC-iPTv}"; Flags: nowait postinstall skipifsilent

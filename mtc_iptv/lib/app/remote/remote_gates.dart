@@ -6,11 +6,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/backend/backend.dart';
 import '../../core/config/env.dart';
 import '../../data/settings/remote_config.dart';
+import '../../data/updates/app_updater.dart';
 import '../l10n/app_localizations.dart';
 import '../shell/sidebar.dart' show isAdminProvider;
 import '../theme/tokens.dart';
@@ -40,7 +40,7 @@ class RemoteGates extends ConsumerWidget {
         icon: Icons.system_update_rounded,
         title: t.updateRequired,
         body: '${rc.releases['notes_$lang'] ?? ''}',
-        action: rc.updateUrl == null ? null : FilledButton(onPressed: () => launchUrl(Uri.parse(rc.updateUrl!), mode: LaunchMode.externalApplication), child: Text(t.updateNow)),
+        action: FilledButton(onPressed: () => AppUpdater.checkNow(fallbackUrl: rc.updateUrl), child: Text(t.updateNow)),
       );
     }
     if (rc.maintenance && !admin && !ref.watch(maintenanceBypassProvider)) {
@@ -148,7 +148,7 @@ class _AnnouncementBarState extends ConsumerState<AnnouncementBar> {
           color: c.accent,
           icon: Icons.system_update_rounded,
           text: t.updateRecommended,
-          action: rc.updateUrl == null ? null : TextButton(onPressed: () => launchUrl(Uri.parse(rc.updateUrl!), mode: LaunchMode.externalApplication), child: Text(t.updateNow)),
+          action: TextButton(onPressed: () => AppUpdater.checkNow(fallbackUrl: rc.updateUrl), child: Text(t.updateNow)),
           onClose: () => setState(() => _updateClosed = true),
         ),
       for (final a in banners)

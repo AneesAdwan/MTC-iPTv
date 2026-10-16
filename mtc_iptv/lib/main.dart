@@ -10,10 +10,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
+import 'app/desktop/deep_links.dart';
 import 'core/backend/backend.dart';
 import 'core/config/env.dart';
 import 'core/logging/log.dart';
 import 'core/settings/local_settings.dart';
+import 'data/updates/app_updater.dart';
 import 'player/tls_bundle.dart';
 
 Future<void> main(List<String> args) async {
@@ -64,8 +66,12 @@ Future<void> main(List<String> args) async {
   runApp(ProviderScope(
     overrides: [
       initialSettingsProvider.overrideWithValue(settings),
+      launchDeepLinkProvider.overrideWithValue(findDeepLink(args)),
       if (hasBackend) supabaseProvider.overrideWithValue(Supabase.instance.client),
     ],
     child: const MtcApp(),
   ));
+
+  // التحديث داخل البرنامج (§18): لنسخ الإصدار فقط، لا لبناء التطوير (3.0.0-dev)
+  unawaited(AppUpdater.init());
 }

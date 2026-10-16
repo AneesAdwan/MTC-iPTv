@@ -10,6 +10,7 @@ import '../../core/settings/local_settings.dart';
 import '../../core/text/bidi.dart';
 import '../../data/catalog/catalog_repository.dart';
 import '../../data/epg/epg_repository.dart';
+import '../../data/favorites/fav_sync.dart';
 import '../../data/settings/remote_config.dart';
 import '../../data/telemetry/telemetry.dart';
 import 'guide_screen.dart' show fmtTime;
@@ -132,6 +133,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ]),
           ),
       ]),
+      _Section(title: t.favSyncTitle, children: const [_FavSyncTiles()]),
       _Section(title: t.sectionStorage, children: [
         ListTile(
           leading: const Icon(Icons.sync_rounded),
@@ -176,6 +178,156 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ),
       ]),
+    ]);
+  }
+}
+
+/// مزامنة المفضلة برمز (§8.3): إنشاء رمز، ربط برمز، نسخ مفتاح التعديل، زامن الآن، فك الربط.
+class _FavSyncTiles extends ConsumerStatefulWidget {
+  const _FavSyncTiles();
+  @override
+  ConsumerState<_FavSyncTiles> createState() => _FavSyncTilesState();
+}
+
+class _FavSyncTilesState extends ConsumerState<_FavSyncTiles> {
+  bool busy = false;
+
+  Future<void> _run(Future<void> Function() f) async {
+    setState(() => busy = true);
+    try {
+      await f();
+    } on StateError {
+      if (mounted) _toast(L10n.of(context).statusOffline);
+    } catch (e) {
+      if (mounted) _toast(L10n.of(context).favSyncFailed);
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  void _toast(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m)));
+
+  void _copy(String v) {
+    Clipboard.setData(ClipboardData(text: v));
+    _toast(L10n.of(context).copied);
+  }
+
+  Future<void> _join() async {
+    final t = L10n.of(context);
+    final ctrl = TextEditingController();
+    String? error;
+    final input = await showDialog<String>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, set) => AlertDialog(
+          title: Text(t.favSyncJoin),
+          content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(t.favSyncJoinHint, style: TextStyle(color: ctx.colors.textMuted, fontSize: 13)),
+            const SizedBox(height: Space.md),
+            TextField(
+              controller: ctrl,
+              autofocus: true,
+              textDirection: TextDirection.ltr,
+              decoration: InputDecoration(hintText: 'ABCD2345', errorText: error),
+              onSubmitted: (v) => parseFavKey(v) == null ? set(() => error = t.favSyncBadCode) : Navigator.pop(ctx, v),
+            ),
+          ]),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: Text(t.cancel)),
+            FilledButton(
+              onPressed: () => parseFavKey(ctrl.text) == null ? set(() => error = t.favSyncBadCode) : Navigator.pop(ctx, ctrl.text),
+              child: Text(t.favSyncLink),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (input == null) return;
+    await _run(() async {
+      final ok = await ref.read(favSyncProvider).join(input);
+      if (mounted) _toast(ok ? t.favSyncLinked : t.favSyncNotFound);
+    });
+  }
+
+  Future<void> _unlink(FavLink l) async {
+    final t = L10n.of(context);
+    var del = false;
+    final go = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, set) => AlertDialog(
+          title: Text(t.favSyncUnlink),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text(t.favSyncUnlinkHint),
+            if (l.canEdit)
+              CheckboxListTile(
+                value: del,
+                onChanged: (v) => set(() => del = v ?? false),
+                title: Text(t.favSyncDeleteRemote),
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
+              ),
+          ]),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.cancel)),
+            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t.favSyncUnlink)),
+          ],
+        ),
+      ),
+    );
+    if (go == true) await _run(() => ref.read(favSyncProvider).unlink(deleteRemote: del));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = L10n.of(context), c = context.colors;
+    final l = ref.watch(favLinkProvider).value;
+    final s = ref.read(favSyncProvider);
+    if (l == null) {
+      return Column(children: [
+        ListTile(
+          leading: const Icon(Icons.sync_rounded),
+          title: Text(t.favSyncCreate),
+          subtitle: Text(t.favSyncCreateHint, style: TextStyle(color: c.textMuted)),
+          trailing: OutlinedButton(onPressed: busy ? null : () => _run(() async => s.create()), child: Text(t.favSyncCreateBtn)),
+        ),
+        ListTile(
+          leading: const Icon(Icons.link_rounded),
+          title: Text(t.favSyncJoin),
+          subtitle: Text(t.favSyncJoinShort, style: TextStyle(color: c.textMuted)),
+          trailing: OutlinedButton(onPressed: busy ? null : _join, child: Text(t.favSyncLink)),
+        ),
+      ]);
+    }
+    return Column(children: [
+      ListTile(
+        leading: const Icon(Icons.sync_rounded),
+        title: Row(children: [
+          Text(t.favSyncCode),
+          const SizedBox(width: Space.sm),
+          SelectableText(l.code, style: TextStyle(color: c.text, fontFamily: 'monospace', fontWeight: FontWeight.w700, fontSize: 18, letterSpacing: 2)),
+          IconButton(tooltip: t.copy, onPressed: () => _copy(l.code), icon: const Icon(Icons.copy_rounded, size: 18)),
+        ]),
+        subtitle: Text(l.canEdit ? t.favSyncOwnerHint : t.favSyncFollowerHint, style: TextStyle(color: c.textMuted)),
+      ),
+      Padding(
+        padding: const EdgeInsetsDirectional.only(start: 56, end: Space.md, bottom: Space.md),
+        child: Wrap(spacing: Space.sm, runSpacing: Space.sm, children: [
+          FilledButton.tonalIcon(
+            onPressed: busy
+                ? null
+                : () => _run(() async {
+                      await s.push();
+                      await s.pull();
+                      if (mounted) _toast(t.syncDone);
+                    }),
+            icon: busy ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.sync_rounded),
+            label: Text(t.syncNow),
+          ),
+          if (l.canEdit) OutlinedButton.icon(onPressed: () => _copy(l.editKey!), icon: const Icon(Icons.key_rounded), label: Text(t.favSyncCopyKey)),
+          TextButton(onPressed: busy ? null : () => _unlink(l), child: Text(t.favSyncUnlink)),
+        ]),
+      ),
     ]);
   }
 }

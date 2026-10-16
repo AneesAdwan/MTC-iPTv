@@ -62,6 +62,16 @@ if (Test-Path $dist) { Remove-Item $dist -Recurse -Force }
 New-Item -ItemType Directory $dist | Out-Null
 [IO.File]::WriteAllText("$dist\NOTES.md", $sec.Value.Trim(), (New-Object Text.UTF8Encoding($false)))
 
+# ---- 2b. update signing key (spec 18.3) -----------------------------------------------------
+# The private DSA key lives OUTSIDE the repo. The public half is compiled into the app (windows/dsa_pub.pem).
+# They must match, or every installed copy would reject all future updates - so check before building.
+$dsaKey = if ($env:MTC_DSA_KEY) { $env:MTC_DSA_KEY } else { "$HOME\.mtc-iptv\dsa_priv.pem" }
+$env:PATH = "$HOME\scoop\apps\openssl\current\bin;$env:PATH"
+if (-not (Test-Path $dsaKey)) { throw "DSA private key not found at $dsaKey (set MTC_DSA_KEY). See docs/runbooks/release.md" }
+$pubFromKey = (openssl dsa -in $dsaKey -pubout 2>$null) -join "`n"
+$pubInApp = ((Get-Content "$root\windows\dsa_pub.pem") -join "`n").Trim()
+if ($pubFromKey.Trim() -ne $pubInApp) { throw 'windows/dsa_pub.pem does not match the private key - refusing to release.' }
+
 # ---- 3. quality gates -----------------------------------------------------------------
 Run 'flutter pub get' { flutter pub get }
 Run 'flutter analyze' { flutter analyze --fatal-infos }
@@ -75,10 +85,61 @@ $defs = @("--build-name=$core", "--build-number=$build", "--dart-define=APP_VERS
 Run 'build windows' { flutter build windows --release @defs }
 Run 'build android' { flutter build apk --release --split-per-abi @defs }
 
+# Secrets scan (spec 26.1/26.2: no secret keys in the package). The anon key is public by design;
+# a service_role JWT or any private key must never ship. Scans the Windows output and every APK entry.
+# Patterns require actual key material: TLS libraries contain bare PEM header names, and the Supabase
+# SDK contains the 'sb_secret_' prefix constant - neither is a secret.
+$secretPatterns = @(
+  '-----BEGIN [A-Z ]*PRIVATE KEY-----\r?\n[A-Za-z0-9+/=]{40}',   # PEM private key with body
+  'sb_secret_[A-Za-z0-9_-]{20,}',                                # Supabase secret API key
+  'service_role',                                                 # plain JWT role claim
+  'c2VydmljZV9yb2xl', 'NlcnZpY2Vfcm9sZ', 'zZXJ2aWNlX3JvbG'        # base64 of service_role (3 offsets)
+)
+function Find-Secrets([byte[]]$bytes, [string]$where) {
+  $text = [Text.Encoding]::GetEncoding(28591).GetString($bytes)   # byte-for-byte latin1 view
+  foreach ($p in $secretPatterns) { if ([regex]::IsMatch($text, $p)) { throw "SECRET LEAK: /$p/ matched in $where" } }
+}
+Get-ChildItem "$root\build\windows\x64\runner\Release" -Recurse -File | ForEach-Object { Find-Secrets ([IO.File]::ReadAllBytes($_.FullName)) $_.FullName }
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+foreach ($apk in Get-ChildItem "$root\build\app\outputs\flutter-apk" -Filter 'app-*-release.apk') {
+  $zip = [IO.Compression.ZipFile]::OpenRead($apk.FullName)
+  try {
+    foreach ($e in $zip.Entries) {
+      if ($e.Length -eq 0) { continue }
+      $ms = New-Object IO.MemoryStream; $s = $e.Open(); $s.CopyTo($ms); $s.Close()
+      Find-Secrets $ms.ToArray() "$($apk.Name)!$($e.FullName)"
+    }
+  } finally { $zip.Dispose() }
+}
+Write-Host 'Secrets scan: clean' -ForegroundColor Green
+
 Run 'windows installer' { iscc /Q "/DAppVersion=$full" "/DFileVersion=$core.$build" "/DSourceDir=$root\build\windows\x64\runner\Release" "/DOutputDir=$dist" "$root\installer\mtc_iptv.iss" }
 foreach ($abi in 'arm64-v8a', 'armeabi-v7a', 'x86_64') {
   Copy-Item "$root\build\app\outputs\flutter-apk\app-$abi-release.apk" "$dist\MTC-iPTv-$full-android-$abi.apk"
 }
+# DSA signature of the Windows installer for WinSparkle (Defender may briefly lock a fresh .exe: retry)
+$setup = "$dist\MTC-iPTv-$full-windows-setup.exe"
+$ErrorActionPreference = 'Continue'
+for ($i = 1; $i -le 6; $i++) {
+  $sigOut = (dart run auto_updater:sign_update $setup $dsaKey 2>&1 | Out-String)
+  $sigM = [regex]::Match($sigOut, 'sparkle:dsaSignature="([^"]+)"')
+  if ($sigM.Success) { break }
+  Write-Host "sign attempt $i failed, retrying..."
+  Start-Sleep -Seconds 3
+}
+$ErrorActionPreference = 'Stop'
+if (-not $sigM.Success) { throw "DSA signing failed: $sigOut" }
+$dsaSig = $sigM.Groups[1].Value
+# self-check: the signature must verify with the public key shipped in the app
+$tmpSig = [IO.Path]::GetTempFileName(); $tmpDig = [IO.Path]::GetTempFileName()
+[IO.File]::WriteAllBytes($tmpSig, [Convert]::FromBase64String($dsaSig))
+$sha1 = [Security.Cryptography.SHA1]::Create().ComputeHash([IO.File]::ReadAllBytes($setup))
+[IO.File]::WriteAllBytes($tmpDig, $sha1)
+$verify = (openssl dgst -sha1 -verify "$root\windows\dsa_pub.pem" -signature $tmpSig $tmpDig 2>&1 | Out-String)
+Remove-Item $tmpSig, $tmpDig
+if ($verify -notmatch 'Verified OK') { throw "DSA signature does not verify with windows/dsa_pub.pem: $verify" }
+Write-Host 'DSA signature: Verified OK' -ForegroundColor Green
+
 $assets = Get-ChildItem $dist -File | Where-Object { $_.Extension -in '.exe', '.apk' }
 ($assets | Get-FileHash -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" }) -join "`n" |
   Set-Content "$dist\SHA256SUMS.txt" -Encoding ascii
@@ -100,3 +161,46 @@ $ghArgs += ($assets | ForEach-Object { $_.FullName })
 $ghArgs += "$dist\SHA256SUMS.txt"
 Run 'gh release' { gh @ghArgs }
 Write-Host "Published v$full" -ForegroundColor Green
+
+# ---- 6. appcast (only after the installer is downloadable) ------------------------------------
+# Served by GitHub Pages from the repo root: https://aneesadwan.github.io/MTC-iPTv/updates/windows-<channel>.xml
+# sparkle:version = the exe's own version string (build-name+build-number), which WinSparkle compares.
+$channel = if ($Stable) { 'stable' } else { $tag }
+$feedDir = "$repo\updates"
+New-Item -ItemType Directory -Force $feedDir | Out-Null
+$setupName = Split-Path $setup -Leaf
+$notesHtml = [Net.WebUtility]::HtmlEncode($sec.Value.Trim()) -replace "`r?`n", '<br/>'
+$date = (Get-Date).ToUniversalTime().ToString('r')
+@"
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>MTC-iPTv ($channel)</title>
+    <item>
+      <title>MTC-iPTv $full</title>
+      <description><![CDATA[<div dir="rtl">$notesHtml</div>]]></description>
+      <pubDate>$date</pubDate>
+      <sparkle:minimumSystemVersion>10.0.19044</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v$full/$setupName"
+                 sparkle:version="$core+$build"
+                 sparkle:shortVersionString="$full"
+                 sparkle:os="windows"
+                 sparkle:dsaSignature="$dsaSig"
+                 length="$((Get-Item $setup).Length)"
+                 type="application/octet-stream" />
+    </item>
+  </channel>
+</rss>
+"@ | Set-Content "$feedDir\windows-$channel.xml" -Encoding utf8
+# Same data for the download page (download/index.html): version, link, size and SHA-256 of the installer
+$setupHash = (Get-FileHash $setup -Algorithm SHA256).Hash.ToLower()
+[ordered]@{
+  version = $full; channel = $channel; date = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd')
+  url = "https://github.com/AneesAdwan/MTC-iPTv/releases/download/v$full/$setupName"
+  size = (Get-Item $setup).Length; sha256 = $setupHash
+  notes = "https://github.com/AneesAdwan/MTC-iPTv/releases/tag/v$full"
+} | ConvertTo-Json | Set-Content "$feedDir\latest-windows-$channel.json" -Encoding ascii
+Run 'git add appcast' { git add "updates/windows-$channel.xml" "updates/latest-windows-$channel.json" }
+Run 'git commit appcast' { git commit -m "updates: windows-$channel appcast v$full" }
+Run 'git push appcast' { git push origin HEAD }
+Write-Host "Appcast: https://aneesadwan.github.io/MTC-iPTv/updates/windows-$channel.xml" -ForegroundColor Green

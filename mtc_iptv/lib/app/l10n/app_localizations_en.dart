@@ -1897,6 +1897,72 @@ class L10nEn extends L10n {
   String get anFailed => 'Failed';
 
   @override
+  String get copy => 'Copy';
+
+  @override
+  String get favSyncTitle => 'Favorites sync';
+
+  @override
+  String get favSyncCreate => 'Sync favorites across your devices';
+
+  @override
+  String get favSyncCreateHint =>
+      'No account needed: you get an 8-character code to enter on your other device.';
+
+  @override
+  String get favSyncCreateBtn => 'Create code';
+
+  @override
+  String get favSyncJoin => 'Link with a code from another device';
+
+  @override
+  String get favSyncJoinShort => 'Enter the code or the edit key.';
+
+  @override
+  String get favSyncJoinHint =>
+      'The code alone brings the other device\'s favorites and adds them to yours. The edit key (code, then -, then the secret) makes both devices share one list they both edit.';
+
+  @override
+  String get favSyncLink => 'Link';
+
+  @override
+  String get favSyncBadCode => 'Invalid code';
+
+  @override
+  String get favSyncLinked => 'Linked and favorites fetched.';
+
+  @override
+  String get favSyncNotFound => 'No favorites with this code.';
+
+  @override
+  String get favSyncFailed => 'Sync failed. Try again later.';
+
+  @override
+  String get favSyncCode => 'Code';
+
+  @override
+  String get favSyncOwnerHint =>
+      'Every change uploads automatically. Give the code to another device to fetch the list, or the edit key to edit it too.';
+
+  @override
+  String get favSyncFollowerHint =>
+      'This device fetches the list on every start and adds it to its favorites, without editing it.';
+
+  @override
+  String get favSyncCopyKey => 'Copy edit key';
+
+  @override
+  String get favSyncUnlink => 'Unlink';
+
+  @override
+  String get favSyncUnlinkHint =>
+      'Your favorites on this device stay as they are.';
+
+  @override
+  String get favSyncDeleteRemote =>
+      'Also delete the shared list from the server';
+
+  @override
   String get anEmpty =>
       'No playback statistics yet. They appear once users watch with the new version and the day is rolled up.';
 

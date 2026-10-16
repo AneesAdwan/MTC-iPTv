@@ -3535,6 +3535,126 @@ abstract class L10n {
   /// **'فشلت'**
   String get anFailed;
 
+  /// No description provided for @copy.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخ'**
+  String get copy;
+
+  /// No description provided for @favSyncTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مزامنة المفضلة'**
+  String get favSyncTitle;
+
+  /// No description provided for @favSyncCreate.
+  ///
+  /// In ar, this message translates to:
+  /// **'مزامنة المفضلة بين أجهزتك'**
+  String get favSyncCreate;
+
+  /// No description provided for @favSyncCreateHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'دون حساب: يُنشأ رمز من 8 أحرف تدخله على جهازك الآخر.'**
+  String get favSyncCreateHint;
+
+  /// No description provided for @favSyncCreateBtn.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء رمز'**
+  String get favSyncCreateBtn;
+
+  /// No description provided for @favSyncJoin.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربط برمز من جهاز آخر'**
+  String get favSyncJoin;
+
+  /// No description provided for @favSyncJoinShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل الرمز أو مفتاح التعديل.'**
+  String get favSyncJoinShort;
+
+  /// No description provided for @favSyncJoinHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرمز وحده يجلب مفضلة الجهاز الآخر ويضيفها لمفضلتك. «مفتاح التعديل» (الرمز ثم - ثم السرّ) يجعل الجهازين يتشاركان قائمة واحدة يعدّلانها معًا.'**
+  String get favSyncJoinHint;
+
+  /// No description provided for @favSyncLink.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربط'**
+  String get favSyncLink;
+
+  /// No description provided for @favSyncBadCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرمز غير صحيح'**
+  String get favSyncBadCode;
+
+  /// No description provided for @favSyncLinked.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الربط وجُلبت المفضلة.'**
+  String get favSyncLinked;
+
+  /// No description provided for @favSyncNotFound.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مفضلة بهذا الرمز.'**
+  String get favSyncNotFound;
+
+  /// No description provided for @favSyncFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّرت المزامنة. حاول لاحقًا.'**
+  String get favSyncFailed;
+
+  /// No description provided for @favSyncCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرمز'**
+  String get favSyncCode;
+
+  /// No description provided for @favSyncOwnerHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُرفع كل تغيير تلقائيًا. أعطِ الرمز لجهاز آخر ليجلب القائمة، أو «مفتاح التعديل» ليعدّلها أيضًا.'**
+  String get favSyncOwnerHint;
+
+  /// No description provided for @favSyncFollowerHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجلب هذا الجهاز القائمة عند كل تشغيل ويضيفها لمفضلته، ولا يعدّلها.'**
+  String get favSyncFollowerHint;
+
+  /// No description provided for @favSyncCopyKey.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخ مفتاح التعديل'**
+  String get favSyncCopyKey;
+
+  /// No description provided for @favSyncUnlink.
+  ///
+  /// In ar, this message translates to:
+  /// **'فك الربط'**
+  String get favSyncUnlink;
+
+  /// No description provided for @favSyncUnlinkHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تبقى مفضلتك على هذا الجهاز كما هي.'**
+  String get favSyncUnlinkHint;
+
+  /// No description provided for @favSyncDeleteRemote.
+  ///
+  /// In ar, this message translates to:
+  /// **'احذف القائمة المشتركة من الخادم أيضًا'**
+  String get favSyncDeleteRemote;
+
   /// No description provided for @anEmpty.
   ///
   /// In ar, this message translates to:

@@ -3,6 +3,7 @@
 // للمشاهد العادي: الإغلاق يُنهي البرنامج كالمعتاد.
 import 'dart:io';
 
+import 'package:auto_updater/auto_updater.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // واجهة tray_manager المتوافقة (legacy): نفس ما جُرّب في نموذج المرحلة 0 (Tray + البدء مع ويندوز + التعويض).
@@ -15,8 +16,10 @@ import '../../core/logging/log.dart';
 import '../../data/admin/admin_device.dart';
 import '../../data/admin/scheduler.dart';
 import '../../data/telemetry/telemetry.dart';
+import '../../data/updates/app_updater.dart';
 import '../../player/playback_controller.dart';
 import '../shell/sidebar.dart' show isAdminProvider;
+import 'deep_links.dart';
 
 bool get isDesktop => Platform.isWindows || Platform.isMacOS || Platform.isLinux;
 
@@ -27,15 +30,35 @@ class DesktopHost extends ConsumerStatefulWidget {
   ConsumerState<DesktopHost> createState() => _DesktopHostState();
 }
 
-class _DesktopHostState extends ConsumerState<DesktopHost> with WindowListener, TrayListener {
+class _DesktopHostState extends ConsumerState<DesktopHost> with WindowListener, TrayListener, UpdaterListener {
   @override
   void initState() {
     super.initState();
     if (!isDesktop) return;
+    DeepLinks.attach(ref); // mtciptv://watch/<id> عند التشغيل ومن نسخة ثانية
     windowManager.addListener(this);
     trayManager.addListener(this);
+    if (AppUpdater.enabled) autoUpdater.addListener(this);
     _setup();
   }
+
+  // WinSparkle نزّل التحديث وتحقق من توقيعه وسيشغّل المثبّت: نخرج فعلًا (لا إخفاء إلى منطقة الإشعارات)
+  @override
+  void onUpdaterBeforeQuitForUpdate(AppcastItem? item) {
+    log.info('quitting for update ${item?.versionString ?? ''}');
+    _quit();
+  }
+
+  @override
+  void onUpdaterError(UpdaterError? error) => log.warning('updater error: ${error?.message}');
+  @override
+  void onUpdaterCheckingForUpdate(Appcast? appcast) {}
+  @override
+  void onUpdaterUpdateAvailable(AppcastItem? item) => log.info('update available ${item?.versionString ?? ''}');
+  @override
+  void onUpdaterUpdateNotAvailable(UpdaterError? error) {}
+  @override
+  void onUpdaterUpdateDownloaded(AppcastItem? item) {}
 
   Future<void> _setup() async {
     try {
@@ -59,6 +82,7 @@ class _DesktopHostState extends ConsumerState<DesktopHost> with WindowListener, 
     if (isDesktop) {
       windowManager.removeListener(this);
       trayManager.removeListener(this);
+      if (AppUpdater.enabled) autoUpdater.removeListener(this);
     }
     super.dispose();
   }

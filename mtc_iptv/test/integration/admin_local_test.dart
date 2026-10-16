@@ -6,7 +6,12 @@ library;
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:drift/native.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mtc_iptv/core/backend/backend.dart';
+import 'package:mtc_iptv/core/storage/catalog_db.dart';
+import 'package:mtc_iptv/data/favorites/fav_sync.dart';
 import 'package:mtc_core/mtc_core.dart';
 import 'package:mtc_iptv/data/admin/admin_repository.dart';
 import 'package:mtc_iptv/data/admin/analytics.dart';
@@ -389,6 +394,62 @@ void main() {
       if (before['features'] == null) await c.from('site_settings').delete().eq('key', 'features');
       if (before['social'] == null) await c.from('site_settings').delete().eq('key', 'social');
     }
+  }, skip: skip);
+
+  test('phase 7: favorites sync by code between two devices (owner, follower, editor)', () async {
+    ProviderContainer device() => ProviderContainer(overrides: [
+          catalogDbProvider.overrideWith((ref) {
+            final db = CatalogDb(NativeDatabase.memory());
+            ref.onDispose(db.close);
+            return db;
+          }),
+          supabaseProvider.overrideWithValue(SupabaseClient(url, anonKey)),
+        ]);
+    Future<void> setFavs(ProviderContainer d, List<String> ids) async {
+      final db = d.read(catalogDbProvider);
+      await db.delete(db.favorites).go();
+      for (var i = 0; i < ids.length; i++) {
+        await db.into(db.favorites).insert(FavoritesCompanion.insert(channelId: ids[i], position: i, addedAt: DateTime.now()));
+      }
+    }
+
+    final a = device(), b = device(), e = device();
+    addTearDown(() {
+      a.dispose();
+      b.dispose();
+      e.dispose();
+    });
+    final sa = a.read(favSyncProvider), sb = b.read(favSyncProvider), se = e.read(favSyncProvider);
+    await setFavs(a, ['c1', 'c2']);
+    final link = await sa.create();
+    expect(link.code, matches(RegExp(r'^[A-HJ-NP-Z2-9]{8}$')));
+
+    // متابع بالرمز وحده: يدمج ولا يعدّل
+    await setFavs(b, ['c9']);
+    expect(await sb.join(link.code.toLowerCase()), isTrue);
+    expect(await sb.localIds(), ['c1', 'c2', 'c9']);
+    expect((await sb.link())!.canEdit, isFalse);
+
+    // المالك يعدّل ← يرفع ← المتابع يسحب
+    await setFavs(a, ['c2', 'c3']);
+    await sa.push();
+    expect(await sb.pull(), isTrue);
+    expect(await sb.localIds(), ['c2', 'c3', 'c1', 'c9']);
+
+    // جهاز ثالث بمفتاح التعديل: قائمة واحدة مشتركة
+    await setFavs(e, ['c7']);
+    expect(await se.join(link.editKey!), isTrue);
+    expect((await se.link())!.canEdit, isTrue);
+    expect(await sa.pull(), isTrue);
+    expect(await sa.localIds(), ['c2', 'c3', 'c7']);
+
+    // رمز غير موجود، وفك الربط مع الحذف
+    expect(await sb.join('ZZZZ2222'), isFalse);
+    await sa.unlink(deleteRemote: true);
+    expect(await sa.link(), isNull);
+    expect(await sb.pull(), isFalse); // حُذفت: يبقى المحلي ويُفك الربط
+    expect(await sb.link(), isNull);
+    expect(await sb.localIds(), ['c2', 'c3', 'c1', 'c9']);
   }, skip: skip);
 
   test('phase 6c: viewer telemetry -> rollup -> analytics, alerts, and forget', () async {

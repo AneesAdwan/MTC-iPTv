@@ -6,6 +6,7 @@ import '../core/backend/backend.dart';
 import '../core/settings/local_settings.dart';
 import '../data/epg/epg_repository.dart';
 import '../features/splash/splash_gate.dart';
+import '../data/favorites/fav_sync.dart';
 import '../data/settings/remote_config.dart';
 import '../data/telemetry/telemetry.dart';
 import 'desktop/desktop_host.dart';
@@ -25,6 +26,7 @@ class MtcApp extends ConsumerWidget {
     ref.watch(remoteConfigSyncProvider); // والإعدادات المركزية والإشعارات (G، F)
     ref.watch(periodicRefreshProvider); // إعادة المزامنة الدورية
     ref.watch(telemetryHeartbeatProvider); // الجهاز نشط + أول دفعة قياس (§20)
+    ref.watch(favSyncAutoProvider); // مزامنة المفضلة برمز (§8.3)
     // G3: لغة وثيم افتراضيان لجهاز لم يختر مستخدمه بعد
     ref.listen(remoteConfigProvider, (_, next) {
       final g = next.value?.general;

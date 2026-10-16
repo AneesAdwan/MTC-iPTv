@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تنزيل MTC-iPTv</title>
+<meta name="description" content="تنزيل برنامج MTC-iPTv لـ Windows — منتج من MTC-Group.">
+<meta name="theme-color" content="#08080c">
+<link rel="icon" type="image/svg+xml" href="../img/mtc-iptv-icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=Inter:wght@500;800&display=swap">
+<style>
+  :root{--bg:#08080c;--bg2:#0f0f15;--surface:#16161e;--surface2:#1e1e28;--line:rgba(255,255,255,.08);
+        --txt:#f5f5f7;--mut:#9a9aab;--ac:#ff2d55;--ac2:#ff7a1a;--grad:linear-gradient(135deg,var(--ac),var(--ac2))}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.7 'IBM Plex Sans Arabic',system-ui,sans-serif}
+  main{max-width:880px;margin:0 auto;padding:48px 16px 64px}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+  header img{width:64px;height:64px}
+  h1{margin:0;font:800 32px/1.2 Inter,'IBM Plex Sans Arabic',sans-serif}
+  .sub{color:var(--mut);margin:2px 0 0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;margin:18px 0}
+  .dl{display:flex;flex-wrap:wrap;align-items:center;gap:16px;justify-content:space-between}
+  .btn{display:inline-flex;align-items:center;gap:10px;background:var(--grad);color:#fff;text-decoration:none;
+       font-weight:700;padding:14px 22px;border-radius:12px}
+  .btn[aria-disabled=true]{opacity:.5;pointer-events:none}
+  .meta{color:var(--mut);font-size:14px}
+  .pill{display:inline-block;font-size:12px;padding:2px 10px;border-radius:99px;background:rgba(255,122,26,.15);color:var(--ac2);margin-inline-start:8px}
+  code,.hash{font-family:ui-monospace,Consolas,monospace;direction:ltr;unicode-bidi:embed}
+  .hash{display:block;word-break:break-all;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;margin-top:8px}
+  h2{font-size:20px;margin:0 0 10px}
+  ol{padding-inline-start:22px;margin:0}
+  li{margin:6px 0}
+  .shot{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .mock{flex:1 1 260px;background:#0a59a8;color:#fff;border-radius:10px;padding:16px;font:14px/1.6 'Segoe UI',sans-serif;direction:ltr;text-align:left}
+  .mock b{display:block;font-size:18px;margin-bottom:6px}
+  .mock .row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+  .mock span{border:1px solid rgba(255,255,255,.7);padding:4px 12px}
+  .mock .hl{background:#fff;color:#0a59a8;font-weight:700}
+  .mock u{cursor:default}
+  .muted{color:var(--mut)}
+  a{color:var(--ac2)}
+  footer{color:var(--mut);font-size:14px;text-align:center;margin-top:40px}
+  @media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#f6f6f8;--bg2:#fff;--surface:#fff;--surface2:#f0f0f4;--line:rgba(0,0,0,.08);--txt:#16161e;--mut:#5d5d6e}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="../img/mtc-iptv-icon.svg" alt="">
+    <div>
+      <h1>MTC-iPTv</h1>
+      <p class="sub">برنامج القنوات المباشرة لـ Windows — منتج من MTC-Group</p>
+    </div>
+  </header>
+
+  <section class="card dl" aria-live="polite">
+    <div>
+      <div><strong id="ver">…</strong><span id="chan" class="pill" hidden>معاينة</span></div>
+      <div class="meta" id="meta">Windows 10 (21H2) أو 11، 64 بت · بلا صلاحيات مدير</div>
+    </div>
+    <a class="btn" id="btn" href="https://github.com/AneesAdwan/MTC-iPTv/releases" aria-disabled="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.6l3.3-3.3 1.4 1.4L12 16.4l-4.7-4.7 1.4-1.4L11 13.6V3h1zM5 19h14v2H5z"/></svg>
+      تنزيل لـ Windows
+    </a>
+  </section>
+
+  <section class="card">
+    <h2>تحذير «حمى Windows جهاز الكمبيوتر» عند التثبيت الأول</h2>
+    <p class="muted">البرنامج غير موقّع رقميًا بعد، فيظهر هذا التحذير <strong>مرة واحدة عند التثبيت</strong>. التحديثات بعدها تتم داخل البرنامج، وكل تحديث موقّع ويُتحقَّق منه قبل تثبيته.</p>
+    <ol>
+      <li>شغّل الملف الذي نزّلته.</li>
+      <li>اضغط <strong>«مزيد من المعلومات»</strong> (More info).</li>
+      <li>اضغط <strong>«تشغيل على أي حال»</strong> (Run anyway).</li>
+    </ol>
+    <div class="shot" aria-hidden="true">
+      <div class="mock"><b>Windows protected your PC</b>Microsoft Defender SmartScreen prevented an unrecognized app from starting.<br><u>More info</u><div class="row"><span>Don't run</span></div></div>
+      <div class="mock"><b>Windows protected your PC</b>App: MTC-iPTv-…-windows-setup.exe<br>Publisher: Unknown publisher<div class="row"><span class="hl">Run anyway</span><span>Don't run</span></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>تحقّق من الملف (اختياري)</h2>
+    <p class="muted">بصمة SHA-256 للمثبّت. يجب أن تطابق ناتج الأمر في PowerShell:</p>
+    <code class="hash">Get-FileHash .\<span id="fname">MTC-iPTv-…-windows-setup.exe</span></code>
+    <span class="hash" id="sha">…</span>
+  </section>
+
+  <section class="card">
+    <h2>Android</h2>
+    <p class="muted">تطبيق Android الحالي متاح من <a href="https://github.com/AneesAdwan/MTC-iPTv/releases/latest">صفحة الإصدارات</a>، والنسخة الجديدة له قادمة.</p>
+  </section>
+
+  <footer>© MTC-Group · برمجة وتطوير: أنيس عدوان · <a href="../">موقع المشاهدة</a> · <a href="https://github.com/AneesAdwan/MTC-iPTv/releases" id="notes">كل الإصدارات</a></footer>
+</main>
+<script>
+  // أحدث إصدار من الملف الذي يكتبه scripts/release.ps1 (نفس النطاق، بلا GitHub API):
+  // المستقر أولًا، وإن لم يوجد بعد (قبل قبول R1) فأحدث معاينة alpha مع وسم «معاينة».
+  (async () => {
+    const get = async ch => { try { const r = await fetch(`../updates/latest-windows-${ch}.json`, { cache: 'no-store' }); return r.ok ? await r.json() : null; } catch { return null; } };
+    const d = (await get('stable')) || (await get('beta')) || (await get('alpha'));
+    const $ = id => document.getElementById(id);
+    if (!d) { $('ver').textContent = 'MTC-iPTv'; $('btn').removeAttribute('aria-disabled'); $('sha').textContent = '—'; return; }
+    $('ver').textContent = `الإصدار ${d.version}`;
+    $('ver').dir = 'ltr';
+    if (d.channel !== 'stable') $('chan').hidden = false;
+    $('meta').textContent = `${(d.size / 1048576).toFixed(1)} MB · ${d.date} · Windows 10 (21H2) أو 11، 64 بت · بلا صلاحيات مدير`;
+    $('btn').href = d.url;
+    $('btn').removeAttribute('aria-disabled');
+    $('sha').textContent = d.sha256;
+    $('fname').textContent = d.url.split('/').pop();
+    $('notes').href = d.notes;
+  })();
+</script>
+</body>
+</html>

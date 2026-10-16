@@ -162,6 +162,10 @@ class SchedulerService extends Notifier<SchedulerState> {
         // آخر 3 أيام دائمًا: يعوّض أيامًا فاتت والجهاز مطفأ (الخام يبقى 30 يومًا)
         final runId = await repo.startRun(key, _device);
         final r = await repo.telemetryRollup(DateTime.now().toUtc().subtract(const Duration(days: 3)));
+        // الاحتفاظ (§20.1): المفضلة المتزامنة غير المستخدمة 365 يومًا (0006)
+        try {
+          r['purged_fav_sets'] = await repo.db.rpc('admin_favsets_purge');
+        } catch (_) {}
         await repo.finishRun(runId!, status: 'ok', summary: r);
       case 'alerts':
         await repo.alertsScan();

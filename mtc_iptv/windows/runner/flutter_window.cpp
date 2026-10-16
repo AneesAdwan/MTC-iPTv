@@ -1,6 +1,9 @@
 #include "flutter_window.h"
 
 #include <optional>
+#include <string>
+
+#include <flutter/standard_method_codec.h>
 
 #include "flutter/generated_plugin_registrant.h"
 
@@ -25,6 +28,9 @@ bool FlutterWindow::OnCreate() {
     return false;
   }
   RegisterPlugins(flutter_controller_->engine());
+  instance_channel_ = std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+      flutter_controller_->engine()->messenger(), "mtc/instance",
+      &flutter::StandardMethodCodec::GetInstance());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
@@ -69,6 +75,18 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
     case WM_FONTCHANGE:
       flutter_controller_->engine()->ReloadSystemFonts();
       break;
+    case WM_COPYDATA: {
+      auto cds = reinterpret_cast<PCOPYDATASTRUCT>(lparam);
+      if (cds != nullptr && cds->dwData == kInstanceArgsMessage && cds->lpData != nullptr && instance_channel_) {
+        std::wstring cmd(static_cast<const wchar_t*>(cds->lpData));
+        int len = ::WideCharToMultiByte(CP_UTF8, 0, cmd.c_str(), -1, nullptr, 0, nullptr, nullptr);
+        std::string utf8(len > 0 ? len - 1 : 0, '\0');
+        if (len > 1) ::WideCharToMultiByte(CP_UTF8, 0, cmd.c_str(), -1, utf8.data(), len, nullptr, nullptr);
+        instance_channel_->InvokeMethod("args", std::make_unique<flutter::EncodableValue>(utf8));
+        return TRUE;
+      }
+      break;
+    }
   }
 
   return Win32Window::MessageHandler(hwnd, message, wparam, lparam);

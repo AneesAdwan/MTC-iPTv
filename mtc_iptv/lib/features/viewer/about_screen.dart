@@ -9,6 +9,7 @@ import '../../app/theme/tokens.dart';
 import '../../core/config/env.dart';
 import '../../core/text/bidi.dart';
 import '../../data/settings/remote_config.dart';
+import '../../data/updates/app_updater.dart';
 import '../../data/updates/update_check.dart';
 import 'widgets/social_links.dart';
 
@@ -95,7 +96,8 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
           ),
           if (update != null)
             FilledButton.icon(
-              onPressed: () => launchUrl(Uri.parse(update!.pageUrl), mode: LaunchMode.externalApplication),
+              // Windows: التنزيل والتحقق من التوقيع والتثبيت داخل البرنامج (WinSparkle)؛ غيره: صفحة الإصدار
+              onPressed: () => AppUpdater.checkNow(fallbackUrl: update!.pageUrl),
               icon: const Icon(Icons.download_rounded),
               label: Text(t.download),
             ),

@@ -16,7 +16,8 @@ namespace {
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
 #endif
 
-constexpr const wchar_t kWindowClassName[] = L"FLUTTER_RUNNER_WIN32_WINDOW";
+// Unique class name: the single-instance hand-off (main.cpp) finds our window by it.
+constexpr const wchar_t kWindowClassName[] = L"MTC_IPTV_WINDOW";
 
 /// Registry key for app theme preference.
 ///

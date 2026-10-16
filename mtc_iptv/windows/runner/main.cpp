@@ -2,6 +2,8 @@
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
 
+#include <string>
+
 #include "flutter_window.h"
 #include "utils.h"
 
@@ -11,6 +13,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   // new console when running with a debugger.
   if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent()) {
     CreateAndAttachConsole();
+  }
+
+  // Single instance: a second launch (e.g. a mtciptv://watch/<id> link, or the desktop icon while
+  // the app sits in the tray) hands its command line to the running window and exits.
+  HANDLE instance_mutex = ::CreateMutexW(nullptr, TRUE, L"Local\\MTC-iPTv-SingleInstance");
+  if (instance_mutex != nullptr && ::GetLastError() == ERROR_ALREADY_EXISTS) {
+    HWND existing = ::FindWindowW(L"MTC_IPTV_WINDOW", nullptr);
+    std::wstring cmd = command_line ? command_line : L"";
+    COPYDATASTRUCT cds;
+    cds.dwData = kInstanceArgsMessage;
+    cds.cbData = static_cast<DWORD>((cmd.size() + 1) * sizeof(wchar_t));
+    cds.lpData = const_cast<wchar_t*>(cmd.c_str());
+    DWORD_PTR handled = 0;
+    if (existing != nullptr &&
+        ::SendMessageTimeoutW(existing, WM_COPYDATA, 0, reinterpret_cast<LPARAM>(&cds), SMTO_ABORTIFHUNG, 3000, &handled) != 0 &&
+        handled == TRUE) {
+      ::SetForegroundWindow(existing);
+      ::CloseHandle(instance_mutex);
+      return EXIT_SUCCESS;
+    }
+    // No live window answered (e.g. the old copy is closing after an update): start normally.
   }
 
   // Initialize COM, so that it is available for use in the library and/or
