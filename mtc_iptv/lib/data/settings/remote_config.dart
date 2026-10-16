@@ -15,7 +15,7 @@ import '../../core/settings/local_settings.dart';
 import '../../core/storage/catalog_db.dart';
 import '../updates/update_check.dart';
 
-const remoteKeys = ['brand', 'social', 'general', 'player', 'features', 'releases', 'announcements', 'notifications'];
+const remoteKeys = ['brand', 'social', 'general', 'player', 'features', 'releases', 'announcements', 'notifications', 'developer'];
 
 class RemoteConfig {
   final Map<String, dynamic> raw; // المفتاح ← القيمة
@@ -30,6 +30,13 @@ class RemoteConfig {
   Map<String, dynamic> get player => _m('player');
   Map<String, dynamic> get features => _m('features');
   Map<String, dynamic> get releases => _m('releases');
+
+  /// اسم المطوّر (site_settings.developer العام: name_ar/name_en) — يظهر في المقدمة. null إن لم يصل بعد.
+  String? developerName(String lang) {
+    final d = _m('developer');
+    final v = (lang == 'ar' ? (d['name_ar'] ?? d['name_en']) : (d['name_en'] ?? d['name_ar'])) as String?;
+    return v == null || v.trim().isEmpty ? null : v.trim();
+  }
   List<Map<String, dynamic>> get social => [for (final x in (raw['social'] is Map ? (raw['social'] as Map)['links'] : raw['social']) as List? ?? const []) if (x is Map) x.cast<String, dynamic>()];
   /// قنوات الدعم (واتساب/تيليجرام) من G2.
   Map<String, String> get support => {

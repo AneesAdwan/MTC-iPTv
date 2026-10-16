@@ -40,7 +40,7 @@ class RemoteGates extends ConsumerWidget {
         icon: Icons.system_update_rounded,
         title: t.updateRequired,
         body: '${rc.releases['notes_$lang'] ?? ''}',
-        action: FilledButton(onPressed: () => AppUpdater.checkNow(fallbackUrl: rc.updateUrl), child: Text(t.updateNow)),
+        action: FilledButton(onPressed: () => AppUpdater.checkNow(fallbackUrl: rc.updateUrl, context: context), child: Text(t.updateNow)),
       );
     }
     if (rc.maintenance && !admin && !ref.watch(maintenanceBypassProvider)) {
@@ -149,7 +149,7 @@ class _AnnouncementBarState extends ConsumerState<AnnouncementBar> {
           color: c.accent,
           icon: Icons.system_update_rounded,
           text: t.updateRecommended,
-          action: TextButton(onPressed: () => AppUpdater.checkNow(fallbackUrl: rc.updateUrl), child: Text(t.updateNow)),
+          action: TextButton(onPressed: () => AppUpdater.checkNow(fallbackUrl: rc.updateUrl, context: context), child: Text(t.updateNow)),
           onClose: () => setState(() => _updateClosed = true),
         ),
       for (final a in banners)

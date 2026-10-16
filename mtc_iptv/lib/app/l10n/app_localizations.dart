@@ -97,6 +97,90 @@ abstract class L10n {
     Locale('en'),
   ];
 
+  /// No description provided for @upDownloading.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ تنزيل التحديث {v}…'**
+  String upDownloading(String v);
+
+  /// No description provided for @upInstallPerm.
+  ///
+  /// In ar, this message translates to:
+  /// **'للتحديث من داخل التطبيق، اسمح لـ MTC-iPTv بتثبيت التطبيقات (مرة واحدة فقط)، ثم ارجع واضغط «تحديث» مرة أخرى.'**
+  String get upInstallPerm;
+
+  /// No description provided for @upOpenSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح الإعدادات'**
+  String get upOpenSettings;
+
+  /// No description provided for @upFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تنزيل التحديث: {e}'**
+  String upFailed(String e);
+
+  /// No description provided for @upNoApk.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد في الإصدار ملف مناسب لهذا الجهاز.'**
+  String get upNoApk;
+
+  /// No description provided for @upVerifyFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'الملف المنزّل لا يطابق بصمة الإصدار، فلم يُثبَّت.'**
+  String get upVerifyFailed;
+
+  /// No description provided for @upInstalling.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاهز — وافق على التثبيت في الشاشة التالية.'**
+  String get upInstalling;
+
+  /// No description provided for @spOperator.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشركة المشغّلة · إحدى شركات مجموعة MTC-Group'**
+  String get spOperator;
+
+  /// No description provided for @spDev.
+  ///
+  /// In ar, this message translates to:
+  /// **'تطوير: {name}'**
+  String spDev(String name);
+
+  /// No description provided for @aPublishChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشر قنواتها ({n})'**
+  String aPublishChannels(int n);
+
+  /// No description provided for @confirmPublishChannels.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشر {n} قناة وإضافتها للتطبيق؟ القنوات الموجودة بالسلة تُسترجع أولًا.'**
+  String confirmPublishChannels(int n);
+
+  /// No description provided for @onlyUnpublished.
+  ///
+  /// In ar, this message translates to:
+  /// **'قنوات غير منشورة فقط'**
+  String get onlyUnpublished;
+
+  /// No description provided for @psTrash.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالسلة'**
+  String get psTrash;
+
+  /// No description provided for @aPublishOne.
+  ///
+  /// In ar, this message translates to:
+  /// **'نشر القناة'**
+  String get aPublishOne;
+
   /// No description provided for @spTag.
   ///
   /// In ar, this message translates to:
@@ -154,7 +238,7 @@ abstract class L10n {
   /// No description provided for @sgCap2.
   ///
   /// In ar, this message translates to:
-  /// **'إحدى شركات'**
+  /// **'الشركة الأم'**
   String get sgCap2;
 
   /// No description provided for @sgName.

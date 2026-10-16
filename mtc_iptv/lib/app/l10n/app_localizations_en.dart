@@ -10,6 +10,60 @@ class L10nEn extends L10n {
   L10nEn([String locale = 'en']) : super(locale);
 
   @override
+  String upDownloading(String v) {
+    return 'Downloading update $v…';
+  }
+
+  @override
+  String get upInstallPerm =>
+      'To update from inside the app, allow MTC-iPTv to install apps (once only), then come back and tap Update again.';
+
+  @override
+  String get upOpenSettings => 'Open settings';
+
+  @override
+  String upFailed(String e) {
+    return 'Couldn\'t download the update: $e';
+  }
+
+  @override
+  String get upNoApk => 'The release has no file for this device.';
+
+  @override
+  String get upVerifyFailed =>
+      'The downloaded file doesn\'t match the release checksum, so it wasn\'t installed.';
+
+  @override
+  String get upInstalling => 'Ready — confirm the install on the next screen.';
+
+  @override
+  String get spOperator => 'The operator · a company of MTC-Group';
+
+  @override
+  String spDev(String name) {
+    return 'Developed by $name';
+  }
+
+  @override
+  String aPublishChannels(int n) {
+    return 'Publish their channels ($n)';
+  }
+
+  @override
+  String confirmPublishChannels(int n) {
+    return 'Publish $n channel(s) to the apps? Channels in the recycle bin are restored first.';
+  }
+
+  @override
+  String get onlyUnpublished => 'Unpublished channels only';
+
+  @override
+  String get psTrash => 'In bin';
+
+  @override
+  String get aPublishOne => 'Publish channel';
+
+  @override
   String get spTag => 'Live TV · thousands of channels worldwide';
 
   @override
@@ -39,7 +93,7 @@ class L10nEn extends L10n {
   String get sgCap1 => 'Presented by';
 
   @override
-  String get sgCap2 => 'A company of';
+  String get sgCap2 => 'The parent company';
 
   @override
   String get sgName => 'Middle East Technology Center Group';

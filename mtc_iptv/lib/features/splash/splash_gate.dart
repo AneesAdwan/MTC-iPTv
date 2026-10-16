@@ -13,13 +13,16 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show KeyDownEvent;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/layout/form_factor.dart';
+import '../../core/config/env.dart';
 import '../../core/settings/local_settings.dart';
+import '../../core/text/bidi.dart';
 import '../../data/catalog/catalog_repository.dart';
+import '../../data/settings/remote_config.dart';
 import '../viewer/home_screen.dart' show channelsProvider;
+import 'group_emblem_painter.dart';
 
 const _red = Color(0xFFFF2D55), _orange = Color(0xFFFF7A1A), _amber = Color(0xFFFFB02E);
 
@@ -100,7 +103,11 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: _skip,
-            child: AnimatedBuilder(animation: Listenable.merge([tl, loop, drift]), builder: (context, _) => _scene(context)),
+            // Material شفاف: النصوص فوق التطبيق (خارج Scaffold) وإلا تظهر بخط أصفر تحتها
+            child: Material(
+              type: MaterialType.transparency,
+              child: AnimatedBuilder(animation: Listenable.merge([tl, loop, drift]), builder: (context, _) => _scene(context)),
+            ),
           ),
         ),
       ),
@@ -144,6 +151,7 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
             ),
           ),
           _footer(t, h, phone),
+          _corners(t, h),
         ]),
       ),
     );
@@ -271,17 +279,8 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
     );
 
     final halo = seg(.3, 2.6);
-    final emblemIn = seg(.3, 1.0, const Cubic(.34, 1.56, .64, 1));
-    final emblem = Opacity(
-      opacity: emblemIn.clamp(0.0, 1.0),
-      child: Transform.scale(
-        scale: .6 + .4 * emblemIn,
-        child: Container(
-          decoration: const BoxDecoration(boxShadow: [BoxShadow(color: Color(0x73FF2D55), blurRadius: 34, offset: Offset(0, 12))], shape: BoxShape.circle),
-          child: SvgPicture.asset('assets/brand/mtc-group-emblem-static.svg', width: emb, height: emb),
-        ),
-      ),
-    );
+    // شعار MTC-Group المتحرك (متجهي، بتوقيتات ملف الموقع المتحرك) — يبدأ عند 0.3 ث
+    final emblem = CustomPaint(size: Size.square(emb), painter: GroupEmblemPainter(tl.value * total - .3));
 
     return Positioned.fill(
       child: Center(
@@ -431,7 +430,38 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
       opacity: p,
       child: Directionality(
         textDirection: Localizations.localeOf(context).languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
-        child: Text(t.spTag, textAlign: TextAlign.center, style: TextStyle(color: const Color(0x9EFFFFFF), fontSize: fs, fontWeight: FontWeight.w500, letterSpacing: fs * (.12 + .38 * (1 - p)))),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(t.spTag, textAlign: TextAlign.center, style: TextStyle(color: const Color(0x9EFFFFFF), fontSize: fs, fontWeight: FontWeight.w500, letterSpacing: fs * (.12 + .38 * (1 - p)))),
+          SizedBox(height: fs * .7),
+          // MTC-iPTv هي الشركة المشغّلة، وإحدى شركات MTC-Group (الشركة الأم)
+          Opacity(
+            opacity: full ? seg(6.8, 1.0) : seg(1.3, .5),
+            child: Text(t.spOperator, textAlign: TextAlign.center, style: TextStyle(color: const Color(0xCCFFC9A3), fontSize: fs * .82, fontWeight: FontWeight.w600)),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  // ── الزاويتان السفليتان: رقم الإصدار يسارًا، واسم المطوّر يمينًا ──
+  Widget _corners(L10n t, double h) {
+    final p = full ? seg(6.6, 1) : seg(.8, .5);
+    final lang = Localizations.localeOf(context).languageCode;
+    final dev = ref.watch(remoteConfigProvider).value?.developerName(lang) ?? (lang == 'ar' ? 'أنيس عدوان' : 'Anees Adwan'); // قبل أول مزامنة
+    final style = TextStyle(color: Colors.white.withValues(alpha: .42), fontSize: 11.5, fontWeight: FontWeight.w500, letterSpacing: .3);
+    final pad = (h * .035).clamp(14.0, 28.0);
+    final dir = lang == 'ar' ? TextDirection.rtl : TextDirection.ltr;
+    return Positioned(
+      left: pad + 4,
+      right: pad + 4,
+      bottom: pad,
+      child: Opacity(
+        opacity: p,
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Flexible(child: Text(t.version(ltr(Env.version)), textDirection: dir, style: style, maxLines: 1, overflow: TextOverflow.ellipsis)),
+          const SizedBox(width: 16),
+          Flexible(child: Text(t.spDev(dev), textDirection: dir, style: style, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.end)),
+        ]),
       ),
     );
   }

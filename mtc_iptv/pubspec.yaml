@@ -92,3 +92,8 @@ flutter:
           weight: 600
         - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
           weight: 700
+    # خط شعار MTC-iPTv في الموقع (Inter 900، رخصة OFL في assets/fonts/Inter-OFL.txt)
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Black.ttf
+          weight: 900

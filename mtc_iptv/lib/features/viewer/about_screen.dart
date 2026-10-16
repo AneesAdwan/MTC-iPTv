@@ -97,7 +97,7 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
           if (update != null)
             FilledButton.icon(
               // Windows: التنزيل والتحقق من التوقيع والتثبيت داخل البرنامج (WinSparkle)؛ غيره: صفحة الإصدار
-              onPressed: () => AppUpdater.checkNow(fallbackUrl: update!.pageUrl),
+              onPressed: () => AppUpdater.checkNow(fallbackUrl: update!.pageUrl, context: context, known: update),
               icon: const Icon(Icons.download_rounded),
               label: Text(t.download),
             ),

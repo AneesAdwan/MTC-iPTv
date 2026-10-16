@@ -39,7 +39,10 @@ class AppVersion implements Comparable<AppVersion> {
 class UpdateInfo {
   final AppVersion version;
   final String pageUrl;
-  const UpdateInfo(this.version, this.pageUrl);
+
+  /// ملفات الإصدار: الاسم ← رابط التنزيل المباشر (للتحديث داخل تطبيق Android).
+  final Map<String, String> assets;
+  const UpdateInfo(this.version, this.pageUrl, [this.assets = const {}]);
 }
 
 /// يختار أحدث إصدار مناسب من قائمة إصدارات GitHub؛ null إن كان الحالي هو الأحدث.
@@ -51,7 +54,11 @@ UpdateInfo? pickUpdate(AppVersion current, List<dynamic> releases) {
     if (v == null || v.major < 3) continue; // التطبيق القديم (2.x) خط إصدارات آخر
     if (v.isPrerelease && !current.isPrerelease) continue;
     if (v.compareTo(current) <= 0) continue;
-    if (best == null || v.compareTo(best.version) > 0) best = UpdateInfo(v, '${r['html_url']}');
+    if (best == null || v.compareTo(best.version) > 0) {
+      best = UpdateInfo(v, '${r['html_url']}', {
+        for (final a in (r['assets'] as List?) ?? const []) '${(a as Map)['name']}': '${a['browser_download_url']}',
+      });
+    }
   }
   return best;
 }

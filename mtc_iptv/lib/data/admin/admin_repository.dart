@@ -403,16 +403,32 @@ class AdminRepository {
     return [for (final r in rows) AdminStream.fromJson(r)];
   }
 
-  Future<List<(AdminStream, String, int?)>> streamsByHealth(String state, {int limit = 500}) async {
-    final rows = await db.from('streams').select('$_streamCols,channels(name,name_ar,name_en,number)').eq('health_state', state).order('last_checked_at', ascending: true, nullsFirst: true).limit(limit);
+  /// روابط حالة صحية معيّنة مع اسم قناتها ورقمها وحالة نشرها ('trash' إن كانت في السلة) —
+  /// ليعرف المدير أي رابط يعمل وقناته ليست في التطبيق بعد.
+  Future<List<(AdminStream, String, int?, String)>> streamsByHealth(String state, {int limit = 500}) async {
+    final rows = await db
+        .from('streams')
+        .select('$_streamCols,channels(name,name_ar,name_en,number,publish_state,trashed_at)')
+        .eq('health_state', state)
+        .order('last_checked_at', ascending: true, nullsFirst: true)
+        .limit(limit);
     return [
       for (final r in rows)
         (
           AdminStream.fromJson(r),
           '${(r['channels'] as Map?)?['name_ar'] ?? (r['channels'] as Map?)?['name'] ?? ''}',
           ((r['channels'] as Map?)?['number'] as num?)?.toInt(),
+          (r['channels'] as Map?)?['trashed_at'] != null ? 'trash' : '${(r['channels'] as Map?)?['publish_state'] ?? ''}',
         ),
     ];
+  }
+
+  /// «إضافة للنظام»: نشر قنوات (ما في السلة يُسترجع أولًا). يعيد عدد القنوات.
+  Future<int> publishChannels(List<String> ids) async {
+    if (ids.isEmpty) return 0;
+    await restoreChannels(ids); // لا يفعل شيئًا لما ليس في السلة
+    await updateChannels(ids, {'publish_state': 'published'});
+    return ids.length;
   }
 
   Future<void> addStream(String channelId, {required String url, String? label, String? userAgent, String? referrer, int priority = 0}) => db.from('streams').insert({

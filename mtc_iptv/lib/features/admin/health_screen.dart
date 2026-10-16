@@ -14,7 +14,7 @@ import 'channels/stream_preview.dart';
 import 'dashboard_screen.dart';
 import 'widgets/admin_widgets.dart';
 
-final _byStateProvider = FutureProvider.autoDispose.family<List<(AdminStream, String, int?)>, String>((ref, s) async => await ref.watch(adminRepoProvider)?.streamsByHealth(s) ?? const []);
+final _byStateProvider = FutureProvider.autoDispose.family<List<(AdminStream, String, int?, String)>, String>((ref, s) async => await ref.watch(adminRepoProvider)?.streamsByHealth(s) ?? const []);
 
 class HealthScreen extends ConsumerStatefulWidget {
   final String? initialState;
@@ -27,6 +27,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   late String state = widget.initialState ?? 'unavailable';
   final selected = <String>{};
   bool playCheck = true;
+  bool onlyUnpublished = false; // روابط تعمل وقنواتها ليست في التطبيق بعد
 
   void _reload() {
     ref.invalidate(_byStateProvider);
@@ -53,7 +54,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     final t = L10n.of(context), c = context.colors;
     final counts = ref.watch(dashboardProvider).value?.streamsByHealth ?? const <String, int>{};
     final list = ref.watch(_byStateProvider(state));
-    final rows = list.value ?? const [];
+    final all = list.value ?? const [];
+    final rows = onlyUnpublished ? all.where((r) => r.$4 != 'published').toList() : all;
     final job = ref.watch(healthJobProvider);
     ref.listen(healthJobProvider, (prev, next) {
       if (prev?.running == true && !next.running) {
@@ -96,6 +98,15 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                 message: t.playCheckHint,
                 child: FilterChip(label: Text(t.playCheck), selected: playCheck, onSelected: (v) => setState(() => playCheck = v)),
               ),
+              FilterChip(
+                avatar: const Icon(Icons.publish_rounded, size: 18, color: Color(0xFF22C55E)),
+                label: Text(t.onlyUnpublished),
+                selected: onlyUnpublished,
+                onSelected: (v) => setState(() {
+                  onlyUnpublished = v;
+                  selected.clear();
+                }),
+              ),
               FilledButton.icon(
                 onPressed: job.running || rows.isEmpty ? null : () => ref.read(healthJobProvider.notifier).run([for (final r in (sel.isEmpty ? rows : sel)) r.$1], playCheck: playCheck),
                 icon: const Icon(Icons.monitor_heart_rounded),
@@ -115,6 +126,20 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           total: rows.length,
           onChanged: () => setState(() {}),
           actions: [
+            // «إضافة للنظام»: نشر قنوات الروابط المحددة غير المنشورة (ما في السلة يُسترجع أولًا)
+            Builder(builder: (context) {
+              final toPublish = {for (final x in sel) if (x.$4 != 'published') x.$1.channelId}.toList();
+              return FilledButton.icon(
+                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF22C55E)),
+                onPressed: toPublish.isEmpty
+                    ? null
+                    : () async {
+                        if (await confirm(context, t.confirmPublishChannels(toPublish.length))) await _act((r) => r.publishChannels(toPublish));
+                      },
+                icon: const Icon(Icons.publish_rounded, size: 18),
+                label: Text(t.aPublishChannels(toPublish.length)),
+              );
+            }),
             OutlinedButton(
               onPressed: () => _act((r) async {
                 for (final x in sel) {
@@ -167,7 +192,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   itemCount: rows.length,
                   separatorBuilder: (_, _) => Divider(height: 1, color: c.line),
                   itemBuilder: (_, i) {
-                    final (s, name, number) = rows[i];
+                    final (s, name, number, chState) = rows[i];
                     return ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: Checkbox(value: selected.contains(s.id), onChanged: (v) => setState(() => v == true ? selected.add(s.id) : selected.remove(s.id))),
@@ -208,6 +233,16 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // حالة القناة: هل هي في التطبيق؟
+                          chState == 'trash' ? Pill(t.psTrash, const Color(0xFFEF4444)) : StatePill(chState),
+                          if (chState != 'published')
+                            IconButton(
+                              tooltip: t.aPublishOne,
+                              onPressed: () async {
+                                if (await confirm(context, t.confirmPublishChannels(1))) await _act((r) => r.publishChannels([s.channelId]));
+                              },
+                              icon: const Icon(Icons.publish_rounded, color: Color(0xFF22C55E)),
+                            ),
                           IconButton(tooltip: t.aTry, onPressed: () => showStreamPreview(context, s, name), icon: const Icon(Icons.play_circle_outline_rounded)),
                           IconButton(tooltip: t.aOpenChannel, onPressed: () => context.go('/admin/channel/${s.channelId}'), icon: const Icon(Icons.open_in_new_rounded)),
                         ],

@@ -10,6 +10,60 @@ class L10nAr extends L10n {
   L10nAr([String locale = 'ar']) : super(locale);
 
   @override
+  String upDownloading(String v) {
+    return 'جارٍ تنزيل التحديث $v…';
+  }
+
+  @override
+  String get upInstallPerm =>
+      'للتحديث من داخل التطبيق، اسمح لـ MTC-iPTv بتثبيت التطبيقات (مرة واحدة فقط)، ثم ارجع واضغط «تحديث» مرة أخرى.';
+
+  @override
+  String get upOpenSettings => 'فتح الإعدادات';
+
+  @override
+  String upFailed(String e) {
+    return 'تعذّر تنزيل التحديث: $e';
+  }
+
+  @override
+  String get upNoApk => 'لا يوجد في الإصدار ملف مناسب لهذا الجهاز.';
+
+  @override
+  String get upVerifyFailed =>
+      'الملف المنزّل لا يطابق بصمة الإصدار، فلم يُثبَّت.';
+
+  @override
+  String get upInstalling => 'جاهز — وافق على التثبيت في الشاشة التالية.';
+
+  @override
+  String get spOperator => 'الشركة المشغّلة · إحدى شركات مجموعة MTC-Group';
+
+  @override
+  String spDev(String name) {
+    return 'تطوير: $name';
+  }
+
+  @override
+  String aPublishChannels(int n) {
+    return 'نشر قنواتها ($n)';
+  }
+
+  @override
+  String confirmPublishChannels(int n) {
+    return 'نشر $n قناة وإضافتها للتطبيق؟ القنوات الموجودة بالسلة تُسترجع أولًا.';
+  }
+
+  @override
+  String get onlyUnpublished => 'قنوات غير منشورة فقط';
+
+  @override
+  String get psTrash => 'بالسلة';
+
+  @override
+  String get aPublishOne => 'نشر القناة';
+
+  @override
   String get spTag => 'بث مباشر · آلاف القنوات من حول العالم';
 
   @override
@@ -39,7 +93,7 @@ class L10nAr extends L10n {
   String get sgCap1 => 'تقدّم';
 
   @override
-  String get sgCap2 => 'إحدى شركات';
+  String get sgCap2 => 'الشركة الأم';
 
   @override
   String get sgName => 'مجموعة شركات مركز تكنولوجيا الشرق الأوسط';

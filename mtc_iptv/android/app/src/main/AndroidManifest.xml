@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <!-- Push (Android 13+ asks the user at first launch) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- تثبيت التحديث الذي ينزّله التطبيق بنفسه (المستخدم يوافق في شاشة التثبيت دائمًا) -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <!-- Android TV (R2): no touchscreen required, appears in the TV launcher -->
     <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
     <uses-feature android:name="android.software.leanback" android:required="false"/>
@@ -53,6 +55,14 @@
             </intent-filter>
         </activity>
         <!-- Push (FCM, topic "all" from the send-push function). Inactive in builds without Firebase config. -->
+        <!-- ملف التحديث المنزّل (مجلد cache/updates فقط) يُسلَّم لمثبّت النظام -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.updates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/update_paths"/>
+        </provider>
         <service android:name=".MtcMessagingService" android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>

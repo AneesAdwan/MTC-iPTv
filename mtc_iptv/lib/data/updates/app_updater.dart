@@ -8,11 +8,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_updater/auto_updater.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config/env.dart';
 import '../../core/logging/log.dart';
+import 'android_update.dart';
+import 'update_check.dart';
 
 const appcastBase = 'https://aneesadwan.github.io/MTC-iPTv/updates';
 const releasesPage = 'https://github.com/AneesAdwan/MTC-iPTv/releases';
@@ -65,7 +68,12 @@ class AppUpdater {
   }
 
   /// «تحقق الآن»: نافذة WinSparkle (تنزيل ← تحقق من التوقيع ← تثبيت عند الموافقة)، وإلا صفحة الإصدارات.
-  static Future<void> checkNow({String? fallbackUrl}) async {
+  static Future<void> checkNow({String? fallbackUrl, BuildContext? context, UpdateInfo? known}) async {
+    // Android: تنزيل وتثبيت من داخل التطبيق (android_update.dart)، لا صفحة GitHub
+    if (Platform.isAndroid && context != null && context.mounted && !Env.version.endsWith('-dev')) {
+      await runAndroidUpdate(context, known: known);
+      return;
+    }
     if (enabled) {
       await init();
       if (_ready) {

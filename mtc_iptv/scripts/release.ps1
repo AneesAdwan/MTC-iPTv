@@ -186,8 +186,17 @@ Run 'git push' { git push origin HEAD --follow-tags }
 
 $ghArgs = @('release', 'create', "v$full", '--title', "MTC-iPTv $full", '--notes-file', "$dist\NOTES.md")
 if (-not $Stable) { $ghArgs += '--prerelease' }   # keeps the live React Native updater (/releases/latest) away from dev builds
-$ghArgs += ($assets | ForEach-Object { $_.FullName })
-$ghArgs += "$dist\SHA256SUMS.txt"
+# Display label per file with the target system in parentheses (owner request 2026-10-17).
+# The file names stay unchanged: the Android in-app updater matches "-android-<abi>.apk".
+function AssetLabel($name) {
+  if ($name -like '*-windows-setup.exe') { return "MTC-iPTv $full (Windows - installer)" }
+  if ($name -like '*-android-arm64-v8a.apk') { return "MTC-iPTv $full (Android ARM64 - most phones)" }
+  if ($name -like '*-android-armeabi-v7a.apk') { return "MTC-iPTv $full (Android ARMv7 - older phones)" }
+  if ($name -like '*-android-x86_64.apk') { return "MTC-iPTv $full (Android x86_64 - emulators / TV boxes)" }
+  return $name
+}
+$ghArgs += ($assets | ForEach-Object { "$($_.FullName)#$(AssetLabel $_.Name)" })
+$ghArgs += "$dist\SHA256SUMS.txt#SHA256SUMS (file checksums)"
 Run 'gh release' { gh @ghArgs }
 Write-Host "Published v$full" -ForegroundColor Green
 

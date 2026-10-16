@@ -9,6 +9,8 @@
 //  • التلفزيون: والتحكم مخفي، الأعلى/الأسفل يغيّران القناة وOK يُظهره؛ وهو ظاهر، الأسهم تتنقل بين الأزرار.
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +30,7 @@ import '../../../data/epg/epg_repository.dart';
 import '../../../data/settings/remote_config.dart';
 import '../../../player/pip.dart';
 import '../../../player/playback_controller.dart';
+import '../guide_screen.dart' show fmtRange;
 import '../report_screen.dart';
 import '../widgets/channel_card.dart' show ChannelLogo;
 import 'channel_drawer.dart';
@@ -75,7 +78,7 @@ class _PlayerViewState extends ConsumerState<PlayerView> with TickerProviderStat
   IconData _bezelIcon = Icons.play_arrow_rounded;
   String? _pill, _osd;
   Timer? _pillT, _osdT;
-  late final _lt = AnimationController(vsync: this, duration: const Duration(milliseconds: 550));
+  late final _lt = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100), reverseDuration: const Duration(milliseconds: 450));
   Timer? _ltT;
   String? _ltFor; // آخر قناة عُرض شريطها
 
@@ -626,8 +629,44 @@ class _LiveBadge extends StatelessWidget {
       );
 }
 
-/// شعار MTC-iPTv: يظهر بمسح من اليسار عند الفتح ثم «نبضة» خفيفة كل بضع ثوانٍ (بديل حركة SVG الموقع،
-/// فـ flutter_svg لا يشغّل حركات CSS). أخفت قليلًا حين يظهر التحكم.
+/// شعار MTC-iPTv بمقاسات img/mtc-iptv-logo.svg تمامًا (viewBox 300×64): الرمز SVG (متجهي، حاد بأي مقاس)،
+/// والاسم نص حقيقي بخط Inter 900 — كان نص SVG يُرسم بخط بديل لأن Inter غير موجود، فبدا «معدّلًا».
+/// ظل ناعم يتبع الحروف (لا مربع) ليُقرأ فوق الفيديو الفاتح.
+class _BrandMark extends StatelessWidget {
+  final double height;
+  const _BrandMark({required this.height});
+  @override
+  Widget build(BuildContext context) {
+    final s = height / 64;
+    final style = TextStyle(
+      fontFamily: 'Inter',
+      fontWeight: FontWeight.w900,
+      fontSize: 40 * s,
+      letterSpacing: -1 * s,
+      height: 1,
+      shadows: const [Shadow(color: Color(0x8C000000), blurRadius: 6, offset: Offset(0, 1))],
+    );
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        SvgPicture.asset('assets/brand/mtc-iptv-icon.svg', width: height, height: height),
+        SizedBox(width: 14 * s),
+        Text('MTC', style: style.copyWith(color: Colors.white)),
+        ShaderMask(
+          blendMode: BlendMode.srcIn,
+          shaderCallback: (r) => const LinearGradient(colors: [Color(0xFFFF2D55), Color(0xFFFF7A1A)]).createShader(r),
+          child: Text('-iPTv', style: style.copyWith(color: Colors.white)),
+        ),
+      ]),
+    );
+  }
+}
+
+/// للاختبارات ومعاينة التصميم فقط.
+@visibleForTesting
+Widget debugBrandMark(double height) => _BrandMark(height: height);
+
+/// شعار MTC-iPTv فوق البث: يظهر بمسح من اليسار عند الفتح، وأخفت قليلًا حين يظهر التحكم.
 class _Watermark extends StatefulWidget {
   final double height;
   final bool dim;
@@ -636,14 +675,12 @@ class _Watermark extends StatefulWidget {
   State<_Watermark> createState() => _WatermarkState();
 }
 
-class _WatermarkState extends State<_Watermark> with TickerProviderStateMixin {
+class _WatermarkState extends State<_Watermark> with SingleTickerProviderStateMixin {
   late final _in = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100))..forward();
-  late final _beat = AnimationController(vsync: this, duration: const Duration(milliseconds: 2400))..repeat();
 
   @override
   void dispose() {
     _in.dispose();
-    _beat.dispose();
     super.dispose();
   }
 
@@ -654,22 +691,12 @@ class _WatermarkState extends State<_Watermark> with TickerProviderStateMixin {
       opacity: widget.dim ? .55 : .85,
       duration: const Duration(milliseconds: 300),
       child: AnimatedBuilder(
-        animation: Listenable.merge([_in, _beat]),
-        builder: (_, child) {
-          final b = _beat.value;
-          final pulse = b < .1 ? 1 - b * 2 : (b < .3 ? .8 + (b - .1) : 1.0); // مثل keyframes beat
-          return ClipRect(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              widthFactor: reveal.value.clamp(0.05, 1.0),
-              child: Transform.scale(scale: .96 + .04 * pulse.clamp(.8, 1.0), alignment: Alignment.centerLeft, child: child),
-            ),
-          );
-        },
-        child: DecoratedBox(
-          decoration: const BoxDecoration(boxShadow: [BoxShadow(color: Color(0x99000000), blurRadius: 12)]),
-          child: SvgPicture.asset('assets/brand/mtc-iptv-logo.svg', height: widget.height),
-        ),
+        animation: _in,
+        // مسح من اليسار عند الظهور فقط؛ بعده الشعار ثابت بمقاسه الأصلي (النبضة كانت تغيّر شكله)
+        builder: (_, child) => reveal.value >= 1
+            ? child!
+            : ClipRect(child: Align(alignment: Alignment.centerLeft, widthFactor: reveal.value.clamp(0.05, 1.0), child: child)),
+        child: _BrandMark(height: widget.height),
       ),
     );
   }
@@ -710,55 +737,278 @@ class _TopTitle extends ConsumerWidget {
   }
 }
 
-/// شريط القناة السفلي بأسلوب التلفاز: يصعد عند بدء قناة ثم ينزل بعد 6 ث.
-class _LowerThird extends ConsumerWidget {
-  final AnimationController anim;
+/// للاختبارات ومعاينة التصميم فقط.
+@visibleForTesting
+Widget debugLowerThird({required AnimationController anim, required ChannelRow ch, double scale = 1}) => _LowerThird(anim: anim, ch: ch, scale: scale);
+
+/// بطاقة القناة عند بدء قناة (طلب المالك 2026-10-17: «فخمة»)، بأسلوب شاشات البث:
+/// بطاقة زجاجية تنكشف من الجانب ← لمعة تعبر ← رقم القناة يقفز في شارة متدرجة ← الشعار بتوهج ←
+/// الاسم والتفاصيل تباعًا ← «مباشر» بنقطة نابضة ← شريط البرنامج يمتلئ حتى موضعه الحالي. تبقى 6 ث ثم تنزل.
+class _LowerThird extends ConsumerStatefulWidget {
+  final AnimationController anim; // 0→1 دخول (1.1 ث)، والعكس خروج
   final ChannelRow? ch;
-  final double scale; // نسبة من عرض الفيديو (مثل clamp(11px,1.45cqw,20px) في الموقع)
+  final double scale; // نسبة من عرض الفيديو
   const _LowerThird({required this.anim, required this.ch, this.scale = 1});
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ch = this.ch;
+  ConsumerState<_LowerThird> createState() => _LowerThirdState();
+}
+
+class _LowerThirdState extends ConsumerState<_LowerThird> with SingleTickerProviderStateMixin {
+  late final _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat();
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ch = widget.ch;
     if (ch == null) return const SizedBox.shrink();
-    final c = context.colors;
+    final c = context.colors, t = L10n.of(context);
+    final k = widget.scale;
+    final locale = Localizations.localeOf(context);
+    final rtl = locale.languageCode == 'ar';
     final nn = ref.watch(nowNextProvider(ch.uid)).value;
-    final name = ch.displayName(Localizations.localeOf(context));
-    final curved = CurvedAnimation(parent: anim, curve: const Cubic(.2, .85, .25, 1));
+    final name = ch.displayName(locale);
+    final now = nn?.now, next = nn?.next;
+    final tags = [ch.category, ch.country, ch.language].whereType<String>().map((x) => x.toUpperCase()).join('  ·  ');
+
     return AnimatedBuilder(
-      animation: curved,
-      builder: (_, child) => Opacity(opacity: curved.value, child: Transform.translate(offset: Offset(0, 40 * (1 - curved.value)), child: child)),
-      child: Directionality(
-        textDirection: Localizations.localeOf(context).languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 14 * scale, vertical: 10 * scale),
-          decoration: BoxDecoration(
-            color: const Color(0xD90A0A0E),
-            borderRadius: BorderRadius.circular(12),
-            border: BorderDirectional(start: BorderSide(color: c.accent, width: 4)),
-          ),
-          child: Row(children: [
-            SizedBox(width: 46 * scale, height: 34 * scale, child: ChannelLogo(ch: ch, size: 34 * scale)),
-            SizedBox(width: 12 * scale),
-            if (ch.number != null)
-              Padding(
-                padding: const EdgeInsetsDirectional.only(end: 10),
-                child: Text(ltr('${ch.number}'), style: TextStyle(color: c.accent2, fontSize: 20 * scale, fontWeight: FontWeight.w900)),
+      animation: Listenable.merge([widget.anim, _pulse]),
+      builder: (context, _) {
+        final v = widget.anim.value;
+        final leaving = widget.anim.status == AnimationStatus.reverse;
+        // مقاطع الدخول (0..1 من مدة الحركة)
+        double seg(double a, double b, [Curve cv = Curves.easeOutCubic]) => leaving ? 1 : cv.transform(((v - a) / (b - a)).clamp(0.0, 1.0));
+        final card = seg(0, .45, const Cubic(.2, .9, .2, 1));
+        final shine = seg(.25, .85, Curves.easeInOut);
+        final badge = seg(.15, .55, const Cubic(.34, 1.56, .64, 1));
+        final logo = seg(.25, .65, const Cubic(.34, 1.4, .64, 1));
+        final title = seg(.32, .72);
+        final meta = seg(.42, .82);
+        final prog = seg(.5, 1, Curves.easeInOutCubic);
+        final exitT = leaving ? Curves.easeIn.transform(1 - v) : 0.0;
+        final dot = (math.sin(_pulse.value * 2 * math.pi) + 1) / 2;
+
+        Widget appear(double p, Widget child, {double dy = 10}) =>
+            Opacity(opacity: p.clamp(0.0, 1.0), child: Transform.translate(offset: Offset(0, dy * k * (1 - p)), child: child));
+
+        final numberBadge = ch.number == null
+            ? const SizedBox.shrink()
+            : Transform.scale(
+                scale: .5 + .5 * badge,
+                child: Opacity(
+                  opacity: badge.clamp(0.0, 1.0),
+                  child: Container(
+                    constraints: BoxConstraints(minWidth: 58 * k),
+                    padding: EdgeInsets.symmetric(horizontal: 12 * k, vertical: 8 * k),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFF2D55), Color(0xFFFF5A36), Color(0xFFFF9A2E)]),
+                      borderRadius: BorderRadius.circular(14 * k),
+                      // توهج متمركز (لا إزاحة: البطاقة تقصّ ما يخرج منها فيظهر ظلًا مربعًا)
+                      boxShadow: [BoxShadow(color: const Color(0xFFFF3B50).withValues(alpha: .45), blurRadius: 14 * k)],
+                    ),
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      Text(t.channelNumber(0).replaceAll('0', '').trim().toUpperCase(),
+                          style: TextStyle(color: Colors.white.withValues(alpha: .85), fontSize: 9.5 * k, fontWeight: FontWeight.w700, height: 1)),
+                      SizedBox(height: 2 * k),
+                      Text(ltr('${ch.number}'), style: TextStyle(color: Colors.white, fontSize: 26 * k, fontWeight: FontWeight.w900, height: 1, letterSpacing: -.5)),
+                    ]),
+                  ),
+                ),
+              );
+
+        final logoTile = Transform.scale(
+          scale: .7 + .3 * logo,
+          child: Opacity(
+            opacity: logo.clamp(0.0, 1.0),
+            child: Container(
+              width: 74 * k,
+              height: 56 * k,
+              padding: EdgeInsets.all(7 * k),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: .07),
+                borderRadius: BorderRadius.circular(14 * k),
+                border: Border.all(color: Colors.white.withValues(alpha: .12)),
+                boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: .06 + .06 * dot), blurRadius: 18 * k)],
               ),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 16 * scale, fontWeight: FontWeight.w700)),
-                if (nn?.now != null)
-                  Text(nn!.now!.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white70, fontSize: 12.5 * scale)),
-                if (nn?.now != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: LinearProgressIndicator(value: nn!.progress(DateTime.now()), minHeight: 2.5, color: c.accent, backgroundColor: Colors.white24),
+              child: ChannelLogo(ch: ch, size: 42 * k),
+            ),
+          ),
+        );
+
+        final live = Container(
+          padding: EdgeInsets.symmetric(horizontal: 8 * k, vertical: 3 * k),
+          decoration: BoxDecoration(color: const Color(0xFFFF0033).withValues(alpha: .16), borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0x80FF0033))),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: 7 * k,
+              height: 7 * k,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFFF2D55),
+                boxShadow: [BoxShadow(color: const Color(0xFFFF2D55).withValues(alpha: .4 + .6 * dot), blurRadius: 4 + 8 * dot, spreadRadius: 1.5 * dot)],
+              ),
+            ),
+            SizedBox(width: 5 * k),
+            Text(t.plLive, style: TextStyle(color: Colors.white, fontSize: 10.5 * k, fontWeight: FontWeight.w800, letterSpacing: .6)),
+          ]),
+        );
+
+        final info = Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+          appear(
+            title,
+            Row(children: [
+              Flexible(
+                child: Text(name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.white, fontSize: 21 * k, fontWeight: FontWeight.w800, height: 1.15, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 8)])),
+              ),
+              SizedBox(width: 8 * k),
+              live,
+              if (ch.quality != null) ...[
+                SizedBox(width: 6 * k),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6 * k, vertical: 2 * k),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), border: Border.all(color: Colors.white38)),
+                  child: Text(ch.quality!, style: TextStyle(color: Colors.white, fontSize: 9.5 * k, fontWeight: FontWeight.w800)),
+                ),
+              ],
+            ]),
+          ),
+          if (tags.isNotEmpty) ...[
+            SizedBox(height: 3 * k),
+            appear(meta, Text(tags, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: const Color(0xFFFFC9A3).withValues(alpha: .85), fontSize: 10.5 * k, fontWeight: FontWeight.w600, letterSpacing: 1.2))),
+          ],
+          if (now != null) ...[
+            SizedBox(height: 8 * k),
+            appear(
+              meta,
+              Row(children: [
+                Text(t.nowLabel, style: TextStyle(color: c.accent2, fontSize: 11.5 * k, fontWeight: FontWeight.w800)),
+                SizedBox(width: 6 * k),
+                Expanded(child: Text(now.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white.withValues(alpha: .92), fontSize: 13 * k, fontWeight: FontWeight.w600))),
+                Text(ltr(fmtRange(context, now.startAt, now.endAt)), style: TextStyle(color: Colors.white54, fontSize: 11 * k)),
+              ]),
+            ),
+            SizedBox(height: 6 * k),
+            // شريط البرنامج: يمتلئ حتى موضعه الحالي، بتوهج عند الطرف
+            LayoutBuilder(builder: (_, box) {
+              final p = (nn!.progress(DateTime.now()) * prog).clamp(0.0, 1.0);
+              return SizedBox(
+                height: 6 * k,
+                child: Stack(alignment: AlignmentDirectional.centerStart, children: [
+                  Container(height: 3 * k, decoration: BoxDecoration(color: Colors.white.withValues(alpha: .14), borderRadius: BorderRadius.circular(3))),
+                  Container(
+                    width: box.maxWidth * p,
+                    height: 3 * k,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [Color(0xFFFF2D55), Color(0xFFFF9A2E)]),
+                      borderRadius: BorderRadius.circular(3),
+                      boxShadow: [BoxShadow(color: const Color(0xFFFF5A36).withValues(alpha: .7), blurRadius: 8 * k)],
+                    ),
+                  ),
+                  PositionedDirectional(
+                    start: (box.maxWidth * p - 3 * k).clamp(0.0, box.maxWidth),
+                    child: Container(
+                      width: 6 * k,
+                      height: 6 * k,
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, boxShadow: [BoxShadow(color: const Color(0xFFFFB46A), blurRadius: 8 * k)]),
+                    ),
+                  ),
+                ]),
+              );
+            }),
+            if (next != null) ...[
+              SizedBox(height: 5 * k),
+              appear(
+                prog,
+                Text('${t.nextLabel}:  ${next.title}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white54, fontSize: 11 * k)),
+              ),
+            ],
+          ],
+        ]);
+
+        final body = ClipRRect(
+          borderRadius: BorderRadius.circular(20 * k),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: Container(
+              padding: EdgeInsets.fromLTRB(14 * k, 12 * k, 18 * k, 12 * k),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: AlignmentDirectional.centerStart,
+                  end: AlignmentDirectional.centerEnd,
+                  colors: [const Color(0xFF14141C).withValues(alpha: .88), const Color(0xFF0A0A10).withValues(alpha: .62)],
+                ),
+              ),
+              child: Stack(children: [
+                Row(children: [numberBadge, SizedBox(width: 12 * k), logoTile, SizedBox(width: 14 * k), Expanded(child: info)]),
+                // لمعة تعبر البطاقة مرة واحدة
+                if (shine > 0 && shine < 1)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: FractionallySizedBox(
+                        widthFactor: .35,
+                        alignment: Alignment(-1.6 + 3.2 * shine, 0),
+                        child: Transform(
+                          transform: Matrix4.skewX(-.35),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.white.withValues(alpha: 0), Colors.white.withValues(alpha: .10), Colors.white.withValues(alpha: 0)])),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
               ]),
             ),
-          ]),
-        ),
-      ),
+          ),
+        );
+
+        // إطار رفيع متدرج + خط ضوء علوي
+        final framed = Container(
+          padding: const EdgeInsets.all(1.2),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(21 * k),
+            gradient: LinearGradient(
+              begin: AlignmentDirectional.topStart,
+              end: AlignmentDirectional.bottomEnd,
+              colors: [const Color(0xFFFF2D55).withValues(alpha: .9), const Color(0xFFFF9A2E).withValues(alpha: .45), Colors.white.withValues(alpha: .06)],
+            ),
+            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .55), blurRadius: 30 * k, offset: Offset(0, 12 * k))],
+          ),
+          child: body,
+        );
+
+        return Directionality(
+          textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+          child: Align(
+            alignment: AlignmentDirectional.bottomStart,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 680 * k),
+              child: Opacity(
+                opacity: (leaving ? 1 - exitT : card).clamp(0.0, 1.0),
+                child: Transform.translate(
+                  offset: Offset(0, leaving ? 30 * k * exitT : 26 * k * (1 - card)),
+                  // الانكشاف من جهة البداية؛ بعد اكتماله بلا قصّ حتى يظهر ظل البطاقة كاملًا
+                  child: leaving || card >= 1
+                      ? framed
+                      : ClipRect(
+                          child: Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            widthFactor: (.25 + .75 * card).clamp(0.0, 1.0),
+                            child: framed,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

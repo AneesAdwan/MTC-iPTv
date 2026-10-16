@@ -114,6 +114,27 @@ void main() {
     expect(await repo.streamsOf(id), isEmpty);
   }, skip: skip);
 
+  test('health: working streams of unpublished channels are added to the system (pending + binned)', () async {
+    final pending = (jsonDecode((await admin('POST', '/rest/v1/channels?select=id', {'uid': 'hp.pending.$stamp', 'name': 'HP Pending $stamp', 'is_published': true})).body) as List).single['id'] as String;
+    final binned = await repo.createChannel(nameAr: '', nameEn: 'HP Binned $stamp');
+    await repo.addStream(pending, url: 'https://example.com/$stamp/hp-p.m3u8');
+    await repo.addStream(binned, url: 'https://example.com/$stamp/hp-b.m3u8');
+    try {
+      await repo.trashChannels([binned]);
+      await c.from('streams').update({'health_state': 'playable'}).inFilter('channel_id', [pending, binned]);
+      final rows = (await repo.streamsByHealth('playable')).where((r) => r.$1.channelId == pending || r.$1.channelId == binned).toList();
+      expect({for (final r in rows) r.$1.channelId: r.$4}, {pending: 'pending', binned: 'trash'});
+      expect(await repo.publishChannels([pending, binned]), 2);
+      expect((await repo.channel(pending))!.publishState, 'published');
+      final b = (await repo.channel(binned))!;
+      expect(b.publishState, 'published');
+      expect(b.trashedAt, isNull);
+    } finally {
+      await repo.trashChannels([pending, binned]);
+      await repo.purgeChannels([pending, binned]);
+    }
+  }, skip: skip);
+
   test('phase 4 (0007): recycle bin, restore, select-all ids, review reject to bin, decisions', () async {
     final base = 80000 + stamp % 9000;
     final a = await repo.createChannel(nameAr: '', nameEn: 'Bin A $stamp', number: base);
