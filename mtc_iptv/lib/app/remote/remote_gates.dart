@@ -130,7 +130,8 @@ class _AnnouncementBarState extends ConsumerState<AnnouncementBar> {
             builder: (d) => AlertDialog(
               title: Text(txt(a, 'title')),
               content: Text(txt(a, 'body')),
-              actions: [TextButton(onPressed: () => Navigator.pop(d), child: Text(t.close))],
+              // autofocus: زر الإغلاق مركّز من البداية، فـ OK في الريموت يغلق النافذة مباشرة
+              actions: [TextButton(autofocus: true, onPressed: () => Navigator.pop(d), child: Text(t.close))],
             ),
           );
           await _dismiss(ref, id);

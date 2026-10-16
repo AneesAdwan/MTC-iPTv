@@ -40,7 +40,21 @@ ThemeData buildTheme(Brightness brightness) {
     splashFactory: InkSparkle.splashFactory,
     visualDensity: VisualDensity.standard,
   );
+  // إطار تركيز ظاهر على كل زر (الريموت ولوحة المفاتيح): طبقة focusColor الخفيفة لا تُرى على زر ممتلئ
+  // بلون التمييز (محاكي Android TV، 2026-10-16: زر «شاهد» مركّز ولا يبدو كذلك). null = الشكل المعتاد.
+  // يظهر فقط في وضع لوحة المفاتيح/الريموت، لا عند اللمس (زر «إغلاق» المركّز تلقائيًا ظهر بإطار على جوال Android 8)
+  final focusRing = WidgetStateProperty.resolveWith<BorderSide?>(
+    (s) => s.contains(WidgetState.focused) && FocusManager.instance.highlightMode == FocusHighlightMode.traditional
+        ? BorderSide(color: c.text, width: 2.5, strokeAlign: BorderSide.strokeAlignOutside)
+        : null,
+  );
+  final ringed = ButtonStyle(side: focusRing);
   return base.copyWith(
+    filledButtonTheme: FilledButtonThemeData(style: ringed),
+    outlinedButtonTheme: OutlinedButtonThemeData(style: ringed),
+    textButtonTheme: TextButtonThemeData(style: ringed),
+    elevatedButtonTheme: ElevatedButtonThemeData(style: ringed),
+    iconButtonTheme: IconButtonThemeData(style: ringed),
     textTheme: base.textTheme.apply(bodyColor: c.text, displayColor: c.text),
     cardTheme: CardThemeData(
       color: c.surface,

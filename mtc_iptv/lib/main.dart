@@ -11,6 +11,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
 import 'app/desktop/deep_links.dart';
+import 'app/layout/form_factor.dart';
 import 'core/backend/backend.dart';
 import 'core/config/env.dart';
 import 'core/logging/log.dart';
@@ -37,6 +38,7 @@ Future<void> main(List<String> args) async {
   };
 
   final settings = await loadSettings();
+  await detectAndroidTv(); // نمط التلفاز (§6.5) قبل أول إطار
   await TlsBundle.prepare();
   // بلا اتصال أو بلا خادم مُعدّ: يعمل التطبيق من الكتالوج المحلي (§22)
   final hasBackend = await initBackend().catchError((Object e) {

@@ -89,6 +89,9 @@ final playerProvider = Provider<Player>((ref) {
     native.setProperty('network-timeout', '${rc.playerSeconds('network_timeout_s', 15)}');
     native.setProperty('cache-secs', '${rc.playerSeconds('cache_s', 10)}');
     native.setProperty('hwdec', rc.player['hwdec'] == false ? 'no' : 'auto-safe');
+    // للتشخيص فقط: --dart-define=MTC_HWDEC=no (فك برمجي) أو mediacodec-copy … لمقارنة مسارات الرسم على جهاز
+    const forceHwdec = String.fromEnvironment('MTC_HWDEC');
+    if (forceHwdec.isNotEmpty) native.setProperty('hwdec', forceHwdec);
     final ua = rc.player['user_agent'] as String?;
     if (ua != null && ua.trim().isNotEmpty) native.setProperty('user-agent', ua.trim());
   }
@@ -119,6 +122,7 @@ class PlaybackController extends Notifier<PlaybackState> {
   PlaybackState build() {
     ref.onDispose(() {
       _watchdog?.cancel();
+      _errorGrace?.cancel();
       for (final s in _subs) {
         s.cancel();
       }
@@ -142,8 +146,34 @@ class PlaybackController extends Notifier<PlaybackState> {
           });
         }
       }))
-      ..add(p.stream.error.listen((e) => _onFailure(classifyPlayerError(e), e)))
+      ..add(p.stream.error.listen(_onPlayerError))
       ..add(p.stream.buffering.listen(_onBuffering));
+  }
+
+  /// mpv يرسل كل سطر سجل بمستوى «خطأ»، ومنها أخطاء يتعافى منها وحده: أشهرها فشل فك الترميز بالعتاد
+  /// ثم الرجوع للفك البرمجي («Could not open codec» على محاكي Android 8، 2026-10-16 — كانت تُفشل القناة فورًا).
+  ///  • رفض المصادقة أو عدم التوفر (401/403/404): فشل فوري، فهي نهائية.
+  ///  • غيرها قبل أول إطار: مهلة قصيرة؛ إن ظهر إطار فلا فشل.
+  ///  • أثناء التشغيل: لا شيء فورًا؛ التجمّد يعالجه مراقب التخزين، وإن توقف التشغيل كليًا نفشل بعد المهلة.
+  static const errorGrace = Duration(seconds: 4);
+  Timer? _errorGrace;
+
+  void _onPlayerError(String e) {
+    final code = classifyPlayerError(e);
+    log.fine('mpv error ($code): $e');
+    if (state.channel == null || state.phase == PlayPhase.failed) return;
+    if (code == 'auth_failed' || code == 'unavailable') {
+      _onFailure(code, e);
+      return;
+    }
+    if (_errorGrace?.isActive ?? false) return; // مهلة جارية لنفس المحاولة
+    final token = _token;
+    _errorGrace = Timer(errorGrace, () {
+      if (token != _token || state.phase == PlayPhase.failed) return;
+      final p = _p;
+      final stillDead = state.phase != PlayPhase.playing || (!p.state.playing && !p.state.buffering);
+      if (stillDead) _onFailure(code, e);
+    });
   }
 
   /// يعمل الآن (أو يحمّل) هذه القناة؟ — للعودة من المشغّل المصغّر دون إعادة فتح البث.
@@ -224,6 +254,7 @@ class PlaybackController extends Notifier<PlaybackState> {
   void _onFirstFrame() {
     if (state.phase == PlayPhase.playing) return;
     _watchdog?.cancel();
+    _errorGrace?.cancel(); // تعافى mpv من خطأ سابق (مثل الرجوع للفك البرمجي)
     final a = _att;
     if (a != null && a.frameAt == null) {
       a.frameAt = DateTime.now();

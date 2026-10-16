@@ -11,6 +11,7 @@ import '../data/migration/rn_migration.dart';
 import '../data/settings/remote_config.dart';
 import '../data/telemetry/telemetry.dart';
 import 'desktop/desktop_host.dart';
+import 'layout/tv_focus.dart';
 import 'remote/remote_gates.dart';
 import 'l10n/app_localizations.dart';
 import 'router.dart';
@@ -39,6 +40,8 @@ class MtcApp extends ConsumerWidget {
       title: 'MTC-iPTv',
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider),
+      actions: tvFriendlyActions, // الريموت: السهم يبدأ من أول عنصر حين لا شيء مركّز
+
       // اللغة والاتجاه على مستوى التطبيق (§6.4): العربية RTL افتراضيًا، والتبديل فوري
       locale: s.locale,
       supportedLocales: L10n.supportedLocales,

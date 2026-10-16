@@ -1,6 +1,10 @@
 package com.mtciptv.mtc_iptv
 
+import android.app.UiModeManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -15,7 +19,18 @@ class MainActivity : FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "mtc/instance").also {
             it.setMethodCallHandler { call, result ->
-                if (call.method == "initialLink") result.success(linkOf(intent)) else result.notImplemented()
+                when (call.method) {
+                    "initialLink" -> result.success(linkOf(intent))
+                    // Android TV / Google TV: وضع التلفاز أو ميزة leanback (§6.5 نمط tv)
+                    "isTv" -> {
+                        val ui = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+                        result.success(
+                            ui.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION ||
+                                packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+                        )
+                    }
+                    else -> result.notImplemented()
+                }
             }
         }
     }
