@@ -78,11 +78,16 @@ class AppShell extends ConsumerWidget {
             backgroundColor: c.bg,
             drawer: phone ? Drawer(backgroundColor: c.bg2, child: Sidebar(location: location, inDrawer: true)) : null,
             bottomNavigationBar: phone ? _PhoneTabs(current: def) : null,
-            body: Column(children: [
-              if (ff.isDesktop) const TitleBar(),
-              Expanded(child: Stack(fit: StackFit.expand, children: [body, const MiniPlayer()])),
-              if (ff.isDesktop) const StatusBar(),
-            ]),
+            // SafeArea: على الجوال والتابلت لا يُرسم الشريط العلوي تحت شريط حالة النظام (اختبار المحاكي 2026-10-16)؛
+            // على سطح المكتب لا حواف نظام فلا أثر له
+            body: SafeArea(
+              bottom: false, // الشريط السفلي (NavigationBar) يعالج الحافة السفلية بنفسه
+              child: Column(children: [
+                if (ff.isDesktop) const TitleBar(),
+                Expanded(child: Stack(fit: StackFit.expand, children: [body, const MiniPlayer()])),
+                if (ff.isDesktop) const StatusBar(),
+              ]),
+            ),
           ),
         ),
       ),

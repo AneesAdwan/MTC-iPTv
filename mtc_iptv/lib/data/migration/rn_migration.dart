@@ -115,10 +115,9 @@ Future<RnMigrationResult?> migrateFromReactNativeIfNeeded(CatalogDb db) async {
     // /data/data/<pkg>/files ← /data/data/<pkg>/databases/RKStorage
     final support = await getApplicationSupportDirectory();
     final file = File('${support.parent.path}/databases/RKStorage');
-    if (!await file.exists()) {
-      await db.setSyncValue(rnMigratedKey, jsonEncode({'at': DateTime.now().toUtc().toIso8601String(), 'none': true}));
-      return null;
-    }
+    // لا علامة «تم» حين لا يوجد الملف: فحص وجوده في كل تشغيل لا يكلّف شيئًا، ولا نُغلق باب الترحيل بالخطأ
+    // (اختبار المحاكي 2026-10-16: وُضعت العلامة مبكرًا فلم يُعَد الترحيل أبدًا)
+    if (!await file.exists()) return null;
     final r = await migrateRnValues(db, readRnStorage(file.path));
     log.info('migrated from React Native: $r');
     return r;

@@ -31,6 +31,10 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <!-- We route mtciptv:// links ourselves (MainActivity "mtc/instance"). Flutter's built-in deep
+                 linking would also push the raw URI to the router as an unknown route and send the user
+                 home, cancelling ours (seen on the emulator test, 2026-10-16). -->
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
