@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../core/logging/log.dart';
+import '../../player/pip.dart';
 import '../router.dart';
 
 /// معرّف القناة من رابط `mtciptv://watch/<id>` (أو null). يقبل الشرطة المائلة الأخيرة والاستعلام.
@@ -50,6 +51,11 @@ class DeepLinks {
       }).catchError((Object _) {});
     }
     _channel.setMethodCallHandler((call) async {
+      // نفس القناة تحمل أحداث صورة داخل صورة من MainActivity (Android)
+      if (call.method == 'pip') {
+        Pip.onModeChanged(call.arguments == true);
+        return null;
+      }
       if (call.method != 'args') return null;
       final cmd = '${call.arguments}';
       log.info('second launch: ${cmd.length > 120 ? cmd.substring(0, 120) : cmd}');

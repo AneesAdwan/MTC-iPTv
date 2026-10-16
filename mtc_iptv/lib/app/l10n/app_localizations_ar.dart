@@ -1890,6 +1890,9 @@ class L10nAr extends L10n {
   String get copy => 'نسخ';
 
   @override
+  String get pictureInPicture => 'صورة داخل صورة';
+
+  @override
   String get favSyncTitle => 'مزامنة المفضلة';
 
   @override

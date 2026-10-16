@@ -574,6 +574,7 @@
   "anOk": "Succeeded",
   "anFailed": "Failed",
   "copy": "Copy",
+  "pictureInPicture": "Picture-in-picture",
   "favSyncTitle": "Favorites sync",
   "favSyncCreate": "Sync favorites across your devices",
   "favSyncCreateHint": "No account needed: you get an 8-character code to enter on your other device.",

@@ -617,6 +617,7 @@
   "anOk": "نجحت",
   "anFailed": "فشلت",
   "copy": "نسخ",
+  "pictureInPicture": "صورة داخل صورة",
   "favSyncTitle": "مزامنة المفضلة",
   "favSyncCreate": "مزامنة المفضلة بين أجهزتك",
   "favSyncCreateHint": "دون حساب: يُنشأ رمز من 8 أحرف تدخله على جهازك الآخر.",

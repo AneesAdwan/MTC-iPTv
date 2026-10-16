@@ -1900,6 +1900,9 @@ class L10nEn extends L10n {
   String get copy => 'Copy';
 
   @override
+  String get pictureInPicture => 'Picture-in-picture';
+
+  @override
   String get favSyncTitle => 'Favorites sync';
 
   @override

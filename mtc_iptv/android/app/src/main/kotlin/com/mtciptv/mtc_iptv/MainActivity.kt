@@ -1,7 +1,10 @@
 package com.mtciptv.mtc_iptv
 
 import android.Manifest
+import android.app.PictureInPictureParams
 import android.app.UiModeManager
+import android.util.Rational
+import androidx.annotation.RequiresApi
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -36,10 +39,46 @@ class MainActivity : FlutterActivity() {
                     }
                     // Push (§14): إذن الإشعارات (Android 13+) + الاشتراك في «all» + الرمز (null إن لم يُعدّ Firebase)
                     "pushInit" -> pushInit(result)
+                    // صورة داخل صورة (§7.6، R2): شاشة المشاهدة تسمح بها أثناء التشغيل، والدخول تلقائي عند مغادرة التطبيق
+                    "setPip" -> {
+                        pipAllowed = call.arguments as? Boolean ?: false
+                        if (Build.VERSION.SDK_INT >= 31) setPictureInPictureParams(pipParams())
+                        result.success(null)
+                    }
+                    "enterPip" -> result.success(enterPip())
                     else -> result.notImplemented()
                 }
             }
         }
+    }
+
+    private var pipAllowed = false
+
+    @RequiresApi(26)
+    private fun pipParams(): PictureInPictureParams {
+        val b = PictureInPictureParams.Builder().setAspectRatio(Rational(16, 9))
+        if (Build.VERSION.SDK_INT >= 31) b.setAutoEnterEnabled(pipAllowed).setSeamlessResizeEnabled(true)
+        return b.build()
+    }
+
+    private fun enterPip(): Boolean {
+        if (Build.VERSION.SDK_INT < 26 || !packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) return false
+        return try {
+            enterPictureInPictureMode(pipParams())
+        } catch (e: IllegalStateException) {
+            false
+        }
+    }
+
+    // Android 8–11: لا دخول تلقائي في النظام، فندخل عند زر الرئيسية/المغادرة (Android 12+ يتكفّل به setAutoEnterEnabled)
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (pipAllowed && Build.VERSION.SDK_INT in 26..30) enterPip()
+    }
+
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        channel?.invokeMethod("pip", isInPictureInPictureMode)
     }
 
     private fun pushInit(result: MethodChannel.Result) {

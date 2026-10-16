@@ -19,6 +19,7 @@ import '../../core/storage/catalog_db.dart';
 import '../../core/text/bidi.dart';
 import '../../data/catalog/catalog_repository.dart';
 import '../../data/epg/epg_repository.dart';
+import '../../player/pip.dart';
 import '../../player/playback_controller.dart';
 import 'guide_screen.dart' show fmtRange, showProgrammeSheet;
 import 'parental.dart';
@@ -54,6 +55,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
       _open.enter();
       _start(widget.channelId);
     });
+    Pip.allow(true); // Android: مغادرة التطبيق أثناء المشاهدة تفتح صورة داخل صورة
   }
 
   @override
@@ -76,6 +78,7 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
   @override
   void dispose() {
     _focus.dispose();
+    Pip.allow(false);
     if (fullscreen && _desktop) windowManager.setFullScreen(false);
     // لا نوقف البث: يستمر في المشغّل المصغّر حتى يغلقه المستخدم
     Future.microtask(_open.leave);
@@ -113,6 +116,9 @@ class _WatchScreenState extends ConsumerState<WatchScreen> {
         _StatusOverlay(state: s),
       ]),
     );
+
+    // داخل نافذة صورة داخل صورة: الفيديو وحده، بلا عناوين ولا أزرار
+    if (ref.watch(pipModeProvider).value ?? false) return video;
 
     final body = fullscreen
         ? Stack(children: [Positioned.fill(child: video), Positioned(left: 0, right: 0, bottom: 0, child: _ControlBar(player: player, state: s, fullscreen: true, onFullscreen: _toggleFullscreen, onStep: _step))])
@@ -258,7 +264,7 @@ class _ControlBar extends ConsumerWidget {
     return Container(
       color: fullscreen ? Colors.black54 : c.bg2,
       padding: const EdgeInsets.symmetric(horizontal: Space.sm, vertical: 2),
-      child: Row(children: [
+      child: _AdaptiveBar([
         btn(Icons.skip_previous_rounded, t.prevChannel, () => onStep(-1)),
         btn(playing ? Icons.pause_rounded : Icons.play_arrow_rounded, playing ? t.pause : t.play, player.playOrPause),
         btn(Icons.skip_next_rounded, t.nextChannel, () => onStep(1)),
@@ -303,10 +309,29 @@ class _ControlBar extends ConsumerWidget {
               () => ref.read(catalogRepoProvider).toggleFavorite(id),
               color: fav ? c.accent : fg),
         if (id != null && !fullscreen && (ref.watch(remoteConfigProvider).value?.feature('report') ?? true)) btn(Icons.flag_outlined, t.reportTitle, () => showReportDialog(context, id)),
+        if (Pip.supported) btn(Icons.picture_in_picture_alt_rounded, t.pictureInPicture, Pip.enter),
         btn(fullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded, fullscreen ? t.exitFullscreen : t.fullscreen, onFullscreen),
       ]),
     );
   }
+}
+
+/// شريط الأزرار: على الشاشات الواسعة صفّ واحد بفاصل مرن، وعلى الجوال أزرار أصغر وسحب أفقي
+/// (لا يُقصّ زر خارج الشاشة — زر «القناة السابقة» اختفى بعد إضافة زر PiP على جوال 411dp).
+class _AdaptiveBar extends StatelessWidget {
+  final List<Widget> children; // Spacer = الفاصل المرن
+  const _AdaptiveBar(this.children);
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
+        if (box.maxWidth >= 600) return Row(children: children);
+        return Theme(
+          data: Theme.of(context).copyWith(visualDensity: VisualDensity.compact),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(children: [for (final w in children) w is Spacer ? const SizedBox(width: Space.md) : w]),
+          ),
+        );
+      });
 }
 
 final _playingProvider = StreamProvider<bool>((ref) => ref.watch(playerProvider).stream.playing);

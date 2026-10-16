@@ -3541,6 +3541,12 @@ abstract class L10n {
   /// **'نسخ'**
   String get copy;
 
+  /// No description provided for @pictureInPicture.
+  ///
+  /// In ar, this message translates to:
+  /// **'صورة داخل صورة'**
+  String get pictureInPicture;
+
   /// No description provided for @favSyncTitle.
   ///
   /// In ar, this message translates to:
