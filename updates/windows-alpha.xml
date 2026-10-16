@@ -3,15 +3,15 @@
   <channel>
     <title>MTC-iPTv (alpha)</title>
     <item>
-      <title>MTC-iPTv 3.0.0-alpha.23</title>
-      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.23] — 2026-10-16<br/><br/>### تجربة على Android 8 وعلى Android TV (محاكيات 64-بت جديدة)<br/>- **التلفزيون صار يُعرض بتصميم التلفزيون** (قائمة جانبية) بدل تصميم الجوال. البرنامج صار يسأل النظام مباشرة إذا الجهاز تلفزيون.<br/>- **الريموت لحاله بيكفّي هلأ:**<br/>  - **نوافذ الإعلانات:** بتتسكّر بكبسة OK. قبل التصليح ما كان في شي محدّد فيها، فالمستخدم كان يعلق.<br/>  - **القائمة الجانبية:** بتوصلها الأسهم من المحتوى، وكانت قبل مش موصولة.<br/>  - **الأزرار المحدّدة:** بيطلعلها إطار واضح لما يكون التنقّل بالريموت أو بلوحة المفاتيح، وما بيطلع وقت اللمس.<br/>- **إصلاح مهم بالمشغّل:** بعض القنوات كانت تطلّع &#171;صيغة هذا البث غير مدعومة&#187; على Android 8.<br/>  - **السبب:** المشغّل بيكتب خطأ لما يفشل فك الترميز بالعتاد، وبعدين بيرجع لحاله للفك البرمجي وبيكمّل. البرنامج كان يعتبر هالخطأ فشل نهائي.<br/>  - **التصليح:** المشغّل صار ياخد 4 ثواني يتعافى فيهن. رفض الدخول و&#171;غير موجود&#187; (404) بيضلوا فشل فوري.<br/>  - **الأثر:** هالشي بيحسّن التشغيل على الأجهزة القديمة والتلفزيونات اللي فك العتاد فيها مش مستقر.<br/>- **خيار تشخيص للبناء:** `MTC_HWDEC` لمقارنة طرق فك الترميز على جهاز معيّن.<br/>- **النتائج بالتفصيل:** `docs/releases/r2-android-upgrade-test.md`. صورة الفيديو على محاكي التلفزيون بتطلع سودا بسبب محاكاة كرت الشاشة بس، والصوت شغّال. التأكيد على جهاز حقيقي.</div>]]></description>
-      <pubDate>Fri, 16 Oct 2026 11:12:34 GMT</pubDate>
-      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.23/MTC-iPTv-3.0.0-alpha.23-windows-setup.exe"
-                 sparkle:version="3.0.0+23"
-                 sparkle:shortVersionString="3.0.0-alpha.23"
+      <title>MTC-iPTv 3.0.0-alpha.24</title>
+      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.24] — 2026-10-16<br/><br/>### Android (R2): إشعارات Push<br/>- **الاشتراك:** التطبيق بيشترك بنفس قناة الإشعارات تبع التطبيق القديم (الموضوع &#171;all&#187;). يعني الإشعار اللي بتبعته من لوحة الإدارة (F1) بيوصل للتطبيقين مع بعض.<br/>- **الإذن:** بأندرويد 13 وما فوق، البرنامج بيطلب إذن الإشعارات أول مرة.<br/>- **عرض الإشعار:**<br/>  - **التطبيق مسكّر أو بالخلفية:** النظام بيعرض الإشعار لحاله.<br/>  - **التطبيق مفتوح:** التطبيق بيعرضه بنفسه.<br/>  - **إشعار فيه رابط قناة:** الكبس عليه بيفتح القناة.<br/>- **رمز الجهاز:** بينحفظ بقاعدة البيانات للنظام بس، والمدير ما بيقدر يقرأه (&#167;20).<br/>- **مكتوب بكود أندرويد الأصلي**، مش بإضافة Flutter، فبرنامج ويندوز ما تأثر لا بحجمه ولا بسرعة بنائه.<br/>- **نسخ المعاينة الحالية (`com.mtciptv.preview`) بدون إشعارات**، لأن Firebase مسجّل للمعرّف الرسمي بس. الإشعارات بتشتغل لحالها لما نبدّل المعرّف.<br/>- **اختبار بالمعرّف الرسمي على محاكي Android 8:** Firebase اشتغل، والتطبيق اشترك بالموضوع، والرمز وصل لقاعدة البيانات.</div>]]></description>
+      <pubDate>Fri, 16 Oct 2026 16:04:07 GMT</pubDate>
+      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.24/MTC-iPTv-3.0.0-alpha.24-windows-setup.exe"
+                 sparkle:version="3.0.0+24"
+                 sparkle:shortVersionString="3.0.0-alpha.24"
                  sparkle:os="windows"
-                 sparkle:dsaSignature="MD0CHFAkg/c6o1FcvPAREytdu/69s8qmtI0AmndJIMwCHQCYM/BpjAk8f1n1XMyrTN+QgRzko2YuOxoSFAnF"
-                 length="28276911"
+                 sparkle:dsaSignature="MDwCHDGVdJJYWeyKbO0JefYMyZ7BXaHHXRrzc2SfIhICHAMGsUylfsBcijtBHtJ36Ki0VNNzkVzHgbdmE2U="
+                 length="28277853"
                  type="application/octet-stream" />
     </item>
   </channel>
