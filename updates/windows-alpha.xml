@@ -3,15 +3,15 @@
   <channel>
     <title>MTC-iPTv (alpha)</title>
     <item>
-      <title>MTC-iPTv 3.0.0-alpha.25</title>
-      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.25] — 2026-10-16<br/><br/>### Android (R2): صورة داخل صورة (PiP)<br/>- **الدخول التلقائي:** إذا طلعت من التطبيق وإنت عم تتفرّج (زر الرئيسية أو تطبيق تاني)، القناة بتكمّل **بشباك صغير** فوق باقي التطبيقات.<br/>- **زر يدوي:** في كمان زر &#171;صورة داخل صورة&#187; بشريط التحكم.<br/>- **محتوى الشباك:** الفيديو بس. الكبس عليه بيرجّعك لشاشة المشاهدة كاملة.<br/>- **مكانها:** شاشة المشاهدة بس. إذا طلعت من التطبيق من شاشة تانية، ما بيفتح الشباك. وما في PiP على التلفزيون.<br/>- **مُختبرة على محاكي Android 8.**<br/>- **إصلاح:** على الجوالات الضيقة كان زر &#171;القناة السابقة&#187; بيختفي برا الشاشة بعد إضافة زر PiP. صارت الأزرار أصغر شوي على الجوال، والشريط بينسحب بالإصبع، فكل الأزرار بتنوصل.</div>]]></description>
-      <pubDate>Fri, 16 Oct 2026 16:42:33 GMT</pubDate>
-      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.25/MTC-iPTv-3.0.0-alpha.25-windows-setup.exe"
-                 sparkle:version="3.0.0+25"
-                 sparkle:shortVersionString="3.0.0-alpha.25"
+      <title>MTC-iPTv 3.0.0-alpha.26</title>
+      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.26] — 2026-10-16<br/><br/>### Android (R2): المعرّف الرسمي<br/>- **نفس معرّف التطبيق القديم (`com.mtciptv`):** نسخة أندرويد صارت **تتثبّت كتحديث فوق التطبيق القديم**، مش تطبيق جنبه. الشرط إنها بنفس مفتاح التوقيع، وهيك هي.<br/>- **نقل البيانات:** المفضلة بتنتقل لحالها من التطبيق القديم وبنفس الترتيب. هالشي **مُجرّب على جوال حقيقي**.<br/>- **الإشعارات (Push):** صارت شغّالة بالنسخ المنشورة.<br/>- **الاسم:** اسم التطبيق صار &#171;MTC-iPTv&#187; بدل &#171;MTC-iPTv Preview&#187;.<br/>- **إذا عندك نسخة Preview القديمة:** احذفها، لأنها تطبيق منفصل وما رح يوصلها تحديث.<br/>- **مستخدمين التطبيق القديم:** لسا ما بيوصلهم التحديث لحاله. التحديث التلقائي عندهم بيشوف الإصدار النهائي بس، مش النسخ التجريبية.<br/>- **فحص بسكربت الإصدار:** صار يرفض النشر إذا أي APK معرّفه غير `com.mtciptv`.</div>]]></description>
+      <pubDate>Fri, 16 Oct 2026 17:25:46 GMT</pubDate>
+      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.26/MTC-iPTv-3.0.0-alpha.26-windows-setup.exe"
+                 sparkle:version="3.0.0+26"
+                 sparkle:shortVersionString="3.0.0-alpha.26"
                  sparkle:os="windows"
-                 sparkle:dsaSignature="MD0CHQCMCgKiPg486b50gxqCMdvq0R5vmb/xuM3T2k35AhwtCsHlqB3gUYtX5ahqWIkwZFnYms9c/d8Z6AbZ"
-                 length="28280301"
+                 sparkle:dsaSignature="MDwCHCT4AVxN+HImmwRq+ZhK48hfbjet1hPB2LFc1L0CHBoIUR4K+RRC/Xwh0uPpj1dt6tuVso/7fJJKsKQ="
+                 length="28278778"
                  type="application/octet-stream" />
     </item>
   </channel>
