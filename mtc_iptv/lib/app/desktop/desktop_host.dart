@@ -34,8 +34,8 @@ class _DesktopHostState extends ConsumerState<DesktopHost> with WindowListener, 
   @override
   void initState() {
     super.initState();
+    DeepLinks.attach(ref); // mtciptv://watch/<id> عند التشغيل ومن نسخة ثانية (Windows) أو Intent (Android)
     if (!isDesktop) return;
-    DeepLinks.attach(ref); // mtciptv://watch/<id> عند التشغيل ومن نسخة ثانية
     windowManager.addListener(this);
     trayManager.addListener(this);
     if (AppUpdater.enabled) autoUpdater.addListener(this);

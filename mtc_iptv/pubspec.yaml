@@ -59,6 +59,7 @@ dependencies:
   file_selector: ^1.1.0
   tray_manager: ^0.8.0
   auto_updater: 1.0.0
+  sqlite3: 3.5.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

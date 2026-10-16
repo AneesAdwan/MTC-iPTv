@@ -41,16 +41,25 @@ class DeepLinks {
       // بعد أول إطار: الموجّه جاهز
       WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(routerProvider).push('/watch/$first'));
     }
-    if (!Platform.isWindows) return;
+    if (!Platform.isWindows && !Platform.isAndroid) return;
+    // Android: الرابط الذي فُتح به التطبيق يأتي من Intent (MainActivity.kt)، لا من الوسائط
+    if (Platform.isAndroid) {
+      _channel.invokeMethod<String>('initialLink').then((link) {
+        final id = channelFromDeepLink(link);
+        if (id != null) WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(routerProvider).push('/watch/$id'));
+      }).catchError((Object _) {});
+    }
     _channel.setMethodCallHandler((call) async {
       if (call.method != 'args') return null;
       final cmd = '${call.arguments}';
       log.info('second launch: ${cmd.length > 120 ? cmd.substring(0, 120) : cmd}');
       if (cmd.contains('--hidden')) return null; // تشغيل تلقائي مكرر مع ويندوز: لا شيء
-      try {
-        await windowManager.show();
-        await windowManager.focus();
-      } catch (_) {}
+      if (Platform.isWindows) {
+        try {
+          await windowManager.show();
+          await windowManager.focus();
+        } catch (_) {}
+      }
       final id = channelFromDeepLink(findDeepLink([cmd]));
       if (id != null) ref.read(routerProvider).push('/watch/$id');
       return null;

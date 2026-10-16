@@ -116,6 +116,23 @@ foreach ($apk in Get-ChildItem "$root\build\app\outputs\flutter-apk" -Filter 'ap
 }
 Write-Host 'Secrets scan: clean' -ForegroundColor Green
 
+# Android signing (spec 24.6): every APK must carry the official certificate of the React Native app,
+# or it could never upgrade it in R2 (and users would have to uninstall).
+$officialCert = 'f9e2e0990964ed0639a6de6c3fbcc033d2471112e3de8d13a03a01008bf6c5f7'
+$apksigner = Get-ChildItem "$env:ANDROID_HOME\build-tools" -Recurse -Filter apksigner.bat | Sort-Object FullName -Descending | Select-Object -First 1
+if (-not $apksigner) { throw 'apksigner not found (ANDROID_HOME/build-tools)' }
+$ErrorActionPreference = 'Continue'
+foreach ($apk in Get-ChildItem "$root\build\app\outputs\flutter-apk" -Filter 'app-*-release.apk') {
+  $certOut = (& $apksigner.FullName verify --print-certs $apk.FullName 2>&1 | Out-String)
+  $certM = [regex]::Match($certOut, 'certificate SHA-256 digest: ([0-9a-f]{64})')
+  if (-not $certM.Success -or $certM.Groups[1].Value -ne $officialCert) {
+    $ErrorActionPreference = 'Stop'
+    throw "$($apk.Name) is not signed with the official key (got '$($certM.Groups[1].Value)'). Check android/key.properties."
+  }
+}
+$ErrorActionPreference = 'Stop'
+Write-Host 'Android signing: official certificate' -ForegroundColor Green
+
 Run 'windows installer' { iscc /Q "/DAppVersion=$full" "/DFileVersion=$core.$build" "/DSourceDir=$root\build\windows\x64\runner\Release" "/DOutputDir=$dist" "$root\installer\mtc_iptv.iss" }
 foreach ($abi in 'arm64-v8a', 'armeabi-v7a', 'x86_64') {
   Copy-Item "$root\build\app\outputs\flutter-apk\app-$abi-release.apk" "$dist\MTC-iPTv-$full-android-$abi.apk"

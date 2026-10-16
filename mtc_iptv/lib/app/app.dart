@@ -7,6 +7,7 @@ import '../core/settings/local_settings.dart';
 import '../data/epg/epg_repository.dart';
 import '../features/splash/splash_gate.dart';
 import '../data/favorites/fav_sync.dart';
+import '../data/migration/rn_migration.dart';
 import '../data/settings/remote_config.dart';
 import '../data/telemetry/telemetry.dart';
 import 'desktop/desktop_host.dart';
@@ -27,6 +28,7 @@ class MtcApp extends ConsumerWidget {
     ref.watch(periodicRefreshProvider); // إعادة المزامنة الدورية
     ref.watch(telemetryHeartbeatProvider); // الجهاز نشط + أول دفعة قياس (§20)
     ref.watch(favSyncAutoProvider); // مزامنة المفضلة برمز (§8.3)
+    ref.watch(rnMigrationProvider); // Android: بيانات تطبيق React Native عند الترقية فوقه (§24.6)
     // G3: لغة وثيم افتراضيان لجهاز لم يختر مستخدمه بعد
     ref.listen(remoteConfigProvider, (_, next) {
       final g = next.value?.general;

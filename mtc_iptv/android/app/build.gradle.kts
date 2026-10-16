@@ -1,7 +1,17 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// مفتاح التوقيع الرسمي (نفس مفتاح تطبيق React Native، §24.6): من android/key.properties المحلي
+// (مستثنى من git) الذي يشير إلى app-keystore/mtc-release.keystore. بدونه يُبنى بمفتاح debug للتطوير فقط،
+// وscripts/release.ps1 يرفض نشر أي APK لا تطابق بصمته البصمة الرسمية.
+val keyProps = Properties().apply {
+    val f = rootProject.file("key.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
 }
 
 android {
@@ -27,15 +37,26 @@ android {
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
         // You can force using the value of versionCode by specifying the `-P force-version-code-ignoring-abi=true`
         // flag during build.
-        versionCode = flutter.versionCode
+        // §24.6: يجب أن يكون أعلى من آخر إصدار React Native (versionCode 21) حتى تتم الترقية فوقه.
+        // 30000 + رقم البناء؛ وFlutter يضيف 1000 × رمز المعمارية عند تقسيم الـ APK.
+        versionCode = 30000 + flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    signingConfigs {
+        if (keyProps.getProperty("storeFile") != null) {
+            create("release") {
+                storeFile = file(keyProps.getProperty("storeFile"))
+                storePassword = keyProps.getProperty("storePassword")
+                keyAlias = keyProps.getProperty("keyAlias")
+                keyPassword = keyProps.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
         }
     }
 }
