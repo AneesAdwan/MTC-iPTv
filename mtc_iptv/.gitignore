@@ -19,3 +19,6 @@ tools/desktop-poc/dist/
 # release artifacts (scripts/release.ps1)
 dist/
 test/failures/
+
+# dart test --coverage output
+coverage/
