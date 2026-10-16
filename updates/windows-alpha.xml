@@ -3,15 +3,15 @@
   <channel>
     <title>MTC-iPTv (alpha)</title>
     <item>
-      <title>MTC-iPTv 3.0.0-alpha.26</title>
-      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.26] — 2026-10-16<br/><br/>### Android (R2): المعرّف الرسمي<br/>- **نفس معرّف التطبيق القديم (`com.mtciptv`):** نسخة أندرويد صارت **تتثبّت كتحديث فوق التطبيق القديم**، مش تطبيق جنبه. الشرط إنها بنفس مفتاح التوقيع، وهيك هي.<br/>- **نقل البيانات:** المفضلة بتنتقل لحالها من التطبيق القديم وبنفس الترتيب. هالشي **مُجرّب على جوال حقيقي**.<br/>- **الإشعارات (Push):** صارت شغّالة بالنسخ المنشورة.<br/>- **الاسم:** اسم التطبيق صار &#171;MTC-iPTv&#187; بدل &#171;MTC-iPTv Preview&#187;.<br/>- **إذا عندك نسخة Preview القديمة:** احذفها، لأنها تطبيق منفصل وما رح يوصلها تحديث.<br/>- **مستخدمين التطبيق القديم:** لسا ما بيوصلهم التحديث لحاله. التحديث التلقائي عندهم بيشوف الإصدار النهائي بس، مش النسخ التجريبية.<br/>- **فحص بسكربت الإصدار:** صار يرفض النشر إذا أي APK معرّفه غير `com.mtciptv`.</div>]]></description>
-      <pubDate>Fri, 16 Oct 2026 17:25:46 GMT</pubDate>
-      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.26/MTC-iPTv-3.0.0-alpha.26-windows-setup.exe"
-                 sparkle:version="3.0.0+26"
-                 sparkle:shortVersionString="3.0.0-alpha.26"
+      <title>MTC-iPTv 3.0.0-alpha.27</title>
+      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.27] — 2026-10-16<br/><br/>### خطة التحسينات — المرحلة 1 (`docs/plans/improvements-2026-10.md`)<br/>- **الفئات وصفوف القنوات على ويندوز:**<br/>  - صارت تتحرك بالماوس: سحب، وأسهم على الطرفين، وشريط تمرير.<br/>  - بشريط الفئات، عجلة الماوس كمان بتحرّكه.<br/>  - **إصلاح:** لما تختار فئة، كان الشريط يرجع لأوله وتختفي الفئة اللي اخترتها، وكان يبيّن إنو الزر ما اشتغل. هلأ الفئة المختارة بتضل ظاهرة.<br/>  - السحب بالماوس صار شغّال بكل قوائم البرنامج.<br/>- **أيقونة الحساب فوق:** صارت قائمة فيها:<br/>  - الحساب اللي داخل فيه.<br/>  - لوحة الإدارة.<br/>  - الحساب والأمان.<br/>  - **تسجيل الخروج** (بيسأل قبل).<br/>  - إذا مش داخل، فيها &#171;دخول المدير&#187;.<br/>- **لوحة الأرقام على الجوال:** زر بالشريط العلوي بيفتح لوحة أرقام. بتكتب رقم القناة، بيطلعلك اسمها، وبتنتقل لإلها.<br/>- **فتح البث أسرع:**<br/>  - **تخزين مؤقت:** قائمة جودات القناة بتنحفظ دقيقتين.<br/>  - **تجهيز مسبق:** وإنت عم تتفرّج، البرنامج بيجهّز القناة التالية والسابقة. ولما توقف بالماوس (أو بالريموت) على قناة، بيجهّزها قبل ما تكبس.<br/>  - **مهلة أقصر:** إذا سيرفر القائمة بطيء، البرنامج ما بيستنّاه أكتر من 3 ثواني (كانت 6).<br/>  - **قياس:** صار يحسب كل وقت الانتظار من لحظة الكبس.</div>]]></description>
+      <pubDate>Fri, 16 Oct 2026 18:21:04 GMT</pubDate>
+      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.27/MTC-iPTv-3.0.0-alpha.27-windows-setup.exe"
+                 sparkle:version="3.0.0+27"
+                 sparkle:shortVersionString="3.0.0-alpha.27"
                  sparkle:os="windows"
-                 sparkle:dsaSignature="MDwCHCT4AVxN+HImmwRq+ZhK48hfbjet1hPB2LFc1L0CHBoIUR4K+RRC/Xwh0uPpj1dt6tuVso/7fJJKsKQ="
-                 length="28278778"
+                 sparkle:dsaSignature="MDwCHEfrCOMMpXu8iFvd6A9TNuRvr51PJ1H710a/o/kCHDFO7JBau2VBn4XB2dYmbmTqJpxTgqzlWlRcjIU="
+                 length="28291263"
                  type="application/octet-stream" />
     </item>
   </channel>
