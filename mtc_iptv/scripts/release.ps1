@@ -194,7 +194,7 @@ $date = (Get-Date).ToUniversalTime().ToString('r')
     </item>
   </channel>
 </rss>
-"@ | Set-Content "$feedDir\windows-$channel.xml" -Encoding utf8
+"@ | ForEach-Object { [IO.File]::WriteAllText("$feedDir\windows-$channel.xml", $_, (New-Object Text.UTF8Encoding($false))) }   # UTF-8 without BOM
 # Same data for the download page (download/index.html): version, link, size and SHA-256 of the installer
 $setupHash = (Get-FileHash $setup -Algorithm SHA256).Hash.ToLower()
 [ordered]@{
