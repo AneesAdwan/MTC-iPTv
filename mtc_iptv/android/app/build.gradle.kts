@@ -14,14 +14,14 @@ val keyProps = Properties().apply {
     if (f.exists()) f.inputStream().use { load(it) }
 }
 
-// معاينة (قبل R2): معرّف منفصل حتى لا تحلّ محلّ تطبيق React Native الحالي (com.mtciptv).
-// يتحوّل إلى com.mtciptv بمفتاح التوقيع الحالي عند الترحيل في R2 (ADR-16).
-val appId = "com.mtciptv.preview"
+// المعرّف الرسمي نفسه لتطبيق React Native (ADR-16): يُثبَّت فوقه كتحديث بنفس مفتاح التوقيع.
+// اعتمده المالك 2026-10-16 بعد نجاح الترقية على جواله (المفضلة انتقلت). كانت المعاينة com.mtciptv.preview.
+val appId = "com.mtciptv"
 
 // Firebase (إشعارات Push، §14): نقرأ google-services.json بأنفسنا ونولّد الموارد التي يقرؤها Firebase عند
 // التشغيل (google_app_id …) بدل إضافة com.google.gms.google-services (توافقها مع AGP 9 غير مضمون).
 // الملف خارج المستودع (key.properties ← googleServices). يُفعَّل فقط إن كان فيه عميل بنفس المعرّف،
-// فنسخ المعاينة (com.mtciptv.preview) تُبنى بلا Push، ونسخة com.mtciptv معه.
+// فأي بناء بمعرّف آخر يُبنى بلا Push.
 val firebaseRes: Map<String, String>? = run {
     val path = keyProps.getProperty("googleServices") ?: return@run null
     val f = file(path)

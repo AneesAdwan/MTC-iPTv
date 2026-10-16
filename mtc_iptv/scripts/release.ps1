@@ -121,6 +121,8 @@ Write-Host 'Secrets scan: clean' -ForegroundColor Green
 $officialCert = 'f9e2e0990964ed0639a6de6c3fbcc033d2471112e3de8d13a03a01008bf6c5f7'
 $apksigner = Get-ChildItem "$env:ANDROID_HOME\build-tools" -Recurse -Filter apksigner.bat | Sort-Object FullName -Descending | Select-Object -First 1
 if (-not $apksigner) { throw 'apksigner not found (ANDROID_HOME/build-tools)' }
+$aapt2 = Get-ChildItem "$env:ANDROID_HOME\build-tools" -Recurse -Filter aapt2.exe | Sort-Object FullName -Descending | Select-Object -First 1
+if (-not $aapt2) { throw 'aapt2 not found (ANDROID_HOME/build-tools)' }
 $ErrorActionPreference = 'Continue'
 foreach ($apk in Get-ChildItem "$root\build\app\outputs\flutter-apk" -Filter 'app-*-release.apk') {
   $certOut = (& $apksigner.FullName verify --print-certs $apk.FullName 2>&1 | Out-String)
@@ -129,9 +131,16 @@ foreach ($apk in Get-ChildItem "$root\build\app\outputs\flutter-apk" -Filter 'ap
     $ErrorActionPreference = 'Stop'
     throw "$($apk.Name) is not signed with the official key (got '$($certM.Groups[1].Value)'). Check android/key.properties."
   }
+  # Since alpha.26 (owner approval 2026-10-16) the package is the official RN id, so it installs as an update.
+  $badging = (& $aapt2.FullName dump badging $apk.FullName 2>&1 | Out-String)
+  $pkgM = [regex]::Match($badging, "package: name='([^']+)'")
+  if ($pkgM.Groups[1].Value -ne 'com.mtciptv') {
+    $ErrorActionPreference = 'Stop'
+    throw "$($apk.Name) has package '$($pkgM.Groups[1].Value)', expected com.mtciptv"
+  }
 }
 $ErrorActionPreference = 'Stop'
-Write-Host 'Android signing: official certificate' -ForegroundColor Green
+Write-Host 'Android signing: official certificate, package com.mtciptv' -ForegroundColor Green
 
 Run 'windows installer' { iscc /Q "/DAppVersion=$full" "/DFileVersion=$core.$build" "/DSourceDir=$root\build\windows\x64\runner\Release" "/DOutputDir=$dist" "$root\installer\mtc_iptv.iss" }
 foreach ($abi in 'arm64-v8a', 'armeabi-v7a', 'x86_64') {

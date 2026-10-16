@@ -11,7 +11,7 @@
     <!-- usesCleartextTraffic: many IPTV sources are plain http; Dart's HttpClient honours Android's
          cleartext policy (blocked by default since Android 9), so playlist/HLS resolution would fail. -->
     <application
-        android:label="MTC-iPTv Preview"
+        android:label="MTC-iPTv"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:banner="@drawable/tv_banner"
