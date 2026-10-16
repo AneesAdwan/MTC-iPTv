@@ -68,7 +68,10 @@ New-Item -ItemType Directory $dist | Out-Null
 $dsaKey = if ($env:MTC_DSA_KEY) { $env:MTC_DSA_KEY } else { "$HOME\.mtc-iptv\dsa_priv.pem" }
 $env:PATH = "$HOME\scoop\apps\openssl\current\bin;$env:PATH"
 if (-not (Test-Path $dsaKey)) { throw "DSA private key not found at $dsaKey (set MTC_DSA_KEY). See docs/runbooks/release.md" }
+# (openssl prints "read DSA key" on stderr; Windows PowerShell 5 turns that into a terminating error under Stop)
+$ErrorActionPreference = 'Continue'
 $pubFromKey = (openssl dsa -in $dsaKey -pubout 2>$null) -join "`n"
+$ErrorActionPreference = 'Stop'
 $pubInApp = ((Get-Content "$root\windows\dsa_pub.pem") -join "`n").Trim()
 if ($pubFromKey.Trim() -ne $pubInApp) { throw 'windows/dsa_pub.pem does not match the private key - refusing to release.' }
 
@@ -127,7 +130,6 @@ for ($i = 1; $i -le 6; $i++) {
   Write-Host "sign attempt $i failed, retrying..."
   Start-Sleep -Seconds 3
 }
-$ErrorActionPreference = 'Stop'
 if (-not $sigM.Success) { throw "DSA signing failed: $sigOut" }
 $dsaSig = $sigM.Groups[1].Value
 # self-check: the signature must verify with the public key shipped in the app
@@ -136,6 +138,7 @@ $tmpSig = [IO.Path]::GetTempFileName(); $tmpDig = [IO.Path]::GetTempFileName()
 $sha1 = [Security.Cryptography.SHA1]::Create().ComputeHash([IO.File]::ReadAllBytes($setup))
 [IO.File]::WriteAllBytes($tmpDig, $sha1)
 $verify = (openssl dgst -sha1 -verify "$root\windows\dsa_pub.pem" -signature $tmpSig $tmpDig 2>&1 | Out-String)
+$ErrorActionPreference = 'Stop'
 Remove-Item $tmpSig, $tmpDig
 if ($verify -notmatch 'Verified OK') { throw "DSA signature does not verify with windows/dsa_pub.pem: $verify" }
 Write-Host 'DSA signature: Verified OK' -ForegroundColor Green
