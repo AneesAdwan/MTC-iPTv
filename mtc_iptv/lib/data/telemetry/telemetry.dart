@@ -11,6 +11,7 @@ import '../../core/backend/backend.dart';
 import '../../core/config/env.dart';
 import '../../core/logging/log.dart';
 import '../../core/settings/local_settings.dart';
+import '../push/push_service.dart';
 import '../settings/remote_config.dart';
 
 class PlayEvent {
@@ -52,6 +53,9 @@ class TelemetryService {
   final queue = <Map<String, dynamic>>[];
   bool _sending = false;
 
+  /// رمز FCM (Android) — يُرسل مع التسجيل، والخادم يحفظه في installations.push_token (لا يقرؤه المدير).
+  String? pushToken;
+
   bool get enabled =>
       ref.read(settingsProvider).telemetry && (ref.read(remoteConfigProvider).value ?? RemoteConfig.empty).telemetryEnabled;
 
@@ -88,6 +92,7 @@ class TelemetryService {
         'p_version': Env.version,
         'p_locale': ref.read(settingsProvider).locale.languageCode,
         'p_events': take,
+        'p_push_token': ?pushToken,
       });
       queue.removeRange(0, take.length.clamp(0, queue.length));
       return (n as num?)?.toInt() ?? 0;
@@ -123,5 +128,6 @@ final telemetryProvider = Provider<TelemetryService>((ref) {
 /// نبضة عند التشغيل بعد المزامنة (الأجهزة النشطة، الإصدارات، المنصّات).
 final telemetryHeartbeatProvider = FutureProvider<void>((ref) async {
   await ref.watch(remoteConfigSyncProvider.future);
+  await ref.watch(pushInitProvider.future); // رمز Push (Android) يُسجَّل مع أول نبضة
   await ref.read(telemetryProvider).flush();
 });

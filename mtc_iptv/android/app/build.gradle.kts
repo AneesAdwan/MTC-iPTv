@@ -14,6 +14,36 @@ val keyProps = Properties().apply {
     if (f.exists()) f.inputStream().use { load(it) }
 }
 
+// معاينة (قبل R2): معرّف منفصل حتى لا تحلّ محلّ تطبيق React Native الحالي (com.mtciptv).
+// يتحوّل إلى com.mtciptv بمفتاح التوقيع الحالي عند الترحيل في R2 (ADR-16).
+val appId = "com.mtciptv.preview"
+
+// Firebase (إشعارات Push، §14): نقرأ google-services.json بأنفسنا ونولّد الموارد التي يقرؤها Firebase عند
+// التشغيل (google_app_id …) بدل إضافة com.google.gms.google-services (توافقها مع AGP 9 غير مضمون).
+// الملف خارج المستودع (key.properties ← googleServices). يُفعَّل فقط إن كان فيه عميل بنفس المعرّف،
+// فنسخ المعاينة (com.mtciptv.preview) تُبنى بلا Push، ونسخة com.mtciptv معه.
+val firebaseRes: Map<String, String>? = run {
+    val path = keyProps.getProperty("googleServices") ?: return@run null
+    val f = file(path)
+    if (!f.exists()) return@run null
+    @Suppress("UNCHECKED_CAST")
+    val root = groovy.json.JsonSlurper().parse(f) as Map<String, Any?>
+    val project = root["project_info"] as Map<String, Any?>
+    val clients = root["client"] as List<Map<String, Any?>>
+    val client = clients.firstOrNull {
+        val info = (it["client_info"] as Map<String, Any?>)["android_client_info"] as Map<String, Any?>
+        info["package_name"] == appId
+    } ?: return@run null
+    val apiKey = (client["api_key"] as List<Map<String, Any?>>).first()["current_key"] as String
+    mapOf(
+        "google_app_id" to ((client["client_info"] as Map<String, Any?>)["mobilesdk_app_id"] as String),
+        "gcm_defaultSenderId" to (project["project_number"] as String),
+        "google_api_key" to apiKey,
+        "google_crash_reporting_api_key" to apiKey,
+        "project_id" to (project["project_id"] as String),
+    )
+}
+
 android {
     namespace = "com.mtciptv.mtc_iptv"
     compileSdk = flutter.compileSdkVersion
@@ -24,11 +54,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    // AGP 9 يعطّل resValue افتراضيًا؛ نحتاجه لموارد Firebase أعلاه
+    buildFeatures {
+        resValues = true
+    }
+
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        // معاينة (قبل R2): معرّف منفصل حتى لا تحلّ محلّ تطبيق React Native الحالي (com.mtciptv).
-        // يتحوّل إلى com.mtciptv بمفتاح التوقيع الحالي عند الترحيل في R2 (ADR-16).
-        applicationId = "com.mtciptv.preview"
+        applicationId = appId
+        firebaseRes?.forEach { (k, v) -> resValue("string", k, v) }
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -69,4 +102,11 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // FCM مباشرة من الكود الأصلي (MtcMessagingService) — بلا إضافة Flutter، فلا يمسّ نسخة Windows
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("androidx.core:core-ktx:1.13.1")
 }
