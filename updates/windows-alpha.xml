@@ -3,16 +3,15 @@
   <channel>
     <title>MTC-iPTv (alpha)</title>
     <item>
-      <title>MTC-iPTv 3.0.0-alpha.21</title>
-      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.21] — 2026-10-16<br/><br/>### اختبار الترقية على Android (محاكي) وإصلاحاته<br/>- **الترقية فوق تطبيق React Native 2.2.5 دون حذف ناجحة** على محاكي Android 17: نفس المعرّف والمفتاح ورقم بناء أعلى. التطبيق بعدها يزامن ويعرض الدليل ويشغّل القنوات.<br/>- **ترحيل البيانات مُختبر على Android نفسه:** المفضلة بترتيبها والسجل والإشعارات، وجلسة المدير لا تُنقل، وملف RN القديم يبقى.<br/>- **إصلاح:** فتح رابط قناة `mtciptv://watch/&lt;id&gt;` والتطبيق يعمل كان يرجع للرئيسية، لأن Flutter يعترض الرابط بنفسه. صار يفتح القناة.<br/>- **إصلاح:** على الجوال كان الشريط العلوي يُرسم تحت ساعة الجهاز وأيقوناته، وصار تحتها. وأُضيف اختبار يمنع رجوع المشكلة.<br/>- **إصلاح:** المرحِّل كان يسجّل &#171;تم&#187; حين لا يجد بيانات RN، فلا يعيد المحاولة أبدًا. صار يفحص عند كل تشغيل.<br/>- **توافق صفحات الذاكرة 16KB** (أجهزة Android 15 وما بعده): لا تحذير لتطبيقنا، بخلاف تطبيق RN الحالي.<br/>- **ما يحتاج أجهزة حقيقية:**<br/>  - **جوال Android 7–8 وصندوق TV:** يحتاجان جهازين حقيقيين. Flutter لا يدعم معالجات x86 32-بت إطلاقًا، والأجهزة الحقيقية ARM ومدعومة.<br/>  - **بيانات RN 2.2.5 الفعلية:** تحتاج جهاز ARM، لأن RN 2.2.5 لا يعمل باستقرار على المحاكي.<br/>  - التفاصيل في `docs/releases/r2-android-upgrade-test.md`.</div>]]></description>
-      <pubDate>Fri, 16 Oct 2026 08:45:55 GMT</pubDate>
-      <sparkle:minimumSystemVersion>10.0.19044</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.21/MTC-iPTv-3.0.0-alpha.21-windows-setup.exe"
-                 sparkle:version="3.0.0+21"
-                 sparkle:shortVersionString="3.0.0-alpha.21"
+      <title>MTC-iPTv 3.0.0-alpha.22</title>
+      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.22] — 2026-10-16<br/><br/>### إصلاح التحديث من داخل البرنامج (بلاغ المالك: &#171;عرف إنو في تحديث بس ما رضي يحمّله&#187;)<br/>كان في خطآن مع بعض:<br/>- **نافذة التحديث كانت تنفتح خلف البرنامج.** لهيك &#171;تنزيل&#187; كان يبيّن كأنه ما عمل شي، مع إن النافذة كانت مفتوحة ومخفية. صارت تطلع قدّام البرنامج.<br/>- **شرط &#171;أقل إصدار ويندوز&#187; بملف التحديثات منع التحديث عن الجميع.** أداة التحديث كانت تقرأ إصدار ويندوز غلط، فتقول لكل الأجهزة &#171;البرنامج محدّث&#187;. أُزيل الشرط، والمثبّت نفسه أصلًا بيرفض الأنظمة القديمة.<br/>- **اختُبر المسار كامل على هالجهاز:** &#171;ثمّة نسخة جديدة متوفّرة&#187; ← تنزيل 28.3MB من GitHub ← التحقق من التوقيع ← البرنامج يسكّر حاله ← المثبّت يفتح.<br/>- **من هالإصدار:** إذا عندك alpha.21، &#171;حول&#187; ← &#171;تحقق من التحديثات&#187; ← &#171;تنزيل&#187; لازم يطلّعلك alpha.22 ويثبّته.<br/><br/>### إصلاحات من سجل البرنامج عند المالك<br/>- **الرئيسية (B4):** إضافة قناة للقسم المميز كانت تفشل بصمت لما يكون القسم فاضي. صارت تنضاف.<br/>- **قيد المراجعة والقنوات:** &#171;فحص الروابط&#187; كان يطلّع خطأ إذا تركت الشاشة قبل ما يبلّش. صار الفحص يكمّل بالخلفية بدون خطأ.</div>]]></description>
+      <pubDate>Fri, 16 Oct 2026 09:21:15 GMT</pubDate>
+      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.22/MTC-iPTv-3.0.0-alpha.22-windows-setup.exe"
+                 sparkle:version="3.0.0+22"
+                 sparkle:shortVersionString="3.0.0-alpha.22"
                  sparkle:os="windows"
-                 sparkle:dsaSignature="MD0CHQCGEN0MSdVt/ieUzG9GefX8+IcCXky28mCcxF8rAhxhENkeYtmc4KRrxcNPxQA2ZhzyyvjBZM8ScIUu"
-                 length="28273808"
+                 sparkle:dsaSignature="MD0CHH1zswRMWAjeSpt9714dXhMExWmkv79Ldua27XUCHQCkPIrLAIrhM7/hYtZE374VRYYJrJmLsEPCI0ke"
+                 length="28277441"
                  type="application/octet-stream" />
     </item>
   </channel>
