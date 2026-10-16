@@ -4,9 +4,11 @@
 //    WinSparkle يرفض أي ملف توقيعه غير مطابق، فلا يُثبَّت شيء معدّل.
 //  • القناة من رقم الإصدار نفسه: alpha/beta ← قناتها، وإلا stable. لا تثبيت صامت: المستخدم يوافق دائمًا.
 //  • على المنصّات الأخرى: صفحة الإصدار (Android لاحقًا في R2).
+import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_updater/auto_updater.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config/env.dart';
@@ -30,6 +32,17 @@ String feedUrlFor(String version, {String platform = 'windows'}) =>
 class AppUpdater {
   AppUpdater._();
   static bool _ready = false;
+  static Timer? _raiser;
+  static const _native = MethodChannel('mtc/instance');
+
+  /// يرفع نوافذ التحديث (WinSparkle) التي لم تُرفع بعد. يعيد عددها.
+  static Future<int> raiseWindows() async {
+    try {
+      return await _native.invokeMethod<int>('raiseUpdater') ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
   static bool get supported => Platform.isWindows;
 
   /// مفعّل لنسخ الإصدار فقط (لا لبناء التطوير 3.0.0-dev ولا للاختبارات).
@@ -42,6 +55,9 @@ class AppUpdater {
       await autoUpdater.setFeedURL(feedUrlFor(Env.version));
       await autoUpdater.setScheduledCheckInterval(6 * 3600);
       _ready = true;
+      // نوافذ WinSparkle تُفتح خلف نافذة البرنامج (بلاغ المالك 2026-10-16: «كبست تنزيل وما صار شي»):
+      // كل ثانيتين نطلب من الجزء الأصلي رفع أي نافذة تحديث جديدة إلى الأمام، مرة واحدة لكل نافذة
+      _raiser ??= Timer.periodic(const Duration(seconds: 2), (_) => raiseWindows());
       log.info('updater: ${feedUrlFor(Env.version)}');
     } catch (e) {
       log.warning('updater init failed', e);
@@ -54,6 +70,10 @@ class AppUpdater {
       await init();
       if (_ready) {
         await autoUpdater.checkForUpdates();
+        // لا ننتظر المؤقّت: نافذة «جارٍ التحقق» تظهر خلال أجزاء من الثانية
+        for (final ms in const [300, 900, 2000]) {
+          Future.delayed(Duration(milliseconds: ms), raiseWindows);
+        }
         return;
       }
     }

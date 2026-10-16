@@ -174,10 +174,14 @@ class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
               OutlinedButton.icon(
                 onPressed: busy
                     ? null
-                    : () => _bulk((r, ids) async {
+                    : () {
+                        // يُقرأ قبل الانتظار: المدير قد يغادر الشاشة أثناء جلب الروابط
+                        final health = ref.read(healthJobProvider.notifier);
+                        _bulk((r, ids) async {
                           final streams = [for (final id in ids) ...await r.streamsOf(id)];
-                          ref.read(healthJobProvider.notifier).run(streams); // في الخلفية
-                        }),
+                          health.run(streams); // في الخلفية
+                        });
+                      },
                 icon: const Icon(Icons.monitor_heart_rounded, size: 18),
                 label: Text(t.aCheckStreams),
               ),

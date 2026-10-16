@@ -10,6 +10,9 @@
 // WM_COPYDATA tag for the single-instance hand-off ('MTC!').
 constexpr ULONG_PTR kInstanceArgsMessage = 0x4D544321;
 
+// Brings dialogs of this process (WinSparkle's update windows) that were not raised yet to the front.
+int RaiseNewDialogs();
+
 #include "win32_window.h"
 
 // A window that does nothing but host a Flutter view.

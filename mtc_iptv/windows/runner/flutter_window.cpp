@@ -1,11 +1,45 @@
 #include "flutter_window.h"
 
 #include <optional>
+#include <set>
 #include <string>
 
 #include <flutter/standard_method_codec.h>
 
 #include "flutter/generated_plugin_registrant.h"
+
+namespace {
+
+std::set<HWND>& RaisedDialogs() {
+  static std::set<HWND> raised;
+  return raised;
+}
+
+BOOL CALLBACK RaiseIfNewDialog(HWND hwnd, LPARAM count) {
+  DWORD pid = 0;
+  ::GetWindowThreadProcessId(hwnd, &pid);
+  if (pid != ::GetCurrentProcessId() || !::IsWindowVisible(hwnd)) return TRUE;
+  wchar_t cls[64] = {0};
+  ::GetClassNameW(hwnd, cls, 64);
+  if (wcscmp(cls, L"#32770") != 0) return TRUE;
+  if (!RaisedDialogs().insert(hwnd).second) return TRUE;  // already raised once
+  const UINT flags = SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW;
+  ::SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, flags);
+  ::SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, flags);
+  ::SetForegroundWindow(hwnd);
+  FLASHWINFO fi = {sizeof(fi), hwnd, FLASHW_TRAY | FLASHW_TIMERNOFG, 3, 0};
+  ::FlashWindowEx(&fi);
+  ++*reinterpret_cast<int*>(count);
+  return TRUE;
+}
+
+}  // namespace
+
+int RaiseNewDialogs() {
+  int count = 0;
+  ::EnumWindows(RaiseIfNewDialog, reinterpret_cast<LPARAM>(&count));
+  return count;
+}
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
     : project_(project) {}
@@ -31,6 +65,18 @@ bool FlutterWindow::OnCreate() {
   instance_channel_ = std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
       flutter_controller_->engine()->messenger(), "mtc/instance",
       &flutter::StandardMethodCodec::GetInstance());
+  // "raiseUpdater": WinSparkle opens its dialogs (#32770) from its own thread and Windows leaves them
+  // BEHIND our window, so "Update now" looked like it did nothing (owner report, 2026-10-16).
+  // Bring each new dialog of this process to the front exactly once.
+  instance_channel_->SetMethodCallHandler(
+      [](const flutter::MethodCall<flutter::EncodableValue>& call,
+         std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
+        if (call.method_name() != "raiseUpdater") {
+          result->NotImplemented();
+          return;
+        }
+        result->Success(flutter::EncodableValue(RaiseNewDialogs()));
+      });
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {

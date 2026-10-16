@@ -185,6 +185,9 @@ Write-Host "Published v$full" -ForegroundColor Green
 # ---- 6. appcast (only after the installer is downloadable) ------------------------------------
 # Served by GitHub Pages from the repo root: https://aneesadwan.github.io/MTC-iPTv/updates/windows-<channel>.xml
 # sparkle:version = the exe's own version string (build-name+build-number), which WinSparkle compares.
+# NO sparkle:minimumSystemVersion: WinSparkle 0.8.1 misreads the Windows version, so with it every client
+# answered "you're up to date" (tested 2026-10-16: same feed with/without it). The installer's
+# MinVersion=10.0.19044 already blocks unsupported Windows.
 $channel = if ($Stable) { 'stable' } else { $tag }
 $feedDir = "$repo\updates"
 New-Item -ItemType Directory -Force $feedDir | Out-Null
@@ -200,7 +203,6 @@ $date = (Get-Date).ToUniversalTime().ToString('r')
       <title>MTC-iPTv $full</title>
       <description><![CDATA[<div dir="rtl">$notesHtml</div>]]></description>
       <pubDate>$date</pubDate>
-      <sparkle:minimumSystemVersion>10.0.19044</sparkle:minimumSystemVersion>
       <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v$full/$setupName"
                  sparkle:version="$core+$build"
                  sparkle:shortVersionString="$full"

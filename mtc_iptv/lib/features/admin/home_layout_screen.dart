@@ -102,7 +102,7 @@ class _HomeLayoutScreenState extends ConsumerState<HomeLayoutScreen> {
       final n = await repo.channelNames(ids);
       setState(() {
         layout = l.rows.isEmpty && l.hero.isEmpty ? HomeLayout.fallback : l;
-        names = n;
+        names = {...n}; // نسخة قابلة للتعديل: channelNames تعيد const {} حين لا قنوات (فيفشل _addChannel)
       });
     } catch (e) {
       setState(() => error = '$e');

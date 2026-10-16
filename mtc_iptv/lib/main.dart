@@ -74,4 +74,8 @@ Future<void> main(List<String> args) async {
 
   // التحديث داخل البرنامج (§18): لنسخ الإصدار فقط، لا لبناء التطوير (3.0.0-dev)
   unawaited(AppUpdater.init());
+  // للاختبار فقط (--dart-define=UPDATE_CHECK_ON_START=true): فحص بواجهة WinSparkle بعد 5 ثوانٍ
+  if (const bool.fromEnvironment('UPDATE_CHECK_ON_START')) {
+    unawaited(Future.delayed(const Duration(seconds: 5), () => AppUpdater.checkNow()));
+  }
 }

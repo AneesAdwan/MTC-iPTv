@@ -135,10 +135,12 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
               onPressed: job.running || busy
                   ? null
                   : () async {
+                      // يُقرأ قبل الانتظار: قد يغادر المدير الشاشة أثناء جلب الروابط، والفحص يكمل في الخلفية
                       final repo = ref.read(adminRepoProvider);
+                      final health = ref.read(healthJobProvider.notifier);
                       if (repo == null) return;
                       final streams = [for (final id in await allIds()) ...await repo.streamsOf(id)];
-                      ref.read(healthJobProvider.notifier).run(streams, playCheck: false);
+                      health.run(streams, playCheck: false);
                     },
               icon: const Icon(Icons.monitor_heart_rounded),
               label: Text('${t.aCheckStreams} · ${t.aAllInBucket(counts[b] ?? 0)}'),
