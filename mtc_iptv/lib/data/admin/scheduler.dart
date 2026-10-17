@@ -18,7 +18,6 @@ import 'admin_repository.dart';
 import 'backup_service.dart';
 import 'epg_admin_service.dart';
 import 'health_service.dart';
-import 'import_service.dart';
 
 class SchedulerState {
   final String? running; // مفتاح المهمة الجارية
@@ -139,14 +138,9 @@ class SchedulerService extends Notifier<SchedulerState> {
       case 'epg':
         await ref.read(epgAdminProvider.notifier).run();
       case 'sources':
-        for (final s in await repo.sources()) {
-          if (s['is_active'] != true) continue;
-          try {
-            await syncSourceHeadless(repo, s);
-          } catch (e) {
-            await repo.updateSource('${s['id']}', {'status': 'failed', 'last_error': '$e'.substring(0, '$e'.length.clamp(0, 300))});
-          }
-        }
+        // معطّل مؤقتًا (جرد A-067/A-054/A-055): الجلب المجدول كان يضيف روابط لقنوات منشورة ويرقّم المحذوفة
+        // والمدموجة بلا مراجعة. الجلب اليدوي من «المصادر» (بمعاينة) يبقى. يعود بمركز المصادر في SuperAdmin الجديد.
+        return 'skipped';
       case 'backup':
         final dev = await ref.read(adminDeviceProvider.future);
         if (dev.backupDir == null || await readBackupPassphrase() == null) return 'skipped';

@@ -193,7 +193,8 @@ class _InfoTabState extends ConsumerState<_InfoTab> {
             child: SegmentedButton<String>(
               segments: [for (final s in publishStates) ButtonSegment(value: s, label: Text(publishLabel(t, s)))],
               selected: {state},
-              onSelectionChanged: (v) => setState(() => state = v.first),
+              // قناة في السلة لا تُنشر من هنا (جرد A-030: كانت تُنشر وهي بالسلة ثم يحذفها التنظيف بعد 30 يومًا) — «استرجاع» أولًا
+              onSelectionChanged: widget.ch.trashedAt != null ? null : (v) => setState(() => state = v.first),
             ),
           ),
           row([TextField(controller: ar, decoration: InputDecoration(labelText: t.fNameAr)), TextField(controller: en, decoration: InputDecoration(labelText: t.fNameEn))]),

@@ -623,7 +623,9 @@ class _BackupsScreenState extends ConsumerState<BackupsScreen> {
               ),
             Wrap(spacing: Space.sm, runSpacing: Space.sm, crossAxisAlignment: WrapCrossAlignment.center, children: [
               FilledButton(
-                onPressed: busy || chosen.isEmpty
+                // معطّل مؤقتًا (جرد A-129): الاستعادة كانت تحوّل كل القنوات المنشورة إلى «معلّقة» بسبب مشغّل المراجعة.
+                // تعود بإصلاح خادمي في SuperAdmin الجديد.
+                onPressed: kLegacyRestoreDisabled || busy || chosen.isEmpty
                     ? null
                     : () => _wrap(() async {
                           final r = await ref.read(backupServiceProvider)!.restore(doc!, tables: chosen.toList());
@@ -633,7 +635,7 @@ class _BackupsScreenState extends ConsumerState<BackupsScreen> {
               ),
               SizedBox(width: 320, child: TextField(controller: channelId, textDirection: TextDirection.ltr, decoration: InputDecoration(labelText: t.bkChannelId, isDense: true))),
               OutlinedButton(
-                onPressed: busy
+                onPressed: kLegacyRestoreDisabled || busy
                     ? null
                     : () => _wrap(() async {
                           if (channelId.text.trim().isEmpty) return;
@@ -777,10 +779,11 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
           Text(t.mtDangerHint, style: TextStyle(color: c.textMuted, fontSize: 12.5)),
           const SizedBox(height: Space.sm),
           Wrap(spacing: Space.sm, runSpacing: Space.sm, children: [
-            for (final (a, l) in [('delete_offline_streams', t.mtDeleteOffline), ('delete_hidden', t.mtDeleteHidden), ('delete_pending', t.mtDeletePending)])
+            for (final (_, l) in [('delete_offline_streams', t.mtDeleteOffline), ('delete_hidden', t.mtDeleteHidden), ('delete_pending', t.mtDeletePending)])
               OutlinedButton(
                 style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFEF4444)),
-                onPressed: busy ? null : () => _cleanup(a, danger: true),
+                // معطّلة مؤقتًا (جرد A-133/A-134/A-135): حذف نهائي بلا سلة يطال قيد المراجعة والسلة والمدموجة وروابط قنوات منشورة.
+                onPressed: null,
                 child: Text(l),
               ),
           ]),
@@ -789,3 +792,6 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
     ]);
   }
 }
+
+/// استعادة النسخ معطّلة في اللوحة المؤقتة حتى إصلاح A-129 (الاستعادة كانت تلغي نشر الكتالوج).
+const kLegacyRestoreDisabled = true;
