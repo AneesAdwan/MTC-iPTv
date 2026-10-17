@@ -129,13 +129,14 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
         child: Stack(fit: StackFit.expand, children: [
           _background(w, h),
           _group(t, w, h, vmin, phone),
+          // شعار MTC-iPTv تحت مشهد MTC-Group بمسافة واضحة (لا يلتصقان)، في الوسط على كل الأجهزة
           Center(
             child: Transform.translate(
-              offset: Offset(0, phone ? 0 : -h * .06),
+              offset: Offset(0, h * .07),
               child: Transform.scale(
                 scale: (.93 + .07 * seg(2.2, 7, const Cubic(.2, .6, .2, 1))) * (1 - .08 * out),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: w * .94),
+                  constraints: BoxConstraints(maxWidth: w * .94, maxHeight: h * .36),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -183,12 +184,12 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
     ]);
   }
 
-  // ── المشهد الأول: MTC-Group، ثم يصعد للأعلى ويصغر ──
+  // ── المشهد الأول: MTC-Group في الوسط (الشعار فوق الاسم على كل الأجهزة)، ثم يصعد لأعلى الشاشة ويصغر ──
+  // بعد الصعود يشغل [9%..32%] من الارتفاع، وشعار MTC-iPTv يبدأ تحته بمسافة (≈ 38%).
   Widget _group(L10n t, double w, double h, double vmin, bool phone) {
     final settle = seg(2.6, 1.1, const Cubic(.65, 0, .25, 1));
     final k = 1 - (1 - .54) * settle;
-    final gy = (h / 2 - (phone ? (h * .16).clamp(95.0, 150.0) : (h * .26).clamp(165.0, 245.0))) * settle;
-    final emb = phone ? (vmin * .3).clamp(84.0, 140.0) : (vmin * .25).clamp(116.0, 230.0);
+    final emb = phone ? (vmin * .3).clamp(84.0, 140.0) : (vmin * .22).clamp(110.0, 210.0);
     double fade(double start) => seg(start, .9, const Cubic(.2, .8, .2, 1));
     Widget rise(double start, Widget child) {
       final p = fade(start);
@@ -198,8 +199,6 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
       );
     }
 
-    final capSwap = seg(2.75, .45);
-    final cap2 = seg(3.2, .6);
     final rule = seg(1.25, 1.1, const Cubic(.65, 0, .35, 1));
     final gem = seg(2.0, .6, const Cubic(.34, 1.56, .64, 1));
     final track = seg(1.45, 1.6, const Cubic(.2, .8, .2, 1));
@@ -208,26 +207,8 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
     final nameSize = phone ? (vmin * .1).clamp(30.0, 46.0) : (vmin * .08).clamp(36.0, 78.0);
 
     final texts = Column(
-      crossAxisAlignment: phone ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // «تقدّم» ← «إحدى شركات»
-        SizedBox(
-          height: (phone ? 18.0 : (vmin * .024).clamp(14.0, 21.0)) * 1.9,
-          child: Stack(alignment: phone ? Alignment.bottomCenter : (rtl ? Alignment.bottomRight : Alignment.bottomLeft), children: [
-            Opacity(
-              opacity: fade(.85) * (1 - capSwap),
-              child: Text(t.sgCap1, style: TextStyle(color: const Color(0xFFFFB37A), fontWeight: FontWeight.w700, letterSpacing: 4, fontSize: phone ? 15 : (vmin * .024).clamp(14.0, 21.0))),
-            ),
-            Opacity(
-              opacity: cap2,
-              child: Transform.translate(
-                offset: Offset(0, 6 * (1 - cap2)),
-                child: Text(t.sgCap2, style: TextStyle(color: const Color(0xFFFFC9A3), fontWeight: FontWeight.w700, fontSize: (phone ? 15.0 : (vmin * .024).clamp(14.0, 21.0)) * 1.5)),
-              ),
-            ),
-          ]),
-        ),
         rise(
           1.0,
           Directionality(
@@ -265,14 +246,21 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
           ]),
         ),
         const SizedBox(height: 4),
-        rise(1.15, Text(t.sgName, textAlign: phone ? TextAlign.center : TextAlign.start, style: TextStyle(color: const Color(0xFFF2F2F7), fontWeight: FontWeight.w700, fontSize: phone ? 15 : (vmin * .033).clamp(16.0, 31.0)))),
+        rise(1.15, Text(t.sgName, textAlign: TextAlign.center, style: TextStyle(color: const Color(0xFFF2F2F7), fontWeight: FontWeight.w700, fontSize: phone ? 15 : (vmin * .033).clamp(16.0, 31.0)))),
         const SizedBox(height: 4),
         Opacity(
           opacity: track,
           child: Text(
             'MIDDLE EAST TECHNOLOGY CENTER GROUP',
+            textAlign: TextAlign.center,
             style: TextStyle(color: const Color(0xCCFFDCB4), fontWeight: FontWeight.w600, fontSize: phone ? 10 : (vmin * .021).clamp(12.0, 19.0), letterSpacing: (phone ? 2.0 : 5.0) + 10 * (1 - track)),
           ),
+        ),
+        SizedBox(height: phone ? 10 : (vmin * .018).clamp(8.0, 16.0)),
+        // «تقدّم»: MTC-Group تقدّم ← MTC-iPTv تحتها
+        Opacity(
+          opacity: fade(1.6),
+          child: Text(t.sgCap1, style: TextStyle(color: const Color(0xFFFFB37A), fontWeight: FontWeight.w700, letterSpacing: 4, fontSize: phone ? 15 : (vmin * .026).clamp(14.0, 22.0))),
         ),
       ],
     );
@@ -282,11 +270,14 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
     final emblem = CustomPaint(size: Size.square(emb), painter: GroupEmblemPainter(tl.value * total - .3));
 
     return Positioned.fill(
-      child: Center(
-        child: Transform.translate(
-          offset: Offset(0, -gy),
+      child: Padding(
+        padding: EdgeInsets.only(top: h * .09 * settle),
+        child: Align(
+          // من منتصف الشاشة إلى أعلاها، ويصغر من حافته العليا فيبقى أعلاه ثابتًا
+          alignment: Alignment.lerp(Alignment.center, Alignment.topCenter, settle)!,
           child: Transform.scale(
             scale: k,
+            alignment: Alignment.lerp(Alignment.center, Alignment.topCenter, settle)!,
             child: Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [
               // الهالة
               Opacity(
@@ -303,16 +294,14 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
                   ),
                 ),
               ),
-              // يصغر ليناسب الشاشات الضيقة جدًا بدل أن يفيض
+              // يصغر ليناسب الشاشة بدل أن يفيض (بعد الصعود: ≤ 42% × 0.54 من الارتفاع)
               ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: w * .94, maxHeight: h * .9),
+                constraints: BoxConstraints(maxWidth: w * .94, maxHeight: h * .42),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Directionality(
                     textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
-                    child: phone
-                        ? Column(mainAxisSize: MainAxisSize.min, children: [emblem, const SizedBox(height: 14), texts])
-                        : Row(mainAxisSize: MainAxisSize.min, children: [emblem, SizedBox(width: (vmin * .028).clamp(16.0, 32.0)), texts]),
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [emblem, SizedBox(height: phone ? 14 : (vmin * .022).clamp(12.0, 22.0)), texts]),
                   ),
                 ),
               ),
@@ -427,15 +416,7 @@ class _SplashGateState extends ConsumerState<SplashGate> with TickerProviderStat
       opacity: p,
       child: Directionality(
         textDirection: Localizations.localeOf(context).languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(t.spTag, textAlign: TextAlign.center, style: TextStyle(color: const Color(0x9EFFFFFF), fontSize: fs, fontWeight: FontWeight.w500, letterSpacing: fs * (.12 + .38 * (1 - p)))),
-          SizedBox(height: fs * .7),
-          // MTC-iPTv هي الشركة المشغّلة، وإحدى شركات MTC-Group (الشركة الأم)
-          Opacity(
-            opacity: seg(6.8, 1.0),
-            child: Text(t.spOperator, textAlign: TextAlign.center, style: TextStyle(color: const Color(0xCCFFC9A3), fontSize: fs * .82, fontWeight: FontWeight.w600)),
-          ),
-        ]),
+        child: Text(t.spTag, textAlign: TextAlign.center, style: TextStyle(color: const Color(0x9EFFFFFF), fontSize: fs, fontWeight: FontWeight.w500, letterSpacing: fs * (.12 + .38 * (1 - p)))),
       ),
     );
   }

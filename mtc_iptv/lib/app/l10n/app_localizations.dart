@@ -139,12 +139,6 @@ abstract class L10n {
   /// **'جاهز — وافق على التثبيت في الشاشة التالية.'**
   String get upInstalling;
 
-  /// No description provided for @spOperator.
-  ///
-  /// In ar, this message translates to:
-  /// **'الشركة المشغّلة · إحدى شركات مجموعة MTC-Group'**
-  String get spOperator;
-
   /// No description provided for @spDev.
   ///
   /// In ar, this message translates to:
@@ -234,12 +228,6 @@ abstract class L10n {
   /// In ar, this message translates to:
   /// **'تقدّم'**
   String get sgCap1;
-
-  /// No description provided for @sgCap2.
-  ///
-  /// In ar, this message translates to:
-  /// **'الشركة الأم'**
-  String get sgCap2;
 
   /// No description provided for @sgName.
   ///

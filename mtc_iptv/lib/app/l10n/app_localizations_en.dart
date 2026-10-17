@@ -37,9 +37,6 @@ class L10nEn extends L10n {
   String get upInstalling => 'Ready — confirm the install on the next screen.';
 
   @override
-  String get spOperator => 'The operator · a company of MTC-Group';
-
-  @override
   String spDev(String name) {
     return 'Developed by $name';
   }
@@ -91,9 +88,6 @@ class L10nEn extends L10n {
 
   @override
   String get sgCap1 => 'Presented by';
-
-  @override
-  String get sgCap2 => 'The parent company';
 
   @override
   String get sgName => 'Middle East Technology Center Group';

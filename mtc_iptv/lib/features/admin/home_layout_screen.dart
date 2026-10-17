@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/widgets/country_flag.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/theme/tokens.dart';
 import '../../data/admin/admin_repository.dart';
@@ -260,7 +261,7 @@ class _HomeLayoutScreenState extends ConsumerState<HomeLayoutScreen> {
                         DropdownButton<String>(
                           value: l.rows[i].ref,
                           hint: Text(t.colCountry),
-                          items: [for (final x in refs?.$1 ?? const <Map<String, dynamic>>[]) DropdownMenuItem(value: x['code'] as String, child: Text('${x['flag_emoji'] ?? ''} ${nm(x)}'))],
+                          items: [for (final x in refs?.$1 ?? const <Map<String, dynamic>>[]) DropdownMenuItem(value: x['code'] as String, child: FlagLabel(x['code'] as String, nm(x)))],
                           onChanged: (v) => _updateRow(i, l.rows[i].copyWith(ref: v)),
                         ),
                       OutlinedButton.icon(

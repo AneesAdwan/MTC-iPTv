@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/widgets/country_flag.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/text/bidi.dart';
@@ -351,7 +352,7 @@ class _DecisionsDialogState extends ConsumerState<_DecisionsDialog> {
             decoration: InputDecoration(labelText: t.colCountry, isDense: true),
             items: [
               const DropdownMenuItem(value: null, child: Text('—')),
-              for (final x in refs?.$1 ?? const <Map<String, dynamic>>[]) DropdownMenuItem(value: x['code'] as String, child: Text('${x['flag_emoji'] ?? ''} ${nm(x)}')),
+              for (final x in refs?.$1 ?? const <Map<String, dynamic>>[]) DropdownMenuItem(value: x['code'] as String, child: FlagLabel(x['code'] as String, nm(x))),
             ],
             onChanged: (v) => setState(() => p.country = v),
           ),

@@ -37,9 +37,6 @@ class L10nAr extends L10n {
   String get upInstalling => 'جاهز — وافق على التثبيت في الشاشة التالية.';
 
   @override
-  String get spOperator => 'الشركة المشغّلة · إحدى شركات مجموعة MTC-Group';
-
-  @override
   String spDev(String name) {
     return 'تطوير: $name';
   }
@@ -91,9 +88,6 @@ class L10nAr extends L10n {
 
   @override
   String get sgCap1 => 'تقدّم';
-
-  @override
-  String get sgCap2 => 'الشركة الأم';
 
   @override
   String get sgName => 'مجموعة شركات مركز تكنولوجيا الشرق الأوسط';

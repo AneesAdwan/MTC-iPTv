@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/widgets/country_flag.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/theme/tokens.dart';
 import '../../data/admin/admin_repository.dart';
@@ -111,7 +112,10 @@ class _Table extends ConsumerWidget {
               contentPadding: EdgeInsets.zero,
               leading: SizedBox(
                 width: 64,
-                child: Text([if (r['flag_emoji'] != null) '${r['flag_emoji']}', k].join(' '), style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600)),
+                child: Row(children: [
+                  if (r['flag_emoji'] != null) ...[CountryFlag(k, height: 14), const SizedBox(width: 6)],
+                  Flexible(child: Text(k, style: TextStyle(color: c.textMuted, fontWeight: FontWeight.w600))),
+                ]),
               ),
               title: Text('${lang == 'ar' ? r['name_ar'] : r['name_en']}', style: TextStyle(color: visible ? c.text : c.textDim, fontWeight: FontWeight.w600)),
               subtitle: Text('${lang == 'ar' ? r['name_en'] : r['name_ar']} · ${t.fSort} ${r['sort_order']}', style: TextStyle(color: c.textMuted, fontSize: 12)),

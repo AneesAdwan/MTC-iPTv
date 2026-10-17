@@ -78,6 +78,7 @@ flutter:
 
   assets:
     - assets/brand/
+    - assets/flags/
     - assets/tls/
     - assets/tray/
 

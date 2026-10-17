@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/widgets/country_flag.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/layout/h_scroller.dart';
 import '../../app/theme/tokens.dart';
@@ -106,7 +107,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             width: 360,
             height: 420,
             child: ListView(
-              children: [for (final x in list) ListTile(title: Text('${x['flag_emoji'] ?? ''} ${lang == 'ar' ? x['name_ar'] : x['name_en']}'.trim()), onTap: () => Navigator.pop(d, x[key] as String))],
+              children: [for (final x in list) ListTile(leading: key == 'code' ? CountryFlag(x[key] as String, height: 18) : null, title: Text('${lang == 'ar' ? x['name_ar'] : x['name_en']}'), onTap: () => Navigator.pop(d, x[key] as String))],
             ),
           ),
         ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/widgets/country_flag.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/layout/h_scroller.dart';
 import '../../app/theme/tokens.dart';
@@ -61,7 +62,7 @@ class ChannelsScreen extends ConsumerWidget {
             underline: const SizedBox.shrink(),
             items: [
               DropdownMenuItem(value: null, child: Text('${t.country}: ${t.filterAll}')),
-              for (final x in countries) DropdownMenuItem(value: x.item.code, child: Text('${x.item.flag ?? ''} ${x.item.displayName(locale)} (${x.count})')),
+              for (final x in countries) DropdownMenuItem(value: x.item.code, child: FlagLabel(x.item.code, '${x.item.displayName(locale)} (${x.count})')),
             ],
             onChanged: (v) => context.go(q(cat: category, cty: v)),
           ),
@@ -91,7 +92,7 @@ class CountriesScreen extends ConsumerWidget {
           child: InkWell(
             onTap: () => context.go('/channels?country=${x.item.code}'),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(x.item.flag ?? '🏳️', style: const TextStyle(fontSize: 34)),
+              CountryFlag(x.item.code, height: 36),
               const SizedBox(height: Space.xs),
               Text(x.item.displayName(locale), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: c.text, fontWeight: FontWeight.w600)),
               Text(t.channelsCount(x.count), style: TextStyle(color: c.textMuted, fontSize: 12)),

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/widgets/country_flag.dart';
 import '../../../app/l10n/app_localizations.dart';
 import '../../../app/theme/tokens.dart';
 import '../../../core/storage/catalog_db.dart';
@@ -214,7 +215,7 @@ class _InfoTabState extends ConsumerState<_InfoTab> {
               decoration: InputDecoration(labelText: t.colCountry),
               items: [
                 const DropdownMenuItem(value: null, child: Text('—')),
-                for (final x in refs?.$1 ?? const <Map<String, dynamic>>[]) DropdownMenuItem(value: x['code'] as String, child: Text('${x['flag_emoji'] ?? ''} ${nm(x)}')),
+                for (final x in refs?.$1 ?? const <Map<String, dynamic>>[]) DropdownMenuItem(value: x['code'] as String, child: FlagLabel(x['code'] as String, nm(x))),
               ],
               onChanged: (v) => country = v,
             ),

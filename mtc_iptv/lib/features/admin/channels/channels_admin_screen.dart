@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../app/widgets/country_flag.dart';
 import '../../../app/l10n/app_localizations.dart';
 import '../../../app/theme/tokens.dart';
 import '../../../data/admin/admin_repository.dart';
@@ -71,7 +72,7 @@ class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
     }
   }
 
-  Future<String?> _pick(String title, List<(String, String)> items) => showDialog<String>(
+  Future<String?> _pick(String title, List<(String, String)> items, {bool flags = false}) => showDialog<String>(
         context: context,
         builder: (c) => SimpleDialog(
           title: Text(title),
@@ -79,7 +80,7 @@ class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
             SizedBox(
               width: 360,
               height: 420,
-              child: ListView(children: [for (final i in items) ListTile(title: Text(i.$2), onTap: () => Navigator.pop(c, i.$1))]),
+              child: ListView(children: [for (final i in items) ListTile(leading: flags ? CountryFlag(i.$1, height: 18) : null, title: Text(i.$2), onTap: () => Navigator.pop(c, i.$1))]),
             ),
           ],
         ),
@@ -125,7 +126,7 @@ class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
         hint: Text(t.allCountries),
         items: [
           DropdownMenuItem(value: null, child: Text(t.allCountries)),
-          for (final x in countries) DropdownMenuItem(value: x['code'] as String, child: Text('${x['flag_emoji'] ?? ''} ${nm(x)}')),
+          for (final x in countries) DropdownMenuItem(value: x['code'] as String, child: FlagLabel(x['code'] as String, nm(x))),
         ],
         onChanged: (v) => _set(v == null ? q.copyWith(clearCountry: true) : q.copyWith(country: v)),
       ),
@@ -193,7 +194,7 @@ class _ChannelsAdminScreenState extends ConsumerState<ChannelsAdminScreen> {
                 onPressed: busy
                     ? null
                     : () async {
-                        final v = await _pick(t.aSetCountry, [for (final x in countries) (x['code'] as String, '${x['flag_emoji'] ?? ''} ${nm(x)}')]);
+                        final v = await _pick(t.aSetCountry, [for (final x in countries) (x['code'] as String, nm(x))], flags: true);
                         if (v != null) await _bulk((r, ids) => r.updateChannels(ids, {'country_code': v}));
                       },
                 child: Text(t.aSetCountry),
@@ -404,7 +405,7 @@ class _AddChannelDialogState extends ConsumerState<_AddChannelDialog> {
             DropdownButtonFormField<String?>(
               initialValue: country,
               decoration: InputDecoration(labelText: t.colCountry),
-              items: [for (final x in refs?.$1 ?? const <Map<String, dynamic>>[]) DropdownMenuItem(value: x['code'] as String, child: Text('${x['flag_emoji'] ?? ''} ${nm(x)}'))],
+              items: [for (final x in refs?.$1 ?? const <Map<String, dynamic>>[]) DropdownMenuItem(value: x['code'] as String, child: FlagLabel(x['code'] as String, nm(x)))],
               onChanged: (v) => country = v,
             ),
             DropdownButtonFormField<String?>(
