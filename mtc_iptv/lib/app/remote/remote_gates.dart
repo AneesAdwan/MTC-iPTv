@@ -1,5 +1,5 @@
 // آثار الإعدادات المركزية على المشاهد:
-//   G5 وضع الصيانة: شاشة الرسالة للمشاهدين، والمدير يدخل عاديًا.
+//   G5 وضع الصيانة: شاشة الرسالة للمشاهدين (برنامج SuperAdmin لا يُحجب).
 //   G6 الحد الأدنى المدعوم: الأقدم يُجبر على التحديث. الموصى به: شريط تنبيه.
 //   F2 الإعلانات: شريط (معلومة/تحذير/صيانة) أو نافذة ترحيبية مرة واحدة، والقابل للإغلاق يُحفظ إغلاقه.
 import 'dart:convert';
@@ -15,15 +15,6 @@ import '../l10n/app_localizations.dart';
 import '../shell/sidebar.dart' show isAdminProvider;
 import '../theme/tokens.dart';
 
-/// تجاوز شاشة الصيانة لهذه الجلسة (زر «دخول المدير»).
-final maintenanceBypassProvider = NotifierProvider<_Bypass, bool>(_Bypass.new);
-
-class _Bypass extends Notifier<bool> {
-  @override
-  bool build() => false;
-  void allow() => state = true;
-}
-
 /// يلف التطبيق كله (تحت الموجّه): الصيانة والتحديث الإجباري.
 class RemoteGates extends ConsumerWidget {
   final Widget child;
@@ -32,7 +23,8 @@ class RemoteGates extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final rc = ref.watch(remoteConfigProvider).value ?? RemoteConfig.empty;
-    final admin = ref.watch(isAdminProvider);
+    // برنامج SuperAdmin لا تحجبه الصيانة ولا التحديث الإجباري (تحديثه منفصل عن تطبيق المشاهدين)
+    final admin = Env.superAdmin || ref.watch(isAdminProvider);
     final lang = Localizations.localeOf(context).languageCode;
     final t = L10n.of(context);
     if (rc.updateRequirement(Env.version) == 'force' && !admin) {
@@ -43,12 +35,11 @@ class RemoteGates extends ConsumerWidget {
         action: FilledButton(onPressed: () => AppUpdater.checkNow(fallbackUrl: rc.updateUrl, context: context), child: Text(t.updateNow)),
       );
     }
-    if (rc.maintenance && !admin && !ref.watch(maintenanceBypassProvider)) {
+    if (rc.maintenance && !admin) {
       return _FullPage(
         icon: Icons.construction_rounded,
         title: t.maintenanceTitle,
         body: rc.maintenanceMessage(lang),
-        action: TextButton(onPressed: ref.read(maintenanceBypassProvider.notifier).allow, child: Text(t.adminSignIn)),
       );
     }
     return child;

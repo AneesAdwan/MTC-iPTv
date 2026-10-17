@@ -94,12 +94,28 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "MTC-Group" "\0"
+#ifdef MTC_SUPERADMIN
+            VALUE "FileDescription", "MTC-iPTv SuperAdmin" "\0"
+#else
             VALUE "FileDescription", "MTC-iPTv" "\0"
+#endif
             VALUE "FileVersion", VERSION_AS_STRING "\0"
+#ifdef MTC_SUPERADMIN
+            VALUE "InternalName", "mtc_superadmin" "\0"
+#else
             VALUE "InternalName", "mtc_iptv" "\0"
+#endif
             VALUE "LegalCopyright", "(C) MTC-Group. Developed by Anees Adwan" "\0"
+#ifdef MTC_SUPERADMIN
+            VALUE "OriginalFilename", "mtc_superadmin.exe" "\0"
+#else
             VALUE "OriginalFilename", "mtc_iptv.exe" "\0"
+#endif
+#ifdef MTC_SUPERADMIN
+            VALUE "ProductName", "MTC-iPTv SuperAdmin" "\0"
+#else
             VALUE "ProductName", "MTC-iPTv" "\0"
+#endif
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

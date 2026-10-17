@@ -1,10 +1,12 @@
 // التوجيه (ADR-05): كل شاشة في السجل لها مسار داخل الهيكل العام.
 // حماية مسارات الإدارة هنا تجربة استخدام فقط — الحماية الحقيقية على الخادم (§19، is_admin + MFA).
+// تطبيق المشاهدين (كل النسخ المنشورة) بلا مسارات إدارة إطلاقًا: أي /admin… ← الرئيسية. الإدارة في برنامج SuperAdmin فقط.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:flutter/material.dart';
 
+import '../core/config/env.dart';
 import '../features/admin/alerts_screen.dart';
 import '../features/admin/analytics_screen.dart';
 import '../features/admin/channels/channel_detail_screen.dart';
@@ -54,6 +56,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     refreshListenable: refresh,
     redirect: (context, state) {
       final path = state.uri.path;
+      if (!Env.superAdmin && path.startsWith('/admin')) return '/home';
       final admin = ref.read(isAdminProvider);
       if (path == adminLoginScreen.path) return admin ? '/admin/dashboard' : null;
       final def = screenForPath(path);
@@ -65,20 +68,22 @@ final routerProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
         routes: [
-          GoRoute(
-            path: adminLoginScreen.path,
-            pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const AdminLoginScreen()),
-          ),
+          if (Env.superAdmin)
+            GoRoute(
+              path: adminLoginScreen.path,
+              pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: const AdminLoginScreen()),
+            ),
           for (final s in screens)
-            if (s.id != 'V-06')
+            if (s.id != 'V-06' && (Env.superAdmin || !s.group.isAdmin))
               GoRoute(
                 path: s.path,
                 pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: _screenFor(s, state)),
               ),
-          GoRoute(
-            path: '/admin/channel/:id',
-            pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: ChannelDetailScreen(key: ValueKey(state.pathParameters['id']), id: state.pathParameters['id']!)),
-          ),
+          if (Env.superAdmin)
+            GoRoute(
+              path: '/admin/channel/:id',
+              pageBuilder: (context, state) => NoTransitionPage(key: state.pageKey, child: ChannelDetailScreen(key: ValueKey(state.pathParameters['id']), id: state.pathParameters['id']!)),
+            ),
         ],
       ),
       // المشاهدة خارج الهيكل: الفيديو يأخذ المساحة كاملة (§8.1)

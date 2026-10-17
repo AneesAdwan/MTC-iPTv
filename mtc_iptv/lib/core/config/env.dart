@@ -11,6 +11,11 @@ abstract final class Env {
   static bool get isStaging => current == AppEnv.staging;
   static bool get isProduction => current == AppEnv.production;
 
+  /// نسخة **MTC-iPTv SuperAdmin** (برنامج الإدارة، ويندوز): `--dart-define=MTC_SUPERADMIN=true`.
+  /// كل النسخ المنشورة (ويندوز، أندرويد، التلفزيون) للمشاهدين فقط: لا دخول للإدارة ولا شاشاتها ولا خدماتها.
+  /// متغيّر لا ثابت حتى تختبر اختبارات اللوحة الوضعين.
+  static bool superAdmin = const bool.fromEnvironment('MTC_SUPERADMIN');
+
   /// رقم الإصدار يُمرَّر من scripts/release.ps1 (--dart-define=APP_VERSION).
   static const version = String.fromEnvironment('APP_VERSION', defaultValue: '3.0.0-dev');
 

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/config/env.dart';
 import '../../core/settings/local_settings.dart';
 import '../../data/auth/admin_auth.dart';
 import '../l10n/app_localizations.dart';
@@ -13,7 +14,8 @@ import '../theme/tokens.dart';
 
 /// قسم الإدارة يظهر فقط لجلسة مدير كاملة (admin_users + MFA). تجربة استخدام فقط:
 /// الخادم يرفض أي عملية إدارية لغير ذلك (is_admin()).
-final isAdminProvider = Provider<bool>((ref) => ref.watch(adminStateProvider).value?.isAdmin ?? false);
+/// مدير بجلسة تحقق بخطوتين — في نسخة SuperAdmin فقط؛ تطبيق المشاهدين لا يعرف المدير أصلًا.
+final isAdminProvider = Provider<bool>((ref) => Env.superAdmin && (ref.watch(adminStateProvider).value?.isAdmin ?? false));
 
 class Sidebar extends ConsumerWidget {
   final String location;
@@ -45,7 +47,8 @@ class Sidebar extends ConsumerWidget {
       }
       items.add(_NavItem(def: s, selected: current?.id == s.id, collapsed: collapsed, closeDrawer: inDrawer));
     }
-    if (!isAdmin) {
+    // «دخول المدير» في برنامج SuperAdmin فقط؛ تطبيق المشاهدين بلا أي مدخل للإدارة
+    if (!isAdmin && Env.superAdmin) {
       items.add(_SectionDivider(label: t.groupAdmin, collapsed: collapsed, strong: true));
       items.add(_NavItem(def: adminLoginScreen, selected: location == adminLoginScreen.path, collapsed: collapsed, closeDrawer: inDrawer));
     }

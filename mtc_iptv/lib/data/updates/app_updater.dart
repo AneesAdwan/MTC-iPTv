@@ -49,7 +49,8 @@ class AppUpdater {
   static bool get supported => Platform.isWindows;
 
   /// مفعّل لنسخ الإصدار فقط (لا لبناء التطوير 3.0.0-dev ولا للاختبارات).
-  static bool get enabled => supported && !Env.version.endsWith('-dev');
+  /// وليس لبرنامج SuperAdmin: الـ appcast لتطبيق المشاهدين، فلا يُستبدل به.
+  static bool get enabled => supported && !Env.superAdmin && !Env.version.endsWith('-dev');
 
   /// يُستدعى مرة عند التشغيل: يضبط الـ appcast والفحص الدوري (كل 6 ساعات، WinSparkle يتذكّر «تخطَّ هذا الإصدار»).
   static Future<void> init() async {

@@ -4,7 +4,13 @@ project(mtc_iptv LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "mtc_iptv")
+# MTC-iPTv SuperAdmin (admin program): scripts/build-superadmin.ps1 sets MTC_SUPERADMIN=1 and wipes build\windows
+# before and after, so a viewer build never inherits this identity (release.ps1 packages mtc_iptv.exe only).
+if(DEFINED ENV{MTC_SUPERADMIN})
+  set(BINARY_NAME "mtc_superadmin")
+else()
+  set(BINARY_NAME "mtc_iptv")
+endif()
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

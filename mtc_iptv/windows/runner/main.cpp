@@ -5,6 +5,7 @@
 #include <string>
 
 #include "flutter_window.h"
+#include "identity.h"
 #include "utils.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
@@ -17,9 +18,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   // Single instance: a second launch (e.g. a mtciptv://watch/<id> link, or the desktop icon while
   // the app sits in the tray) hands its command line to the running window and exits.
-  HANDLE instance_mutex = ::CreateMutexW(nullptr, TRUE, L"Local\\MTC-iPTv-SingleInstance");
+  HANDLE instance_mutex = ::CreateMutexW(nullptr, TRUE, kInstanceMutexName);
   if (instance_mutex != nullptr && ::GetLastError() == ERROR_ALREADY_EXISTS) {
-    HWND existing = ::FindWindowW(L"MTC_IPTV_WINDOW", nullptr);
+    HWND existing = ::FindWindowW(kAppWindowClass, nullptr);
     std::wstring cmd = command_line ? command_line : L"";
     COPYDATASTRUCT cds;
     cds.dwData = kInstanceArgsMessage;
@@ -50,7 +51,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
-  if (!window.Create(L"MTC-iPTv", origin, size)) {
+  if (!window.Create(kAppTitle, origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

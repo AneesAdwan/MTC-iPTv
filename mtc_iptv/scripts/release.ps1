@@ -85,7 +85,12 @@ Pop-Location
 
 # ---- 4. builds ----------------------------------------------------------------------------
 $defs = @("--build-name=$core", "--build-number=$build", "--dart-define=APP_VERSION=$full")
+# Published builds are the VIEWER app only (owner 2026-10-17). Never inherit the SuperAdmin identity
+# from scripts/build-superadmin.ps1 (env var, or a stale CMake cache in build\windows).
+if ($env:MTC_SUPERADMIN) { throw 'MTC_SUPERADMIN is set - refusing to publish the admin program. Open a new shell.' }
+if (Test-Path "$root\build\windows\x64\runner\Release\mtc_superadmin.exe") { Remove-Item "$root\build\windows" -Recurse -Force }
 Run 'build windows' { flutter build windows --release @defs }
+if (-not (Test-Path "$root\build\windows\x64\runner\Release\mtc_iptv.exe") -or (Test-Path "$root\build\windows\x64\runner\Release\mtc_superadmin.exe")) { throw 'Windows build is not the viewer app (mtc_iptv.exe) - refusing to release.' }
 Run 'build android' { flutter build apk --release --split-per-abi @defs }
 
 # Secrets scan (spec 26.1/26.2: no secret keys in the package). The anon key is public by design;

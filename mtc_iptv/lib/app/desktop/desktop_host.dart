@@ -13,6 +13,7 @@ import 'package:tray_manager/legacy.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../core/logging/log.dart';
+import '../../core/config/env.dart';
 import '../../data/admin/admin_device.dart';
 import '../../data/admin/scheduler.dart';
 import '../../data/telemetry/telemetry.dart';
@@ -135,7 +136,7 @@ class _DesktopHostState extends ConsumerState<DesktopHost> with WindowListener, 
 
   @override
   Widget build(BuildContext context) {
-    if (isDesktop) ref.watch(schedulerProvider); // يبقى المُجدوِل حيًا طوال عمر البرنامج
+    if (isDesktop && Env.superAdmin) ref.watch(schedulerProvider); // يبقى المُجدوِل حيًا طوال عمر برنامج SuperAdmin
     return widget.child;
   }
 }

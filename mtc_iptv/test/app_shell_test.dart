@@ -2,6 +2,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mtc_core/mtc_core.dart';
 import 'package:mtc_iptv/app/app.dart';
 import 'package:mtc_iptv/app/l10n/app_localizations_ar.dart';
@@ -9,15 +10,24 @@ import 'package:mtc_iptv/app/l10n/app_localizations_en.dart';
 import 'package:mtc_iptv/app/screens.dart';
 import 'package:mtc_iptv/app/shell/sidebar.dart';
 import 'package:mtc_iptv/core/backend/backend.dart';
+import 'package:mtc_iptv/core/config/env.dart';
 import 'package:mtc_iptv/core/settings/local_settings.dart';
 import 'package:mtc_iptv/core/storage/catalog_db.dart';
+import 'package:mtc_iptv/data/auth/admin_auth.dart';
 import 'package:mtc_iptv/features/admin/analytics_screen.dart';
 
-/// [admin]: يعرض قسم الإدارة (جلسة مدير كاملة) دون خادم.
-Widget app(LocalSettings s, {bool admin = true}) => ProviderScope(
+/// [admin]: يعرض قسم الإدارة (جلسة مدير كاملة) دون خادم. [superAdmin]: نسخة برنامج الإدارة (افتراضيًا)،
+/// أو `false` = تطبيق المشاهدين المنشور (بلا أي مدخل للإدارة).
+Widget app(LocalSettings s, {bool admin = true, bool superAdmin = true}) {
+  Env.superAdmin = superAdmin;
+  return ProviderScope(
       overrides: [
         initialSettingsProvider.overrideWithValue(s),
-        isAdminProvider.overrideWithValue(admin),
+        // تطبيق المشاهدين: حالة الجلسة الحقيقية تمر عبر بوابة Env.superAdmin داخل isAdminProvider
+        if (superAdmin)
+          isAdminProvider.overrideWithValue(admin)
+        else
+          adminStateProvider.overrideWith((ref) => Stream.value(AdminState(admin ? AdminStage.admin : AdminStage.signedOut, email: 'owner@example.com'))),
         catalogDbProvider.overrideWith((ref) {
           final db = CatalogDb(NativeDatabase.memory());
           ref.onDispose(db.close);
@@ -26,6 +36,7 @@ Widget app(LocalSettings s, {bool admin = true}) => ProviderScope(
       ],
       child: const MtcApp(),
     );
+}
 
 /// testWidgets + إزالة الشجرة في النهاية: استعلامات drift المراقَبة تُغلق بمؤقت صفري عند الإلغاء،
 /// فنُفرغ الشجرة وننفّذ المؤقت داخل الاختبار بدل أن يبقى معلّقًا.
@@ -116,8 +127,40 @@ void main() {
     });
   });
 
-  group('navigation', () {
-    appTest('tapping a sidebar item opens its screen', (tester) async {
+  group('viewer apps have no admin entry (owner 2026-10-17: SuperAdmin is the only way in)', () {
+    Future<void> pumpViewer(WidgetTester tester, {bool admin = false}) async {
+      tester.view.physicalSize = const Size(1280, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(app(const LocalSettings(), admin: admin, superAdmin: false));
+      await tester.pumpAndSettle();
+    }
+
+    appTest('no admin sign-in, no admin section, no account menu', (tester) async {
+      await pumpViewer(tester);
+      expect(find.text('دخول المدير'), findsNothing);
+      expect(find.text('الإدارة'), findsNothing);
+      expect(find.byTooltip(L10nAr().accountMenu), findsNothing);
+    });
+
+    appTest('even an existing admin session shows nothing admin', (tester) async {
+      await pumpViewer(tester, admin: true);
+      expect(find.text('لوحة المعلومات'), findsNothing);
+      expect(find.text('الإدارة'), findsNothing);
+    });
+
+    appTest('admin routes redirect home', (tester) async {
+      await pumpViewer(tester);
+      final router = GoRouter.of(tester.element(find.byType(Scaffold).first));
+      for (final p in ['/admin/login', '/admin/dashboard', '/admin/channel/x']) {
+        router.go(p);
+        await tester.pumpAndSettle();
+        expect(router.routerDelegate.currentConfiguration.uri.path, '/home', reason: p);
+      }
+    });
+  });
+
+  group('navigation', () {    appTest('tapping a sidebar item opens its screen', (tester) async {
       await pumpApp(tester, const LocalSettings());
       // القائمة كسولة: نمرّرها حتى يظهر العنصر
       await tester.scrollUntilVisible(find.text('التحليلات'), 200, scrollable: find.byType(Scrollable).first);

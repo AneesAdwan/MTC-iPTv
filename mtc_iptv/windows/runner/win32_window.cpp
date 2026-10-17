@@ -1,4 +1,5 @@
 #include "win32_window.h"
+#include "identity.h"
 
 #include <dwmapi.h>
 #include <flutter_windows.h>
@@ -17,7 +18,7 @@ namespace {
 #endif
 
 // Unique class name: the single-instance hand-off (main.cpp) finds our window by it.
-constexpr const wchar_t kWindowClassName[] = L"MTC_IPTV_WINDOW";
+constexpr const wchar_t* kWindowClassName = kAppWindowClass;
 
 /// Registry key for app theme preference.
 ///

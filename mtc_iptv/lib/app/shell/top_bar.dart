@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/settings/local_settings.dart';
 import '../../core/text/bidi.dart';
+import '../../core/config/env.dart';
 import '../../data/auth/admin_auth.dart';
 import '../../data/reminders/reminders.dart';
 import '../../features/viewer/widgets/number_entry.dart';
@@ -103,6 +104,8 @@ class AccountMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors, t = L10n.of(context);
+    // تطبيق المشاهدين بلا حسابات ولا دخول إدارة: الأيقونة في برنامج SuperAdmin فقط
+    if (!Env.superAdmin) return const SizedBox.shrink();
     final st = ref.watch(adminStateProvider).value;
     if (st == null || st.stage == AdminStage.noBackend) return const SizedBox.shrink();
     final signedIn = st.stage != AdminStage.signedOut;
