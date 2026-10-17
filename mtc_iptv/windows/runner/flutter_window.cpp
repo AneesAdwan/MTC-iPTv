@@ -44,7 +44,14 @@ int RaiseNewDialogs() {
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
     : project_(project) {}
 
-FlutterWindow::~FlutterWindow() {}
+// Tear the window down while this object is still a FlutterWindow (see OnDestroy). Without it, when
+// the message loop ended by PostQuitMessage (window_manager's destroy(), WinSparkle's quit for
+// update) the HWND was still alive here and flutter_controller_ died in the implicit member
+// destructor: MSVC's ~unique_ptr does not null the pointer first, so the focus/activation messages
+// sent while the Flutter view's child HWND is destroyed re-entered MessageHandler, saw a non-null
+// controller and called into the freed view (flutter_windows.dll+0x1e220,
+// FlutterWindowsView::GetWindowHandle, c0000005 -> c000041d on every exit, builds 18-35).
+FlutterWindow::~FlutterWindow() { Destroy(); }
 
 bool FlutterWindow::OnCreate() {
   if (!Win32Window::OnCreate()) {
@@ -96,8 +103,12 @@ bool FlutterWindow::OnCreate() {
 }
 
 void FlutterWindow::OnDestroy() {
+  // The channel talks through the engine's messenger: drop it before the engine goes.
+  instance_channel_ = nullptr;
   if (flutter_controller_) {
-    flutter_controller_ = nullptr;
+    // reset() clears the member before deleting, so messages re-entering MessageHandler during the
+    // controller's teardown see nullptr instead of a half-destroyed controller.
+    flutter_controller_.reset();
   }
 
   Win32Window::OnDestroy();
@@ -119,7 +130,7 @@ FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
 
   switch (message) {
     case WM_FONTCHANGE:
-      flutter_controller_->engine()->ReloadSystemFonts();
+      if (flutter_controller_) flutter_controller_->engine()->ReloadSystemFonts();
       break;
     case WM_COPYDATA: {
       auto cds = reinterpret_cast<PCOPYDATASTRUCT>(lparam);
