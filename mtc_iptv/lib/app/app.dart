@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/backend/backend.dart';
+import '../core/config/env.dart';
 import '../core/settings/local_settings.dart';
 import '../data/epg/epg_repository.dart';
 import '../features/splash/splash_gate.dart';
@@ -38,7 +39,7 @@ class MtcApp extends ConsumerWidget {
       ref.read(settingsProvider.notifier).applyDefaults(language: g['default_language'] as String?, theme: g['default_theme'] as String?);
     });
     return MaterialApp.router(
-      title: 'MTC-iPTv',
+      title: Env.appTitle,
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(routerProvider),
       actions: tvFriendlyActions, // الريموت: السهم يبدأ من أول عنصر حين لا شيء مركّز

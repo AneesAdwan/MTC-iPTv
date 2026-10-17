@@ -49,11 +49,11 @@ Future<void> main(List<String> args) async {
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     await windowManager.ensureInitialized();
     await windowManager.waitUntilReadyToShow(
-      const WindowOptions(
+      WindowOptions(
         size: Size(1280, 800),
         minimumSize: Size(420, 560),
         center: true,
-        title: 'MTC-iPTv',
+        title: Env.appTitle,
         titleBarStyle: TitleBarStyle.hidden, // شريط العنوان المخصص (§6.6)
         backgroundColor: Color(0xFF08080C),
       ),

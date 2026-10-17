@@ -51,7 +51,7 @@ class _TitleBarState extends State<TitleBar> with WindowListener {
               child: Row(children: [
                 SvgPicture.asset('assets/brand/mtc-iptv-icon.svg', width: 18, height: 18),
                 const SizedBox(width: Space.sm),
-                Text(t.appTitle, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: c.text)),
+                Text(Env.superAdmin ? Env.appTitle : t.appTitle, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: c.text)),
                 if (Env.isStaging) ...[
                   const SizedBox(width: Space.sm),
                   _Badge('STAGING', c.warn),

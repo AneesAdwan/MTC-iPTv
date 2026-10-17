@@ -16,6 +16,9 @@ abstract final class Env {
   /// متغيّر لا ثابت حتى تختبر اختبارات اللوحة الوضعين.
   static bool superAdmin = const bool.fromEnvironment('MTC_SUPERADMIN');
 
+  /// اسم البرنامج في النافذة وشريط العنوان.
+  static String get appTitle => superAdmin ? 'MTC-iPTv SuperAdmin' : 'MTC-iPTv';
+
   /// رقم الإصدار يُمرَّر من scripts/release.ps1 (--dart-define=APP_VERSION).
   static const version = String.fromEnvironment('APP_VERSION', defaultValue: '3.0.0-dev');
 
