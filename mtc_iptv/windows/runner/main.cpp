@@ -62,6 +62,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
     ::DispatchMessage(&msg);
   }
 
+  // The loop can end by WM_QUIT with the window still open (window_manager's destroy() and
+  // WinSparkle's quit-for-update both PostQuitMessage). Shut Flutter and the window down here, in
+  // order and while COM is still initialised, instead of in the destructors after CoUninitialize.
+  window.Destroy();
+
   ::CoUninitialize();
   return EXIT_SUCCESS;
 }

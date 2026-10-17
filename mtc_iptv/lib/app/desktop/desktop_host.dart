@@ -93,19 +93,35 @@ class _DesktopHostState extends ConsumerState<DesktopHost> with WindowListener, 
     await windowManager.focus();
   }
 
+  bool _quitting = false;
+
+  // خروج واحد مرتب (م-14): الإغلاق والتحديث وقائمة الأيقونة قد تطلبه معًا، فلا يُنفَّذ إلا مرة.
+  // windowManager.destroy() يُنهي حلقة الرسائل فقط (PostQuitMessage)؛ إغلاق المحرك والنافذة بالترتيب
+  // صار في windows/runner (main.cpp و FlutterWindow::~FlutterWindow) — كان سبب انهيار flutter_windows.dll عند كل خروج.
   Future<void> _quit() async {
+    if (_quitting) return;
+    _quitting = true;
     // آخر أحداث القياس (§12.4): تُغلق جلسة المشاهدة وتُرسل الدفعة، بمهلة قصيرة كي لا يتأخر الإغلاق
     try {
-      await ref.read(playbackProvider.notifier).stop();
+      await ref.read(playbackProvider.notifier).stop().timeout(const Duration(seconds: 2));
+    } catch (_) {}
+    try {
       await ref.read(telemetryProvider).flush().timeout(const Duration(seconds: 3));
     } catch (_) {}
-    await trayManager.destroy();
+    // لا أحداث نافذة/أيقونة/تحديث بعد هذه النقطة
+    windowManager.removeListener(this);
+    trayManager.removeListener(this);
+    if (AppUpdater.enabled) autoUpdater.removeListener(this);
+    try {
+      await trayManager.destroy();
+    } catch (_) {}
     await windowManager.setPreventClose(false);
     await windowManager.destroy();
   }
 
   @override
   void onWindowClose() async {
+    if (_quitting) return;
     final dev = ref.read(adminDeviceProvider).value;
     final admin = ref.read(isAdminProvider);
     if (admin && (dev?.keepInTray ?? true) && (dev?.schedulerEnabled ?? true)) {
