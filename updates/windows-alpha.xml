@@ -3,15 +3,15 @@
   <channel>
     <title>MTC-iPTv (alpha)</title>
     <item>
-      <title>MTC-iPTv 3.0.0-alpha.34</title>
-      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.34] — 2026-10-17<br/><br/>### أعلام الدول<br/>- **ويندوز:** الأعلام صارت تظهر. ويندوز ما بيرسم أعلام الإيموجي، فصارت صور مضمّنة بالتطبيق (نفس أعلام الموقع، بتشتغل بدون إنترنت) بكل الأنظمة.<br/>  - بتظهر بصفحة الدول، وفلتر الدولة، وقوائم اختيار الدولة بلوحة التحكم.<br/><br/>### أنيميشن الدخول<br/>- **في الوسط:** مشهد MTC-Group صار بالوسط على كل الأجهزة (الشعار فوق الاسم).<br/>- **مسافة واضحة:** بعد ما يطلع لفوق، صار في مسافة واضحة بينه وبين شعار MTC-iPTv، ما عادوا ملزقين.<br/>- **الصياغة:** انشالت عبارتا &#171;الشركة الأم&#187; و&#171;الشركة المشغّلة&#187;. ظلّت &#171;تقدّم&#187; تحت اسم المجموعة.</div>]]></description>
-      <pubDate>Sat, 17 Oct 2026 12:36:57 GMT</pubDate>
-      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.34/MTC-iPTv-3.0.0-alpha.34-windows-setup.exe"
-                 sparkle:version="3.0.0+34"
-                 sparkle:shortVersionString="3.0.0-alpha.34"
+      <title>MTC-iPTv 3.0.0-alpha.35</title>
+      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.35] — 2026-10-17<br/><br/>### التطبيق صار للمشاهدين فقط<br/>- **لوحة الإدارة انشالت من كل النسخ** (ويندوز، أندرويد، التلفزيون). الإدارة صارت ببرنامج منفصل اسمه **MTC-iPTv SuperAdmin** للمدير فقط.<br/>  - **أيقونة المستخدم:** ما في قائمة حساب ولا &#171;دخول المدير&#187;.<br/>  - **القائمة الجانبية ولوحة الأوامر:** ما في قسم إدارة.<br/>  - **الروابط:** أي رابط `/admin` بيرجّع للرئيسية.<br/>  - **شاشة الصيانة:** ما فيها زر دخول.<br/>- **الخدمات:** المهام الدورية والتحديثات الإدارية ما بتشتغل بتطبيق المشاهدين.</div>]]></description>
+      <pubDate>Sat, 17 Oct 2026 13:07:13 GMT</pubDate>
+      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.35/MTC-iPTv-3.0.0-alpha.35-windows-setup.exe"
+                 sparkle:version="3.0.0+35"
+                 sparkle:shortVersionString="3.0.0-alpha.35"
                  sparkle:os="windows"
-                 sparkle:dsaSignature="MD0CHDVMHLz9efLGyGdgW0eH0b6HrwKbf6GMSCyZWbUCHQCVWgFUSqF0wo6irEjMo14369s0xcf/3bTEAlyy"
-                 length="28758718"
+                 sparkle:dsaSignature="MD0CHFYhgQNW4I+lEFdFK0d+8Y69z9L1Ji6CSyjcaZYCHQCYumtXfM8cs0LpNzG+VjRqWIr+bcNd7bLPSFDV"
+                 length="28721236"
                  type="application/octet-stream" />
     </item>
   </channel>
