@@ -22,3 +22,8 @@ app-keystore/
 # نسخ التطبيق APK — مستثناة من GitHub
 apk-releases/
 *.apk
+
+# SuperAdmin update signing key (Ed25519) - lives in %USERPROFILE%\.mtc-iptv\, NEVER in the repo
+superadmin_ed25519.key*
+*.ed25519.key
+

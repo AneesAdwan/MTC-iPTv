@@ -1,0 +1,14 @@
+# https://dart.dev/tools/private-files
+.dart_tool/
+pubspec.lock
+
+# Signing keys - NEVER commit (private keys live in %USERPROFILE%\.mtc-iptv\).
+# Tests only ever create throw-away keys in system temp directories.
+*.key
+*.key.pub
+*.pem
+*.key.*
+*.seed
+# Release outputs produced by bin/sign_release.dart when run inside the package.
+manifest.json
+manifest.sig
