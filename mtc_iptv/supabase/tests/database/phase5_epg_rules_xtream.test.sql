@@ -7,9 +7,11 @@ select plan(18);
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000005a1', 'admin5@test.local', 'authenticated', 'authenticated');
 insert into public.admin_users (user_id) values ('00000000-0000-0000-0000-0000000005a1');
+-- 0008: is_admin() also needs the JWT's session alive in auth.sessions (as_user uses the user id as session id)
+insert into auth.sessions (id, user_id, aal, created_at, updated_at) select id, id, 'aal2', now(), now() from auth.users where email like '%@test.local' and id::text like '00000000-0000-0000-0000-%' on conflict do nothing;
 
 create function pg_temp.as_user(uid text, aal text) returns void language sql as $$
-  select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'aal', aal)::text, true),
+  select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'aal', aal, 'session_id', uid)::text, true),
          set_config('role', 'authenticated', true)
 $$;
 create function pg_temp.as_anon() returns void language sql as $$

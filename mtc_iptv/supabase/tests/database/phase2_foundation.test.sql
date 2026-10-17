@@ -14,6 +14,8 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a1', 'admin@test.local', 'authenticated', 'authenticated'),
   ('00000000-0000-0000-0000-0000000000b2', 'viewer@test.local', 'authenticated', 'authenticated');
 insert into public.admin_users (user_id) values ('00000000-0000-0000-0000-0000000000a1');
+-- 0008: is_admin() also needs the JWT's session alive in auth.sessions (as_user uses the user id as session id)
+insert into auth.sessions (id, user_id, aal, created_at, updated_at) select id, id, 'aal2', now(), now() from auth.users where email like '%@test.local' and id::text like '00000000-0000-0000-0000-%' on conflict do nothing;
 
 -- a published channel (review gate bypass = what the admin's manual add does) + a pending one
 select set_config('mtc.review_bypass', 'on', true);
@@ -27,7 +29,7 @@ insert into public.streams (id, channel_id, url, status) values
   ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', 'https://cdn.example/x/index.m3u8', 'unknown');
 
 create function pg_temp.as_user(uid text, aal text) returns void language sql as $$
-  select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'aal', aal)::text, true),
+  select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'aal', aal, 'session_id', uid)::text, true),
          set_config('role', 'authenticated', true)
 $$;
 create function pg_temp.as_anon() returns void language sql as $$
