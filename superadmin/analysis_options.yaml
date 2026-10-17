@@ -1,0 +1,15 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - windows/**
+  language:
+    strict-casts: true
+
+linter:
+  rules:
+    - prefer_single_quotes
+    - prefer_final_locals
+    - unawaited_futures
+    - avoid_dynamic_calls

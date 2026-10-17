@@ -1,0 +1,51 @@
+name: mtc_superadmin
+description: "MTC-iPTv SuperAdmin — the admin program for MTC-iPTv (Windows only). MTC-Group."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  go_router: ^18.1.0
+  # Pure-Dart Supabase client (not supabase_flutter): no shared_preferences / path_provider, so nothing
+  # is written into the ProductName folder the interim SuperAdmin uses. The session is kept in memory.
+  supabase: ^2.16.5
+  qr_flutter: ^4.1.0
+  intl: any
+  # Shared pure-Dart logic with the viewer app. Never depend on the mtc_iptv app package itself.
+  mtc_core:
+    path: ../mtc_iptv/packages/mtc_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/help/ar/
+
+  fonts:
+    - family: IBMPlexSansArabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700
+    # Brand wordmark font (Inter 900, OFL: assets/fonts/Inter-OFL.txt)
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Black.ttf
+          weight: 900
