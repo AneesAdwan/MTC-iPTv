@@ -3,15 +3,15 @@
   <channel>
     <title>MTC-iPTv (alpha)</title>
     <item>
-      <title>MTC-iPTv 3.0.0-alpha.35</title>
-      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.35] — 2026-10-17<br/><br/>### التطبيق صار للمشاهدين فقط<br/>- **لوحة الإدارة انشالت من كل النسخ** (ويندوز، أندرويد، التلفزيون). الإدارة صارت ببرنامج منفصل اسمه **MTC-iPTv SuperAdmin** للمدير فقط.<br/>  - **أيقونة المستخدم:** ما في قائمة حساب ولا &#171;دخول المدير&#187;.<br/>  - **القائمة الجانبية ولوحة الأوامر:** ما في قسم إدارة.<br/>  - **الروابط:** أي رابط `/admin` بيرجّع للرئيسية.<br/>  - **شاشة الصيانة:** ما فيها زر دخول.<br/>- **الخدمات:** المهام الدورية والتحديثات الإدارية ما بتشتغل بتطبيق المشاهدين.</div>]]></description>
-      <pubDate>Sat, 17 Oct 2026 13:07:13 GMT</pubDate>
-      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.35/MTC-iPTv-3.0.0-alpha.35-windows-setup.exe"
-                 sparkle:version="3.0.0+35"
-                 sparkle:shortVersionString="3.0.0-alpha.35"
+      <title>MTC-iPTv 3.0.0-alpha.36</title>
+      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.36] — 2026-10-17<br/><br/>### إصلاح<br/>- **ويندوز:** البرنامج كان يوقع بكل مرة بينسكّر (وبعد تثبيت التحديث) من النسخة 18. السبب ترتيب إغلاق محرّك Flutter والنافذة، وانصلح بجذره. ما في رسالة خطأ عند الإغلاق، وآخر بيانات القياس بتنبعت قبل ما يسكّر.</div>]]></description>
+      <pubDate>Sat, 17 Oct 2026 14:46:26 GMT</pubDate>
+      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.36/MTC-iPTv-3.0.0-alpha.36-windows-setup.exe"
+                 sparkle:version="3.0.0+36"
+                 sparkle:shortVersionString="3.0.0-alpha.36"
                  sparkle:os="windows"
-                 sparkle:dsaSignature="MD0CHFYhgQNW4I+lEFdFK0d+8Y69z9L1Ji6CSyjcaZYCHQCYumtXfM8cs0LpNzG+VjRqWIr+bcNd7bLPSFDV"
-                 length="28721236"
+                 sparkle:dsaSignature="MD0CHGiFhW4+NVBv7HE9ljFTMJnG7O/A8sz/RR252TMCHQDGENDpaeSl36R+NPxG471kGnO0gWoZVWX9h3MU"
+                 length="28719383"
                  type="application/octet-stream" />
     </item>
   </channel>

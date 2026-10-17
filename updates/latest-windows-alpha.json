@@ -1,9 +1,9 @@
 {
-  "version": "3.0.0-alpha.35",
+  "version": "3.0.0-alpha.36",
   "channel": "alpha",
   "date": "2026-10-17",
-  "url": "https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.35/MTC-iPTv-3.0.0-alpha.35-windows-setup.exe",
-  "size": 28721236,
-  "sha256": "8848a0a9aa4319348db6bdb3b1a3781a1a3bf90782baf2af2a785b233f74f759",
-  "notes": "https://github.com/AneesAdwan/MTC-iPTv/releases/tag/v3.0.0-alpha.35"
+  "url": "https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.36/MTC-iPTv-3.0.0-alpha.36-windows-setup.exe",
+  "size": 28719383,
+  "sha256": "1f00532b9305b621c93838ad3198806a7b901d85a3c53c34e8c3e59d33944b43",
+  "notes": "https://github.com/AneesAdwan/MTC-iPTv/releases/tag/v3.0.0-alpha.36"
 }
