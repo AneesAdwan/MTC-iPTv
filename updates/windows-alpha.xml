@@ -3,15 +3,15 @@
   <channel>
     <title>MTC-iPTv (alpha)</title>
     <item>
-      <title>MTC-iPTv 3.0.0-alpha.33</title>
-      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.33] — 2026-10-17<br/><br/>### المشغّل<br/>- **شعار MTC-iPTv فوق البث:** تصميم جديد متحرك، مرسوم متجهي (حاد بأي مقاس).<br/>  - **دائمًا وبهدوء:** تدرّج الدائرة بيدور، والمدار المنقّط بيلف، والنقطة الصغيرة بتدور حواليه.<br/>  - **كل دقيقتين، وأول ما يظهر، حركة &#171;هوية قناة&#187;:** الدائرة بتنبض، والموجات بتومض وبتطلع منها حلقات بث، والنقطة بتلف لفة سريعة بذيل، ولمعة بتعبر الاسم، ونجمة بريق آخره.<br/>- **إشعار القناة:** صار بعرض الشاشة كلها وبيكبر مع حجمها. على الشاشات العريضة في الطرف التاني الساعة والتاريخ.<br/><br/>### أنيميشن الدخول<br/>- **أبطأ وكاملة كل مرة:** صارت أبطأ بـ40% وبتنعرض كاملة بكل تشغيل (≈15 ثانية)، بدل النسخة القصيرة (3 ثواني).<br/>  - رسائل التحميل صار وقتها كافي للقراءة.<br/>- **التخطي:** في فوق &#171;اضغط للتخطي&#187;، وأي لمسة أو زر بيتخطاها.</div>]]></description>
-      <pubDate>Fri, 16 Oct 2026 23:09:08 GMT</pubDate>
-      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.33/MTC-iPTv-3.0.0-alpha.33-windows-setup.exe"
-                 sparkle:version="3.0.0+33"
-                 sparkle:shortVersionString="3.0.0-alpha.33"
+      <title>MTC-iPTv 3.0.0-alpha.34</title>
+      <description><![CDATA[<div dir="rtl">## [3.0.0-alpha.34] — 2026-10-17<br/><br/>### أعلام الدول<br/>- **ويندوز:** الأعلام صارت تظهر. ويندوز ما بيرسم أعلام الإيموجي، فصارت صور مضمّنة بالتطبيق (نفس أعلام الموقع، بتشتغل بدون إنترنت) بكل الأنظمة.<br/>  - بتظهر بصفحة الدول، وفلتر الدولة، وقوائم اختيار الدولة بلوحة التحكم.<br/><br/>### أنيميشن الدخول<br/>- **في الوسط:** مشهد MTC-Group صار بالوسط على كل الأجهزة (الشعار فوق الاسم).<br/>- **مسافة واضحة:** بعد ما يطلع لفوق، صار في مسافة واضحة بينه وبين شعار MTC-iPTv، ما عادوا ملزقين.<br/>- **الصياغة:** انشالت عبارتا &#171;الشركة الأم&#187; و&#171;الشركة المشغّلة&#187;. ظلّت &#171;تقدّم&#187; تحت اسم المجموعة.</div>]]></description>
+      <pubDate>Sat, 17 Oct 2026 12:36:57 GMT</pubDate>
+      <enclosure url="https://github.com/AneesAdwan/MTC-iPTv/releases/download/v3.0.0-alpha.34/MTC-iPTv-3.0.0-alpha.34-windows-setup.exe"
+                 sparkle:version="3.0.0+34"
+                 sparkle:shortVersionString="3.0.0-alpha.34"
                  sparkle:os="windows"
-                 sparkle:dsaSignature="MD0CHQCqYM9xNMYzdh1Her36qD3YIc+MbbWKOTzF0WBMAhxsEB/QwyLxdlbVng6awOK4MLPuZp6glk8XUDdy"
-                 length="28538027"
+                 sparkle:dsaSignature="MD0CHDVMHLz9efLGyGdgW0eH0b6HrwKbf6GMSCyZWbUCHQCVWgFUSqF0wo6irEjMo14369s0xcf/3bTEAlyy"
+                 length="28758718"
                  type="application/octet-stream" />
     </item>
   </channel>
