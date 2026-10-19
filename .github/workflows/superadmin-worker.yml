@@ -1,0 +1,112 @@
+# SuperAdmin background worker (plan 9.3, owner decision ق-11): heavy jobs from the `jobs` table —
+# epg_sync (XMLTV guide), source_fetch (playlist → staging for review, never published),
+# link_check (quick L1 stream check). Code: mtc_iptv/tools/worker (README there, Arabic + English).
+#
+# Needs two repository secrets (Settings → Secrets and variables → Actions):
+#   SUPABASE_URL               https://<project>.supabase.co
+#   SUPABASE_SERVICE_ROLE_KEY  the service_role key (Project settings → API)
+# Until both exist every run stops at the first step with a notice (green, nothing done).
+#
+# Logs of a public repository are public: the worker prints counts and ids only, never URLs or keys.
+name: SuperAdmin worker
+
+on:
+  schedule:
+    - cron: '7,37 * * * *' # every 30 min, off the top of the hour (GitHub delays :00 runs)
+  workflow_dispatch:
+    inputs:
+      kinds:
+        description: 'Job kinds (comma separated)'
+        required: false
+        default: 'epg_sync,source_fetch,metadata_sync,link_check'
+      max_minutes:
+        description: 'Time window in minutes (running jobs yield before it ends)'
+        required: false
+        default: '25'
+      enqueue_periodic:
+        description: 'Enqueue the periodic jobs first (idempotent time-bucket keys)'
+        type: boolean
+        required: false
+        default: true
+
+# one worker at a time; a new scheduled run waits instead of overlapping (jobs are lease-locked anyway)
+concurrency:
+  group: superadmin-worker
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write # start the next run at once while work is left (GitHub delays scheduled runs)
+
+jobs:
+  work:
+    name: run jobs
+    if: github.repository == 'AneesAdwan/MTC-iPTv'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35 # > max_minutes (25) + build; the worker yields its job before its window ends
+    defaults:
+      run:
+        working-directory: mtc_iptv/tools/worker
+    steps:
+      - name: Check secrets
+        id: secrets
+        working-directory: .
+        env:
+          HAS_URL: ${{ secrets.SUPABASE_URL != '' }}
+          HAS_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY != '' }}
+        run: |
+          if [ "$HAS_URL" = "true" ] && [ "$HAS_KEY" = "true" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY secrets are not set yet — nothing to do (see mtc_iptv/tools/worker/README.md)."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.secrets.outputs.ok == 'true'
+        with:
+          # the code is private (AneesAdwan/MTC-iPTv-src): read-only deploy key
+          repository: AneesAdwan/MTC-iPTv-src
+          ssh-key: ${{ secrets.SRC_DEPLOY_KEY }}
+
+      - uses: dart-lang/setup-dart@v1
+        if: steps.secrets.outputs.ok == 'true'
+        with:
+          sdk: stable
+
+      - name: Build (compiled executable — the SSRF test allowance is refused in compiled builds)
+        if: steps.secrets.outputs.ok == 'true'
+        run: |
+          dart pub get
+          dart compile exe bin/worker.dart -o "$RUNNER_TEMP/mtc_worker"
+
+      - name: Run worker
+        id: run
+        if: steps.secrets.outputs.ok == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # inputs pass through env (never interpolated into the script)
+          KINDS: ${{ inputs.kinds || 'epg_sync,source_fetch,metadata_sync,link_check' }}
+          MAX_MINUTES: ${{ inputs.max_minutes || '25' }}
+          ENQUEUE: ${{ github.event_name == 'schedule' || inputs.enqueue_periodic }}
+          WORKER_ID: gh-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          case "$MAX_MINUTES" in (*[!0-9]*|'') echo "bad max_minutes"; exit 64;; esac
+          if [ "$MAX_MINUTES" -gt 30 ]; then MAX_MINUTES=30; fi
+          args=(--kinds "$KINDS" --max-minutes "$MAX_MINUTES" --worker-id "$WORKER_ID")
+          if [ "$ENQUEUE" = "true" ]; then args+=(--enqueue-periodic); fi
+          "$RUNNER_TEMP/mtc_worker" "${args[@]}"
+
+      # GitHub runs schedules late (every ~2 h on busy days), so a long link check would take a day.
+      # While due jobs remain, start the next run now; concurrency keeps it after this one, and failed
+      # jobs wait for their backoff (not counted), so this can't loop on a broken job.
+      - name: Continue while work is left
+        if: steps.secrets.outputs.ok == 'true' && steps.run.outputs.remaining != '' && steps.run.outputs.remaining != '0'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LEFT: ${{ steps.run.outputs.remaining }}
+        run: |
+          echo "::notice::$LEFT job(s) still due — starting the next run now"
+          gh workflow run superadmin-worker.yml --repo "$GITHUB_REPOSITORY" --ref main -f enqueue_periodic=false

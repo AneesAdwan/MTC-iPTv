@@ -1,0 +1,40 @@
+# The website (https://aneesadwan.github.io/MTC-iPTv/) and the Windows update feed (updates/) are published from the
+# private code (AneesAdwan/MTC-iPTv-src) — this repo only keeps the README and the releases.
+# Started by the release script and after site changes; also every 6 hours as a safety net.
+name: Website
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 */6 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: AneesAdwan/MTC-iPTv-src
+          ssh-key: ${{ secrets.SRC_DEPLOY_KEY }}
+      - name: Site files only
+        run: |
+          mkdir _site
+          for p in index.html config.js sw.js manifest.webmanifest .nojekyll src img download updates data asadmin; do
+            [ -e "$p" ] && cp -R "$p" _site/
+          done
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: _site }
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,79 @@
+# macOS + iPhone builds of a release (started by the release script after Windows + Android are published).
+# The code is private (AneesAdwan/MTC-iPTv-src): it is checked out with a read-only deploy key.
+# Not signed with an Apple developer account (owner decision 2026-10-19):
+#   • macOS: .dmg — first open with right-click → Open (Gatekeeper).
+#   • iPhone: unsigned .ipa — install with AltStore / Sideloadly.
+name: Apple builds
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, e.g. v3.0.0-alpha.41'
+        required: true
+      ref:
+        description: 'Source ref to build (default: the tag)'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apple-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 75
+    env:
+      TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: AneesAdwan/MTC-iPTv-src
+          ref: ${{ inputs.ref || inputs.tag }}
+          ssh-key: ${{ secrets.SRC_DEPLOY_KEY }}
+
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, flutter-version: 3.47.7, cache: true }
+
+      - name: Dependencies + version (same flags as the Windows/Android release)
+        working-directory: mtc_iptv
+        run: |
+          flutter pub get
+          L=$(grep -m1 '^version:' pubspec.yaml | awk '{print $2}')
+          FULL="${L%%+*}"; BUILD="${L##*+}"; CORE="${FULL%%-*}"
+          echo "DEFS=--build-name=$CORE --build-number=$BUILD --dart-define=APP_VERSION=$FULL" >> "$GITHUB_ENV"
+
+      - name: macOS (.dmg)
+        working-directory: mtc_iptv
+        run: |
+          V="${TAG#v}"
+          flutter build macos --release $DEFS
+          APP=$(ls -d build/macos/Build/Products/Release/*.app | head -1)
+          mkdir -p dmg && cp -R "$APP" dmg/ && ln -s /Applications dmg/Applications
+          hdiutil create -volname "MTC-iPTv" -srcfolder dmg -ov -format UDZO "$RUNNER_TEMP/MTC-iPTv-$V-macos.dmg"
+
+      - name: iPhone (unsigned .ipa)
+        working-directory: mtc_iptv
+        run: |
+          V="${TAG#v}"
+          flutter build ios --release --no-codesign $DEFS
+          mkdir -p ipa/Payload && cp -R build/ios/iphoneos/Runner.app ipa/Payload/
+          (cd ipa && zip -qry "$RUNNER_TEMP/MTC-iPTv-$V-ios-unsigned.ipa" Payload)
+
+      - name: Add to the release (+ checksums)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V="${TAG#v}"
+          cd "$RUNNER_TEMP"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern 'SHA256SUMS.txt' --clobber || touch SHA256SUMS.txt
+          grep -v -e '-macos.dmg' -e '-ios-unsigned.ipa' SHA256SUMS.txt > sums.txt || true
+          shasum -a 256 "MTC-iPTv-$V-macos.dmg" "MTC-iPTv-$V-ios-unsigned.ipa" >> sums.txt
+          mv sums.txt SHA256SUMS.txt
+          gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
+            "MTC-iPTv-$V-macos.dmg#MTC-iPTv $V (macOS - right-click > Open the first time)" \
+            "MTC-iPTv-$V-ios-unsigned.ipa#MTC-iPTv $V (iPhone - unsigned, install with AltStore / Sideloadly)" \
+            "SHA256SUMS.txt#SHA256SUMS (file checksums)"
