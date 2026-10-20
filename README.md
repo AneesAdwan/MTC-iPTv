@@ -1,58 +1,97 @@
 <div align="center">
 
-<img src="https://aneesadwan.github.io/MTC-iPTv/img/app-icon-192.png" width="96" alt="MTC-iPTv">
+<img src="https://aneesadwan.github.io/MTC-iPTv/img/app-icon-192.png" width="110" alt="MTC-iPTv">
 
 # MTC-iPTv
 
-**بث مباشر لآلاف القنوات التلفزيونية من كل دول العالم — مجانًا، بجودة عالية، ومن أي جهاز.**
+### آلاف القنوات المباشرة من كل دول العالم — مجانًا، وعلى كل أجهزتك
 
-إحدى شركات **MTC-Group** — مجموعة شركات مركز تكنولوجيا الشرق الأوسط
-
-[🌐 الموقع](https://aneesadwan.github.io/MTC-iPTv/) · [⬇️ كل الإصدارات](https://github.com/AneesAdwan/MTC-iPTv/releases)
+[![Watch now](https://img.shields.io/badge/Watch_now-Website-FF2D55?style=for-the-badge&logo=googlechrome&logoColor=white)](https://aneesadwan.github.io/MTC-iPTv/)
+[![Download](https://img.shields.io/badge/Download-Windows_·_Android_·_Mac_·_iPhone-FF7A1A?style=for-the-badge&logo=github&logoColor=white)](https://github.com/AneesAdwan/MTC-iPTv/releases)
 
 </div>
 
----
+<div dir="rtl">
 
-## ⬇️ التحميل
+## ⬇️ حمّل التطبيق
 
-أحدث النسخ دائمًا في **[صفحة الإصدارات](https://github.com/AneesAdwan/MTC-iPTv/releases)** (أعلى إصدار)، أو من شريط «حمّل التطبيق» أعلى [الموقع](https://aneesadwan.github.io/MTC-iPTv/) — ضغطة واحدة تنزّل النسخة المناسبة لجهازك.
+افتح **[صفحة الإصدارات](https://github.com/AneesAdwan/MTC-iPTv/releases)** وحمّل من **أول إصدار بالأعلى** الملف المناسب لجهازك:
 
-| الجهاز | الملف | ملاحظات |
-|---|---|---|
-| 🪟 **ويندوز 10 / 11** | `…-windows-setup.exe` | أول تثبيت: «المزيد من المعلومات ← تشغيل على أي حال». بعدها يتحدّث البرنامج من داخله. |
-| 🤖 **أندرويد** (أغلب الهواتف) | `…-android-arm64-v8a.apk` | اسمح بالتثبيت من هذا المصدر. يتحدّث من داخل التطبيق. |
-| 📺 **أندرويد 32 بت** (هواتف قديمة، أجهزة تلفزيون) | `…-android-armeabi-v7a.apk` | |
-| 💻 **أندرويد x86_64** (Chromebook، المحاكيات) | `…-android-x86_64.apk` | |
-| 🍎 **ماك** | `…-macos.dmg` | اسحب التطبيق إلى Applications. أول مرة: **زر يمين ← فتح** (غير موقّع من آبل بعد). |
-| 📱 **آيفون** | `…-ios-unsigned.ipa` | غير موقّع: يُثبَّت عبر [AltStore](https://altstore.io) أو [Sideloadly](https://sideloadly.io) من الكمبيوتر، ويُعاد توقيعه كل 7 أيام. |
+| جهازك | الملف اللي بتحمّله |
+|:--|:--|
+| 🪟 **ويندوز** | الملف اللي آخره `windows-setup.exe` |
+| 🤖 **أندرويد** — أغلب الهواتف | الملف اللي آخره `arm64-v8a.apk` |
+| 📺 **أندرويد** — الهواتف القديمة وأجهزة التلفزيون | الملف اللي آخره `armeabi-v7a.apk` |
+| 🍎 **ماك** | الملف اللي آخره `macos.dmg` |
+| 📱 **آيفون** | الملف اللي آخره `ios-unsigned.ipa` |
 
-## ✨ المزايا
+> 💡 **أسهل طريقة:** ادخل على [الموقع](https://aneesadwan.github.io/MTC-iPTv/) — بأعلاه شريط «حمّل التطبيق» بيعرف جهازك وبيعطيك النسخة المناسبة بضغطة وحدة.
 
-- آلاف القنوات المباشرة مرتبة حسب الدولة والفئة واللغة، مع البحث والمفضلة.
-- دليل البرامج: الآن والتالي، وجدول كل قناة، والتذكير.
-- مشغّل متطور: اختيار الجودة والصوت والترجمة، تبديل السيرفر تلقائيًا، صورة داخل صورة، والتحكم بالريموت على التلفزيون.
-- قسم الرياضة: مباريات اليوم والنتائج المباشرة والقنوات الناقلة، ومتابعة الفرق.
-- حساب اختياري (البريد، Google، Apple، Facebook، Microsoft) مع إدارة الأجهزة.
-- واجهة عربية وإنجليزية، داكنة وفاتحة، على الهاتف والكمبيوتر والتلفزيون.
+## 🛠️ التثبيت
 
-## ℹ️ ملاحظة
+<details>
+<summary><b>🪟 ويندوز</b></summary>
 
-القنوات من روابط بث عامة ومجانية متاحة على الإنترنت، ولا تستضيف المنصة أي محتوى.
+1. شغّل الملف اللي حمّلته.
+2. إذا طلعت رسالة «Windows protected your PC» اضغط **More info** ثم **Run anyway**.
+3. بعد التثبيت البرنامج **بيتحدّث لحاله** كل ما ينزل إصدار جديد.
+
+</details>
+
+<details>
+<summary><b>🤖 أندرويد والتلفزيون</b></summary>
+
+1. افتح الملف اللي حمّلته.
+2. إذا طلب الإذن، اسمح **بالتثبيت من هذا المصدر** وارجع ثبّت.
+3. التحديثات الجديدة بتوصلك من داخل التطبيق.
+
+</details>
+
+<details>
+<summary><b>🍎 ماك</b></summary>
+
+1. افتح ملف `dmg` واسحب **MTC-iPTv** إلى مجلد **Applications**.
+2. **أول مرة فقط:** اضغط على التطبيق **بزر الماوس اليمين ← Open ← Open**.
+
+</details>
+
+<details>
+<summary><b>📱 آيفون</b></summary>
+
+نسخة الآيفون لسا مش على App Store، فبتنزل من الكمبيوتر عن طريق برنامج
+**[AltStore](https://altstore.io)** أو **[Sideloadly](https://sideloadly.io)**:
+افتح البرنامج، وصّل الآيفون بالكمبيوتر، واختار ملف `ipa` اللي حمّلته.
+
+</details>
+
+## ✨ شو فيه
+
+- 📡 **آلاف القنوات المباشرة** مرتّبة حسب الدولة والفئة واللغة، مع البحث والمفضلة.
+- 🗓️ **دليل البرامج:** شو بيعرض الآن وشو التالي، وجدول كل قناة، والتذكير بالبرامج.
+- ⚽ **رياضة:** مباريات اليوم والنتائج المباشرة والقنوات الناقلة، وتابع فرقك المفضلة.
+- 🖼️ **صورة داخل صورة:** كمّل المشاهدة بنافذة صغيرة فوق باقي البرامج.
+- 🔢 **انتقل للقناة برقمها**، ومشغّل سريع بيبدّل السيرفر لحاله إذا وقف البث.
+- 📺 **على كل الأجهزة:** الهاتف، الكمبيوتر، التلفزيون (بالريموت)، الماك والآيفون.
+- 🌙 **عربي وإنجليزي**، وضع داكن وفاتح.
+
+## ❓ أسئلة سريعة
+
+**هل هو مجاني؟** نعم، بالكامل.
+
+**ليش في قناة ما بتشتغل؟** القنوات من روابط بث عامة على الإنترنت وممكن تتوقف أحيانًا. التطبيق بيجرّب سيرفر تاني لحاله، وفيك تبلّغ عنها من زر 🚩 بالمشغّل.
+
+**كيف بتواصل معكم؟** من [الموقع](https://aneesadwan.github.io/MTC-iPTv/) أو من قسم «حول» داخل التطبيق.
+
+</div>
 
 ---
 
 <div align="center">
 
-© MTC-Group · برمجة وتطوير: **أنيس عدوان**
+**MTC-iPTv** · إحدى شركات **MTC-Group** — مجموعة شركات مركز تكنولوجيا الشرق الأوسط
+
+برمجة وتطوير: **أنيس عدوان**
+
+<sub>القنوات من روابط بث عامة ومجانية متاحة على الإنترنت، والمنصة لا تستضيف أي محتوى.</sub>
 
 </div>
-
----
-
-### English
-
-**MTC-iPTv** — thousands of live TV channels from every country, free, on any device. An **MTC-Group** company.
-Downloads for **Windows, Android (arm64 / armv7 / x86_64), macOS and iPhone** are attached to every
-[release](https://github.com/AneesAdwan/MTC-iPTv/releases). macOS: right-click → Open the first time (not notarized yet).
-iPhone: the `.ipa` is unsigned — install it with AltStore or Sideloadly. Channels come from public free streams; the platform hosts no content.
