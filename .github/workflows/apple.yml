@@ -77,3 +77,6 @@ jobs:
             "MTC-iPTv-$V-macos.dmg#MTC-iPTv $V (macOS - right-click > Open the first time)" \
             "MTC-iPTv-$V-ios-unsigned.ipa#MTC-iPTv $V (iPhone - unsigned, install with AltStore / Sideloadly)" \
             "SHA256SUMS.txt#SHA256SUMS (file checksums)"
+          # Fixed names on the "tv" release: short links in posts always give the newest build
+          cp "MTC-iPTv-$V-macos.dmg" MTC-iPTv-macos.dmg && cp "MTC-iPTv-$V-ios-unsigned.ipa" MTC-iPTv-ios.ipa
+          gh release upload tv --repo "$GITHUB_REPOSITORY" --clobber MTC-iPTv-macos.dmg MTC-iPTv-ios.ipa
