@@ -31,7 +31,7 @@ jobs:
       - name: Site files only
         run: |
           mkdir _site
-          for p in index.html config.js sw.js manifest.webmanifest .nojekyll src img download updates data; do
+          for p in index.html config.js sw.js manifest.webmanifest .nojekyll src img download beta updates data; do
             if [ -e "$p" ]; then cp -R "$p" _site/; fi   # a missing entry is skipped, never a failure
           done
       - uses: actions/upload-pages-artifact@v3
