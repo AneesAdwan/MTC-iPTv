@@ -34,6 +34,27 @@ jobs:
           for p in index.html config.js sw.js manifest.webmanifest .nojekyll src img download beta updates data; do
             if [ -e "$p" ]; then cp -R "$p" _site/; fi   # a missing entry is skipped, never a failure
           done
+      # The published catalog as one file (MTC-Panel plan §8.4): a fresh app install reads it from here instead of
+      # thousands of rows from the database, then asks the database only for what changed after its rev.
+      # Same rows as catalog_changes (the public function the apps use); a failure only skips the file.
+      - name: Catalog snapshot
+        continue-on-error: true
+        run: |
+          URL=$(jq -r .url data/backend.json); KEY=$(jq -r .anon_key data/backend.json)
+          since=0; echo '[]' > ch.json; echo '[]' > st.json
+          for i in $(seq 1 60); do
+            curl -sf --retry 3 "$URL/rest/v1/rpc/catalog_changes" -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+              -H 'Content-Type: application/json' -d "{\"since\":$since,\"max_rows\":2000}" > page.json
+            jq -s '.[0] + .[1].channels' ch.json page.json > t.json && mv t.json ch.json
+            jq -s '.[0] + .[1].streams' st.json page.json > t.json && mv t.json st.json
+            next=$(jq .rev page.json); more=$(jq .more page.json)
+            if [ "$more" != true ] || [ "$next" = "$since" ]; then since=$next; break; fi
+            since=$next
+          done
+          mkdir -p _site/data
+          jq -n --arg b "$URL" --argjson rev "$since" --slurpfile c ch.json --slurpfile s st.json \
+            '{v: 1, backend: $b, rev: $rev, at: (now | todate), channels: $c[0], streams: $s[0]}' | gzip -9 > _site/data/catalog.json.gz
+          echo "snapshot rev $since: $(jq length ch.json) channels, $(jq length st.json) links, $(stat -c %s _site/data/catalog.json.gz) bytes"
       - uses: actions/upload-pages-artifact@v3
         with: { path: _site }
       - id: deploy
