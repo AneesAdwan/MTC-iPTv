@@ -4,6 +4,10 @@
 name: Website
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/website.yml'
   workflow_dispatch:
   schedule:
     - cron: '23 */6 * * *'
