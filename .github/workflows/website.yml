@@ -1,5 +1,5 @@
 # The website (https://aneesadwan.github.io/MTC-iPTv/)
-# Rebuild after the VOD provider integration. The Windows update feed (updates/) is published from the
+# Publish MTC-iPTv 2.7.2 with the VOD provider integration. The Windows update feed (updates/) is published from the
 # private code (AneesAdwan/MTC-iPTv-src) — this repo only keeps the README and the releases.
 # Started by the release script and after site changes; also every 6 hours as a safety net.
 name: Website
@@ -33,6 +33,8 @@ jobs:
         with:
           repository: AneesAdwan/MTC-iPTv-src
           ssh-key: ${{ secrets.SRC_DEPLOY_KEY }}
+      - name: Validate VOD module syntax
+        run: node --check src/movies.js
       - name: Site files only
         run: |
           mkdir _site
