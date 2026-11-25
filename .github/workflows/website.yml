@@ -34,7 +34,7 @@ jobs:
           repository: AneesAdwan/MTC-iPTv-src
           ssh-key: ${{ secrets.SRC_DEPLOY_KEY }}
       - name: Validate VOD module syntax
-        run: node --check src/movies.js
+        run: node --input-type=module --check < src/movies.js
       - name: Site files only
         run: |
           mkdir _site
