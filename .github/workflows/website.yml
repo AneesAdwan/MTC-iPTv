@@ -61,6 +61,10 @@ jobs:
             '{v: 1, backend: $b, rev: $rev, at: (now | todate), channels: $c[0], streams: $s[0]}' | gzip -9 > _site/data/catalog.json.gz
           echo "snapshot rev $since: $(jq length ch.json) channels, $(jq length st.json) links, $(stat -c %s _site/data/catalog.json.gz) bytes"
       - uses: actions/upload-pages-artifact@v3
-        with: { path: _site }
+        with:
+          path: _site
+          name: github-pages-${{ github.run_attempt }}
       - id: deploy
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
