@@ -35,12 +35,28 @@ jobs:
           ssh-key: ${{ secrets.SRC_DEPLOY_KEY }}
       - name: Validate VOD module syntax
         run: node --input-type=module --check < src/movies.js
-      - name: Site files only
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.9
+          cache: false
+      - name: Build Flutter Web viewer
+        working-directory: mtc_iptv/web_portal
+        env:
+          MTC_GATEWAY_URL: ${{ vars.MTC_GATEWAY_URL }}
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test --platform chrome
+          flutter build web --release --base-href /MTC-iPTv/ --dart-define=MTC_GATEWAY_URL="$MTC_GATEWAY_URL"
+      - name: Assemble Pages artifact
         run: |
           mkdir _site
-          for p in index.html config.js sw.js manifest.webmanifest .nojekyll src img download beta updates data; do
-            if [ -e "$p" ]; then cp -R "$p" _site/; fi   # a missing entry is skipped, never a failure
+          cp index.html _site/legacy.html
+          for p in config.js sw.js manifest.webmanifest .nojekyll src img download beta updates data; do
+            if [ -e "$p" ]; then cp -R "$p" _site/; fi
           done
+          cp -R mtc_iptv/web_portal/build/web/. _site/
       # The published catalog as one file (MTC-Panel plan §8.4): a fresh app install reads it from here instead of
       # thousands of rows from the database, then asks the database only for what changed after its rev.
       # Same rows as catalog_changes (the public function the apps use); a failure only skips the file.
