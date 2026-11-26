@@ -39,7 +39,7 @@ jobs:
         with:
           channel: stable
           flutter-version: 3.47.9
-          cache: true
+          cache: false
       - name: Build Flutter Web viewer
         working-directory: mtc_iptv/web_portal
         env:
